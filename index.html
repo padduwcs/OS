@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Bài giảng Hệ điều hành bằng tiếng Việt, bám theo Operating System Concepts, ấn bản 10.">
+  <meta name="description" content="Bài giảng Hệ điều hành bằng tiếng Việt cho người mới bắt đầu, bám theo Operating System Concepts, 10th Edition, với hình minh họa, mô phỏng và bài tập có lời giải.">
   <title>OS · Hệ điều hành</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,14 +24,50 @@
   <main class="home" id="main" tabindex="-1">
     <div class="eyebrow">Operating System Concepts · 10th Edition</div>
     <h1>Học Hệ điều hành từ con số 0</h1>
-    <p class="lead">Mở một tệp trong lúc nghe nhạc, nộp bài cùng lúc với người khác, cuộn qua một bộ ảnh lớn. Bốn buổi đầu lần theo các thao tác quen thuộc này để giải thích cách hệ điều hành chia CPU, điều phối luồng và quản lý bộ nhớ.</p>
-    <p class="reading-cue">Tên buổi, chương và mục giữ nguyên như giáo trình, kèm chú thích tiếng Việt, để bạn vừa hiểu khái niệm vừa nắm được thuật ngữ gốc. Mỗi mô phỏng có câu hỏi “Đoán trước”, và cuối mỗi buổi có bài tập kèm lời giải cùng bảng thuật ngữ Anh–Việt.</p>
+    <p class="lead">Mỗi ngày bạn mở tệp, nghe nhạc, chạy nhiều ứng dụng cùng lúc mà hiếm khi tự hỏi vì sao chúng không giẫm lên nhau. Phía sau mọi thao tác đó là hệ điều hành, lớp phần mềm đứng giữa ứng dụng và phần cứng. Khóa học này giảng lại giáo trình <cite>Operating System Concepts</cite> bằng tiếng Việt, dành cho người chưa từng học về hệ điều hành, với mục tiêu giúp bạn hiểu bản chất các cơ chế chứ không chỉ thuộc định nghĩa.</p>
 
+    <h2 class="home-section">Môn học này nói về điều gì?</h2>
+    <p>Một chiếc máy tính chỉ có vài tài nguyên cốt lõi: CPU để chạy lệnh, bộ nhớ để chứa chương trình đang chạy, ổ lưu trữ để giữ dữ liệu lâu dài, và các thiết bị vào ra. Trong khi đó, hàng chục chương trình cùng muốn dùng những tài nguyên này cùng một lúc. Hệ điều hành là người đứng ra phân chia: nó quyết định chương trình nào được chạy, mỗi chương trình được dùng vùng nhớ nào, dữ liệu được cất ở đâu, và ai được phép làm gì. Đồng thời nó phải làm cho mọi thứ trông thật đơn giản với người dùng và người lập trình, như thể mỗi chương trình có riêng cả một chiếc máy.</p>
+    <p>Vì vậy môn học xoay quanh một chuỗi câu hỏi nối tiếp nhau. Hệ điều hành nằm ở đâu và làm sao nó giữ được quyền kiểm soát máy? Nó chia CPU cho nhiều chương trình ra sao? Khi nhiều chương trình cùng chạm vào một dữ liệu, làm sao để kết quả vẫn đúng? Làm sao nhiều chương trình cùng sống trong một bộ nhớ? Dữ liệu được cất giữ và tổ chức thành tệp thế nào, và làm sao bảo vệ chúng? Hình dưới đây cho thấy vị trí của hệ điều hành và buổi học nào trả lời câu hỏi nào.</p>
+    <figure class="fig">
+      <svg class="teaching-svg wide" viewBox="0 0 640 300" role="img" aria-labelledby="map-title">
+        <title id="map-title">Hệ điều hành nằm giữa ứng dụng và phần cứng; mỗi buổi học phụ trách một phần của nó</title>
+        <rect class="z-acc" x="4" y="6" width="632" height="54" rx="10"/>
+        <text x="320" y="30" text-anchor="middle">Ứng dụng</text>
+        <text class="annotation" x="320" y="49" text-anchor="middle">trình soạn thảo · trình phát nhạc · trình duyệt · máy chủ</text>
+        <rect class="z-violet" x="4" y="74" width="632" height="152" rx="10"/>
+        <text x="20" y="96">Hệ điều hành</text>
+        <text class="annotation" x="626" y="96" text-anchor="end">Buổi 1: OS là gì, giao tiếp qua system call</text>
+        <g class="map-box">
+          <rect x="20" y="108" width="190" height="50" rx="8"/><rect x="225" y="108" width="190" height="50" rx="8"/><rect x="430" y="108" width="190" height="50" rx="8"/>
+          <rect x="20" y="166" width="190" height="50" rx="8"/><rect x="225" y="166" width="190" height="50" rx="8"/><rect x="430" y="166" width="190" height="50" rx="8"/>
+        </g>
+        <text x="115" y="130" text-anchor="middle">Tiến trình, CPU</text><text class="annotation" x="115" y="149" text-anchor="middle">Buổi 2</text>
+        <text x="320" y="130" text-anchor="middle">Đồng bộ, bế tắc</text><text class="annotation" x="320" y="149" text-anchor="middle">Buổi 3</text>
+        <text x="525" y="130" text-anchor="middle">Bộ nhớ</text><text class="annotation" x="525" y="149" text-anchor="middle">Buổi 4</text>
+        <text x="115" y="188" text-anchor="middle">Lưu trữ, I/O</text><text class="annotation" x="115" y="207" text-anchor="middle">Buổi 5</text>
+        <text x="320" y="188" text-anchor="middle">Hệ thống tệp</text><text class="annotation" x="320" y="207" text-anchor="middle">Buổi 6</text>
+        <text x="525" y="188" text-anchor="middle">Bảo vệ, an ninh</text><text class="annotation" x="525" y="207" text-anchor="middle">Buổi 7</text>
+        <rect class="nd-soft" x="4" y="240" width="632" height="54" rx="10"/>
+        <text x="320" y="264" text-anchor="middle">Phần cứng</text>
+        <text class="annotation" x="320" y="283" text-anchor="middle">CPU · RAM · ổ lưu trữ · thiết bị vào ra · mạng</text>
+      </svg>
+      <figcaption><b>Bản đồ của khóa học.</b> Ứng dụng không chạm trực tiếp vào phần cứng mà đi qua hệ điều hành ở giữa. Buổi 1 giải thích hệ điều hành đứng ở đó bằng cách nào. Sáu ô ở giữa là sáu mảng việc chính của nó, mỗi mảng một buổi. Buổi 8 mở rộng ra máy ảo và nhiều máy nối mạng, còn Buổi 9 xem toàn bộ các ý tưởng ấy kết hợp lại trong hai hệ điều hành thật là Linux và Windows.</figcaption>
+    </figure>
+
+    <h2 class="home-section">Khóa học được tổ chức thế nào?</h2>
+    <p>Khóa học gồm 9 buổi, phủ toàn bộ phần lý thuyết chính của giáo trình từ Chapter 1 tới Chapter 21. Mỗi buổi là một cụm kiến thức lớn gồm hai tới ba chương liền nhau, được giảng như một bài học hoàn chỉnh chứ không chia vụn. Tên buổi, tên chương và tên từng mục giữ nguyên tiếng Anh như trong giáo trình, kèm chú thích tiếng Việt ngay bên dưới, để bạn vừa hiểu khái niệm vừa đối chiếu được với sách gốc. Thuật ngữ quan trọng cũng được ghi kèm tên tiếng Anh ở lần đầu xuất hiện.</p>
+    <p>Mỗi buổi học đi theo cùng một trình tự. Phần mở đầu cho bạn bức tranh tổng quan: buổi này trả lời những câu hỏi nào và nối tiếp buổi trước ra sao, kèm một ví dụ quen thuộc sẽ theo bạn suốt buổi. Mỗi chương mở bằng một đoạn dẫn cho biết chương sẽ đi theo thứ tự nào. Trong từng mục, bài giảng đặt vấn đề trước, cho bạn thấy vì sao cách làm đơn giản chưa đủ, rồi mới đi tới cơ chế và ví dụ cụ thể. Cuối buổi là bảng hệ thống hóa kiến thức, câu hỏi tự kiểm tra có lời giải, và bảng thuật ngữ Anh–Việt.</p>
+
+    <h2 class="home-section">Học thế nào cho hiệu quả?</h2>
+    <p>Hãy đọc các buổi theo thứ tự, vì mỗi buổi dựa trên kiến thức của buổi trước. Trong mỗi buổi, các mô phỏng không phải phần trang trí mà là một phần của bài giảng. Trước mỗi mô phỏng có một câu hỏi <b>Đoán trước</b>. Hãy dừng lại tự trả lời rồi mới bấm Bước tiếp, vì chỗ bạn đoán sai thường chính là chỗ đáng học nhất. Với những ví dụ có tính toán, như lập lịch CPU, thuật toán chủ ngân hàng hay thay trang, hãy thử tự làm trên giấy trước khi xem lời giải. Cuối cùng, phần câu hỏi tự kiểm tra là cách tốt nhất để biết bạn đã thật sự hiểu hay chỉ mới đọc qua.</p>
+
+    <h2 class="home-section">Các buổi đã sẵn sàng</h2>
     <div class="road course-road">
       <section class="ch">
         <div class="k">Buổi 1 · Chapter 1–2</div>
         <h2><a class="ch-go" href="buoi-1.html">Introduction &amp; Operating-System Structures <span class="arr" aria-hidden="true">→</span></a></h2>
-        <p>Tổng quan và cấu trúc hệ điều hành. Lần theo một thao tác mở tệp để thấy vì sao cần ngắt, DMA, bộ định thời và chế độ kép, rồi theo lời gọi <code>open()</code> qua ranh giới user–kernel và so sánh các cách tổ chức kernel.</p>
+        <p>Hệ điều hành là gì và đứng ở đâu trong máy tính. Theo một thao tác mở tệp để thấy vì sao cần ngắt, DMA, bộ định thời và chế độ kép, rồi theo lời gọi <code>open()</code> đi qua ranh giới giữa ứng dụng và kernel, và so sánh các cách tổ chức kernel.</p>
         <a class="l" href="buoi-1.html#chuong-1"><b>1</b><span>Introduction<small>Tổng quan về hệ điều hành</small></span></a>
         <a class="l" href="buoi-1.html#chuong-2"><b>2</b><span>Operating-System Structures<small>Cấu trúc hệ điều hành</small></span></a>
         <a class="l" href="buoi-1.html#mo-phong-io"><b aria-hidden="true">▶</b><span>Mô phỏng: đường dữ liệu và đường báo ngắt</span></a>
@@ -40,7 +76,7 @@
       <section class="ch">
         <div class="k">Buổi 2 · Chapter 3–5</div>
         <h2><a class="ch-go" href="buoi-2.html">Processes, Threads &amp; Concurrency, CPU Scheduling <span class="arr" aria-hidden="true">→</span></a></h2>
-        <p>Tiến trình, luồng và lập lịch CPU. Kernel phải nhớ gì để dừng một công việc rồi cho chạy tiếp, ứng dụng chia mình thành nhiều luồng ra sao, và khi nhiều việc cùng sẵn sàng thì chọn việc nào.</p>
+        <p>Đơn vị mà hệ điều hành quản lý là gì, một chương trình chia mình thành nhiều luồng ra sao, và khi nhiều việc cùng sẵn sàng thì chọn việc nào chạy trước. Tự tính và so sánh các thuật toán lập lịch bằng số liệu.</p>
         <a class="l" href="buoi-2.html#chuong-3"><b>3</b><span>Processes<small>Tiến trình</small></span></a>
         <a class="l" href="buoi-2.html#chuong-4"><b>4</b><span>Threads &amp; Concurrency<small>Luồng và tính đồng thời</small></span></a>
         <a class="l" href="buoi-2.html#chuong-5"><b>5</b><span>CPU Scheduling<small>Lập lịch CPU</small></span></a>
@@ -50,7 +86,7 @@
       <section class="ch">
         <div class="k">Buổi 3 · Chapter 6–8</div>
         <h2><a class="ch-go" href="buoi-3.html">Synchronization Tools, Synchronization Examples, Deadlocks <span class="arr" aria-hidden="true">→</span></a></h2>
-        <p>Công cụ đồng bộ, các bài toán đồng bộ và bế tắc. Bắt đầu từ một lần tăng bộ đếm bị mất, đi qua Peterson, lệnh nguyên tử, mutex, semaphore, monitor, rồi tới bế tắc và thuật toán chủ ngân hàng.</p>
+        <p>Vì sao hai luồng cùng tăng một biến đếm có thể làm mất một lần tăng, và cách sửa bằng lệnh nguyên tử, mutex, semaphore, monitor. Sau đó là bế tắc: khi nào xảy ra, và cách ngăn ngừa, tránh, phát hiện nó.</p>
         <a class="l" href="buoi-3.html#chuong-6"><b>6</b><span>Synchronization Tools<small>Công cụ đồng bộ</small></span></a>
         <a class="l" href="buoi-3.html#chuong-7"><b>7</b><span>Synchronization Examples<small>Các bài toán và ví dụ đồng bộ</small></span></a>
         <a class="l" href="buoi-3.html#chuong-8"><b>8</b><span>Deadlocks<small>Bế tắc</small></span></a>
@@ -60,7 +96,7 @@
       <section class="ch">
         <div class="k">Buổi 4 · Chapter 9–10</div>
         <h2><a class="ch-go" href="buoi-4.html">Main Memory &amp; Virtual Memory <span class="arr" aria-hidden="true">→</span></a></h2>
-        <p>Bộ nhớ chính và bộ nhớ ảo. Theo một lần đọc ảnh từ địa chỉ logic đến RAM: MMU, phân trang, TLB, lỗi trang, thay trang, rồi vì sao thêm khung đôi khi lại tăng lỗi và vì sao hệ thống có thể thrashing.</p>
+        <p>Làm sao nhiều tiến trình cùng sống trong một RAM, và làm sao chạy được chương trình lớn hơn cả RAM. Theo một lần đọc ảnh từ địa chỉ logic tới RAM: MMU, phân trang, TLB, lỗi trang, thay trang và thrashing.</p>
         <a class="l" href="buoi-4.html#chuong-9"><b>9</b><span>Main Memory<small>Bộ nhớ chính</small></span></a>
         <a class="l" href="buoi-4.html#chuong-10"><b>10</b><span>Virtual Memory<small>Bộ nhớ ảo</small></span></a>
         <a class="l" href="buoi-4.html#mo-phong-thay-trang"><b aria-hidden="true">▶</b><span>Mô phỏng: FIFO, OPT, LRU, Clock và nghịch lý Belady</span></a>
@@ -70,13 +106,13 @@
 
     <h2 class="home-road-title">Các buổi tiếp theo trong lộ trình</h2>
     <ol class="course-plan" start="5">
-      <li>Mass-Storage Structure &amp; I/O Systems <span>Chapter 11–12</span></li>
-      <li>File-System Interface, Implementation &amp; Internals <span>Chapter 13–15</span></li>
-      <li>Security &amp; Protection <span>Chapter 16–17</span></li>
-      <li>Virtual Machines, Networks &amp; Distributed Systems <span>Chapter 18–19</span></li>
-      <li>The Linux System &amp; Windows 10 <span>Chapter 20–21</span></li>
+      <li>Mass-Storage Structure &amp; I/O Systems <span>Chapter 11–12 · ổ đĩa, lập lịch ổ, RAID và hệ thống vào ra</span></li>
+      <li>File-System Interface, Implementation &amp; Internals <span>Chapter 13–15 · tệp, thư mục và cách hệ thống tệp được cài đặt</span></li>
+      <li>Security &amp; Protection <span>Chapter 16–17 · mối đe dọa, mật mã, xác thực và kiểm soát truy cập</span></li>
+      <li>Virtual Machines, Networks &amp; Distributed Systems <span>Chapter 18–19 · máy ảo, mạng và hệ thống tệp phân tán</span></li>
+      <li>The Linux System &amp; Windows 10 <span>Chapter 20–21 · hai hệ điều hành thật dưới góc nhìn toàn khóa</span></li>
     </ol>
-    <p class="src">Biên soạn theo <cite>Operating System Concepts</cite>, ấn bản 10 (2018) của Abraham Silberschatz, Peter Baer Galvin và Greg Gagne.</p>
+    <p class="src">Biên soạn theo Abraham Silberschatz, Peter Baer Galvin và Greg Gagne, <cite>Operating System Concepts</cite>, 10th Edition, Wiley, 2018. Tình huống, hình minh họa, mô phỏng và bài tập được soạn riêng cho khóa học này.</p>
   </main>
 </body>
 </html>

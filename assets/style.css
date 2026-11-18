@@ -763,3 +763,8 @@ h3 .vi{font-size:.74em}
 h4 .vi{font-size:.84em}
 .toc a{line-height:1.35;padding:4px 0}
 .teaching-svg tspan.sub{font-size:.72em;baseline-shift:sub}
+/* Trang giới thiệu */
+.home h2.home-section{display:block;font-size:1.35rem;margin:3rem 0 .8rem}
+.home h2.home-section+p{margin-top:0}
+.home .fig .teaching-svg .map-box rect{fill:var(--surface);stroke:var(--violet);stroke-width:1.4}
+.course-plan span{display:block;margin:.1rem 0 0}
