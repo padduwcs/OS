@@ -128,3 +128,18 @@ li[data-task='D'], li[data-task='M'] { color: var(--teal); background: var(--tea
 .schedule-meter{height:.55rem;background:var(--surface-2);border-radius:4px;overflow:hidden}
 .schedule-meter i{display:block;height:100%;border-radius:4px;background:var(--muted)}
 .schedule-measure>div:last-child i{background:var(--accent)}
+
+/* Gantt: vạch chia, mốc đến, màu theo việc */
+.schedule-ticks, .schedule-arrivals { position: relative; display: grid; grid-template-columns: repeat(var(--ticks), minmax(0, 1fr)); color: var(--muted); font-size: .68rem; font-variant-numeric: tabular-nums; }
+.schedule-ticks { margin-top: -.4rem; border-top: 1px solid var(--line-2); }
+.schedule-ticks span { padding-top: .15rem; border-left: 1px solid var(--line-2); padding-left: 2px; }
+.schedule-ticks span.schedule-end { position: absolute; right: 0; top: 0; border-left: 0; border-right: 1px solid var(--line-2); padding: .15rem 2px 0 0; }
+.schedule-ticks .is-now { color: var(--ink); font-weight: 700; }
+.schedule-arrivals { margin-bottom: -.35rem; min-height: 1rem; }
+.schedule-arrivals span { grid-row: 1; justify-self: start; color: var(--chance); font-weight: 600; white-space: nowrap; }
+.schedule-timeline { min-height: 2rem; background: repeating-linear-gradient(90deg, var(--surface-2) 0 calc(100% / var(--ticks) - 1px), var(--line) 0 calc(100% / var(--ticks))); border-radius: 4px; }
+.schedule-timeline li[data-task='A'] { background: var(--accent-soft); color: var(--accent-ink); box-shadow: inset 0 0 0 1px var(--accent); }
+.schedule-timeline li[data-task='B'] { background: var(--ok-soft); color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+.schedule-timeline li[data-task='C'] { background: var(--chance-soft); color: var(--chance); box-shadow: inset 0 0 0 1px var(--chance); }
+.schedule-timeline li[data-task='M'] { background: var(--violet-soft); color: var(--violet); box-shadow: inset 0 0 0 1px var(--violet); }
+.schedule-axis { display: none; }

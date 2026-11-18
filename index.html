@@ -22,58 +22,59 @@
     </button>
   </header>
   <main class="home" id="main" tabindex="-1">
-    <div class="eyebrow">Theo Operating System Concepts · Ấn bản&nbsp;10</div>
+    <div class="eyebrow">Operating System Concepts · 10th Edition</div>
     <h1>Học Hệ điều hành từ con số 0</h1>
     <p class="lead">Mở một tệp trong lúc nghe nhạc, nộp bài cùng lúc với người khác, cuộn qua một bộ ảnh lớn. Bốn buổi đầu lần theo các thao tác quen thuộc này để giải thích cách hệ điều hành chia CPU, điều phối luồng và quản lý bộ nhớ.</p>
+    <p class="reading-cue">Tên buổi, chương và mục giữ nguyên như giáo trình, kèm chú thích tiếng Việt, để bạn vừa hiểu khái niệm vừa nắm được thuật ngữ gốc. Mỗi mô phỏng có câu hỏi “Đoán trước”, và cuối mỗi buổi có bài tập kèm lời giải cùng bảng thuật ngữ Anh–Việt.</p>
 
     <div class="road course-road">
       <section class="ch">
-        <div class="k">Buổi 1 · Chương 1–2</div>
-        <h2><a class="ch-go" href="buoi-1.html">Nhập môn và cấu trúc hệ điều hành <span class="arr" aria-hidden="true">→</span></a></h2>
-        <p>Theo một yêu cầu mở tệp qua ứng dụng, kernel và thiết bị. Sơ đồ và mô phỏng từng bước giúp thấy dữ liệu đi đâu, CPU đổi lượt khi nào và quyền truy cập được kiểm tra ở đâu.</p>
-        <a class="l" href="buoi-1.html#chuong-1"><b>1</b><span>Hệ điều hành vận hành máy tính thế nào?</span></a>
-        <a class="l" href="buoi-1.html#chuong-2"><b>2</b><span>Ứng dụng giao tiếp với hệ điều hành thế nào?</span></a>
-        <a class="l" href="buoi-1.html#mo-phong-io"><b aria-hidden="true">▶</b><span>Thử mô phỏng đọc dữ liệu và phát ngắt</span></a>
-        <a class="l" href="buoi-1.html#tu-kiem-tra"><b aria-hidden="true">↳</b><span>Câu hỏi và bài tập tự kiểm tra</span></a>
+        <div class="k">Buổi 1 · Chapter 1–2</div>
+        <h2><a class="ch-go" href="buoi-1.html">Introduction &amp; Operating-System Structures <span class="arr" aria-hidden="true">→</span></a></h2>
+        <p>Tổng quan và cấu trúc hệ điều hành. Lần theo một thao tác mở tệp để thấy vì sao cần ngắt, DMA, bộ định thời và chế độ kép, rồi theo lời gọi <code>open()</code> qua ranh giới user–kernel và so sánh các cách tổ chức kernel.</p>
+        <a class="l" href="buoi-1.html#chuong-1"><b>1</b><span>Introduction<small>Tổng quan về hệ điều hành</small></span></a>
+        <a class="l" href="buoi-1.html#chuong-2"><b>2</b><span>Operating-System Structures<small>Cấu trúc hệ điều hành</small></span></a>
+        <a class="l" href="buoi-1.html#mo-phong-io"><b aria-hidden="true">▶</b><span>Mô phỏng: đường dữ liệu và đường báo ngắt</span></a>
+        <a class="l" href="buoi-1.html#tu-kiem-tra"><b aria-hidden="true">↳</b><span>Practice Exercises · bảng thuật ngữ</span></a>
       </section>
       <section class="ch">
-        <div class="k">Buổi 2 · Chương 3–5</div>
-        <h2><a class="ch-go" href="buoi-2.html">Tiến trình, luồng và lập lịch CPU <span class="arr" aria-hidden="true">→</span></a></h2>
-        <p>Theo dõi việc đọc tệp, lập chỉ mục và phát nhạc tranh lượt CPU. Thử đưa việc qua hàng đợi và so sánh cách các thuật toán cấp CPU.</p>
-        <a class="l" href="buoi-2.html#chuong-3"><b>3</b><span>Tiến trình, trạng thái và giao tiếp</span></a>
-        <a class="l" href="buoi-2.html#chuong-4"><b>4</b><span>Luồng, thực thi đồng thời và song song</span></a>
-        <a class="l" href="buoi-2.html#chuong-5"><b>5</b><span>Lập lịch CPU và thời gian đáp ứng</span></a>
-        <a class="l" href="buoi-2.html#mo-phong-lap-lich"><b aria-hidden="true">▶</b><span>Thử các thuật toán lập lịch</span></a>
-        <a class="l" href="buoi-2.html#tu-kiem-tra"><b aria-hidden="true">↳</b><span>Câu hỏi và bài tập tự kiểm tra</span></a>
+        <div class="k">Buổi 2 · Chapter 3–5</div>
+        <h2><a class="ch-go" href="buoi-2.html">Processes, Threads &amp; Concurrency, CPU Scheduling <span class="arr" aria-hidden="true">→</span></a></h2>
+        <p>Tiến trình, luồng và lập lịch CPU. Kernel phải nhớ gì để dừng một công việc rồi cho chạy tiếp, ứng dụng chia mình thành nhiều luồng ra sao, và khi nhiều việc cùng sẵn sàng thì chọn việc nào.</p>
+        <a class="l" href="buoi-2.html#chuong-3"><b>3</b><span>Processes<small>Tiến trình</small></span></a>
+        <a class="l" href="buoi-2.html#chuong-4"><b>4</b><span>Threads &amp; Concurrency<small>Luồng và tính đồng thời</small></span></a>
+        <a class="l" href="buoi-2.html#chuong-5"><b>5</b><span>CPU Scheduling<small>Lập lịch CPU</small></span></a>
+        <a class="l" href="buoi-2.html#mo-phong-lap-lich"><b aria-hidden="true">▶</b><span>Mô phỏng: tính và so sánh tám thuật toán lập lịch</span></a>
+        <a class="l" href="buoi-2.html#tu-kiem-tra"><b aria-hidden="true">↳</b><span>Practice Exercises · bảng thuật ngữ</span></a>
       </section>
       <section class="ch">
-        <div class="k">Buổi 3 · Chương 6–8</div>
-        <h2><a class="ch-go" href="buoi-3.html">Đồng bộ và bế tắc <span class="arr" aria-hidden="true">→</span></a></h2>
-        <p>Theo dõi hai lượt nộp bài cùng sửa bộ đếm, chờ hàng đợi và tranh tài nguyên. Thử dùng khóa, kiểm tra trạng thái an toàn và tìm những luồng đang bế tắc.</p>
-        <a class="l" href="buoi-3.html#chuong-6"><b>6</b><span>Vùng tới hạn, khóa và biến điều kiện</span></a>
-        <a class="l" href="buoi-3.html#chuong-7"><b>7</b><span>Bộ đệm hữu hạn và các bài toán đồng bộ</span></a>
-        <a class="l" href="buoi-3.html#chuong-8"><b>8</b><span>Ngăn ngừa, tránh và phát hiện bế tắc</span></a>
-        <a class="l" href="buoi-3.html#mo-phong-ngan-hang"><b aria-hidden="true">▶</b><span>Thử thuật toán chủ ngân hàng</span></a>
-        <a class="l" href="buoi-3.html#tu-kiem-tra"><b aria-hidden="true">↳</b><span>Câu hỏi và bài tập tự kiểm tra</span></a>
+        <div class="k">Buổi 3 · Chapter 6–8</div>
+        <h2><a class="ch-go" href="buoi-3.html">Synchronization Tools, Synchronization Examples, Deadlocks <span class="arr" aria-hidden="true">→</span></a></h2>
+        <p>Công cụ đồng bộ, các bài toán đồng bộ và bế tắc. Bắt đầu từ một lần tăng bộ đếm bị mất, đi qua Peterson, lệnh nguyên tử, mutex, semaphore, monitor, rồi tới bế tắc và thuật toán chủ ngân hàng.</p>
+        <a class="l" href="buoi-3.html#chuong-6"><b>6</b><span>Synchronization Tools<small>Công cụ đồng bộ</small></span></a>
+        <a class="l" href="buoi-3.html#chuong-7"><b>7</b><span>Synchronization Examples<small>Các bài toán và ví dụ đồng bộ</small></span></a>
+        <a class="l" href="buoi-3.html#chuong-8"><b>8</b><span>Deadlocks<small>Bế tắc</small></span></a>
+        <a class="l" href="buoi-3.html#mo-phong-ngan-hang"><b aria-hidden="true">▶</b><span>Mô phỏng: thuật toán chủ ngân hàng</span></a>
+        <a class="l" href="buoi-3.html#tu-kiem-tra"><b aria-hidden="true">↳</b><span>Practice Exercises · bảng thuật ngữ</span></a>
       </section>
       <section class="ch">
-        <div class="k">Buổi 4 · Chương 9–10</div>
-        <h2><a class="ch-go" href="buoi-4.html">Bộ nhớ chính và bộ nhớ ảo <span class="arr" aria-hidden="true">→</span></a></h2>
-        <p>Theo một lần đọc ảnh từ địa chỉ ảo đến RAM. Thử xử lý lỗi trang, chọn khung để thu hồi và xem vì sao thêm khung đôi khi làm tăng số lỗi.</p>
-        <a class="l" href="buoi-4.html#chuong-9"><b>9</b><span>Cấp phát, phân trang và dịch địa chỉ</span></a>
-        <a class="l" href="buoi-4.html#chuong-10"><b>10</b><span>Nạp theo yêu cầu và quản lý khung</span></a>
-        <a class="l" href="buoi-4.html#mo-phong-thay-trang"><b aria-hidden="true">▶</b><span>So sánh các thuật toán thay trang</span></a>
-        <a class="l" href="buoi-4.html#tu-kiem-tra"><b aria-hidden="true">↳</b><span>Câu hỏi và bài tập tự kiểm tra</span></a>
+        <div class="k">Buổi 4 · Chapter 9–10</div>
+        <h2><a class="ch-go" href="buoi-4.html">Main Memory &amp; Virtual Memory <span class="arr" aria-hidden="true">→</span></a></h2>
+        <p>Bộ nhớ chính và bộ nhớ ảo. Theo một lần đọc ảnh từ địa chỉ logic đến RAM: MMU, phân trang, TLB, lỗi trang, thay trang, rồi vì sao thêm khung đôi khi lại tăng lỗi và vì sao hệ thống có thể thrashing.</p>
+        <a class="l" href="buoi-4.html#chuong-9"><b>9</b><span>Main Memory<small>Bộ nhớ chính</small></span></a>
+        <a class="l" href="buoi-4.html#chuong-10"><b>10</b><span>Virtual Memory<small>Bộ nhớ ảo</small></span></a>
+        <a class="l" href="buoi-4.html#mo-phong-thay-trang"><b aria-hidden="true">▶</b><span>Mô phỏng: FIFO, OPT, LRU, Clock và nghịch lý Belady</span></a>
+        <a class="l" href="buoi-4.html#tu-kiem-tra"><b aria-hidden="true">↳</b><span>Practice Exercises · bảng thuật ngữ</span></a>
       </section>
     </div>
 
     <h2 class="home-road-title">Các buổi tiếp theo trong lộ trình</h2>
     <ol class="course-plan" start="5">
-      <li>Lưu trữ thứ cấp và hệ thống I/O <span>Chương 11–12</span></li>
-      <li>Hệ thống tệp <span>Chương 13–15</span></li>
-      <li>An ninh và bảo vệ <span>Chương 16–17</span></li>
-      <li>Máy ảo, mạng và hệ thống phân tán <span>Chương 18–19</span></li>
-      <li>Linux và Windows 10 <span>Chương 20–21</span></li>
+      <li>Mass-Storage Structure &amp; I/O Systems <span>Chapter 11–12</span></li>
+      <li>File-System Interface, Implementation &amp; Internals <span>Chapter 13–15</span></li>
+      <li>Security &amp; Protection <span>Chapter 16–17</span></li>
+      <li>Virtual Machines, Networks &amp; Distributed Systems <span>Chapter 18–19</span></li>
+      <li>The Linux System &amp; Windows 10 <span>Chapter 20–21</span></li>
     </ol>
     <p class="src">Biên soạn theo <cite>Operating System Concepts</cite>, ấn bản 10 (2018) của Abraham Silberschatz, Peter Baer Galvin và Greg Gagne.</p>
   </main>

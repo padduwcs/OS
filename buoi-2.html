@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Buổi 2 Hệ điều hành. Tự học về tiến trình, luồng, thực thi đồng thời và lập lịch CPU qua sơ đồ, mô phỏng và bài tập có lời giải.">
-  <title>Buổi 2 · Tiến trình, luồng và lập lịch CPU · PADOS</title>
+  <title>Buổi 2 · Processes, Threads &amp; Concurrency, CPU Scheduling · PADOS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
@@ -21,7 +21,7 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M9.5 4.5v15"/></svg>
     </button>
     <a class="brand" href="index.html">PADOS</a>
-    <span class="crumb">Buổi 2 · Tiến trình, luồng và lập lịch CPU</span>
+    <span class="crumb">Buổi 2 · Processes, Threads &amp; Concurrency, CPU Scheduling</span>
     <span class="spacer"></span>
     <button class="icon-btn print-btn" type="button" title="In bài" aria-label="In bài" hidden>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V4h10v5"/><rect x="3.5" y="9" width="17" height="8" rx="2"/><rect x="7" y="14" width="10" height="6"/></svg>
@@ -35,51 +35,84 @@
     <aside class="sidebar" id="sidebar">
       <nav aria-label="Mục lục buổi học">
         <div class="nav-chapter">
-          <a class="nav-chapter-title" href="#chuong-3">Chương 3 · Tiến trình</a>
+          <a class="nav-chapter-title" href="#chuong-3">Chapter 3 · Processes</a>
           <div class="toc">
-            <a href="#trang-thai">3.1–3.2 · Trạng thái và chuyển ngữ cảnh</a>
-            <a href="#tao-tien-trinh">3.3 · Tạo và kết thúc tiến trình</a>
-            <a href="#ipc">3.4–3.7 · Giao tiếp liên tiến trình</a>
-            <a href="#client-server">3.8 · Socket và RPC</a>
+            <a href="#trang-thai">3.1 · Process Concept</a>
+            <a href="#lap-lich-tien-trinh">3.2 · Process Scheduling</a>
+            <a href="#tao-tien-trinh">3.3 · Operations on Processes</a>
+            <a href="#ipc">3.4 · Interprocess Communication</a>
+            <a href="#ipc-bo-nho-chung">3.5 · IPC in Shared-Memory Systems</a>
+            <a href="#ipc-thong-diep">3.6 · IPC in Message-Passing Systems</a>
+            <a href="#vi-du-ipc">3.7 · Examples of IPC Systems</a>
+            <a href="#client-server">3.8 · Communication in Client–Server Systems</a>
           </div>
         </div>
         <div class="nav-chapter">
-          <a class="nav-chapter-title" href="#chuong-4">Chương 4 · Luồng</a>
+          <a class="nav-chapter-title" href="#chuong-4">Chapter 4 · Threads &amp; Concurrency</a>
           <div class="toc">
-            <a href="#chia-luong">4.1–4.2 · Đồng thời và song song</a>
-            <a href="#anh-xa">4.3–4.4 · Ánh xạ luồng và API</a>
-            <a href="#giao-viec">4.5 · Giao tác vụ cho thư viện</a>
-            <a href="#vong-doi-luong">4.6–4.7 · Vòng đời luồng</a>
+            <a href="#chia-luong">4.1 · Overview</a>
+            <a href="#lap-trinh-da-loi">4.2 · Multicore Programming</a>
+            <a href="#anh-xa">4.3 · Multithreading Models</a>
+            <a href="#thu-vien-luong">4.4 · Thread Libraries</a>
+            <a href="#giao-viec">4.5 · Implicit Threading</a>
+            <a href="#vong-doi-luong">4.6 · Threading Issues</a>
+            <a href="#vi-du-luong">4.7 · Operating-System Examples</a>
           </div>
         </div>
         <div class="nav-chapter">
-          <a class="nav-chapter-title" href="#chuong-5">Chương 5 · Lập lịch CPU</a>
+          <a class="nav-chapter-title" href="#chuong-5">Chapter 5 · CPU Scheduling</a>
           <div class="toc">
-            <a href="#tieu-chi">5.1–5.2 · Quyết định và thước đo</a>
-            <a href="#thuat-toan">5.3 · Thuật toán lập lịch</a>
-            <a href="#lap-lich-da-loi">5.4–5.5 · Lập lịch luồng và đa lõi</a>
-            <a href="#thoi-gian-thuc">5.6 · Lập lịch thời gian thực</a>
-            <a href="#danh-gia">5.7–5.8 · Hệ điều hành và đánh giá</a>
+            <a href="#tieu-chi">5.1 · Basic Concepts</a>
+            <a href="#tieu-chi-danh-gia">5.2 · Scheduling Criteria</a>
+            <a href="#thuat-toan">5.3 · Scheduling Algorithms</a>
+            <a href="#lap-lich-da-loi">5.4 · Thread Scheduling</a>
+            <a href="#lap-lich-da-xu-ly">5.5 · Multi-Processor Scheduling</a>
+            <a href="#thoi-gian-thuc">5.6 · Real-Time CPU Scheduling</a>
+            <a href="#vi-du-lap-lich">5.7 · Operating-System Examples</a>
+            <a href="#danh-gia">5.8 · Algorithm Evaluation</a>
           </div>
         </div>
         <div class="nav-chapter">
-          <a class="nav-chapter-title" href="#ghi-nho">Ghi nhớ</a>
-          <div class="toc"><a href="#tu-kiem-tra">Câu hỏi tự kiểm tra</a><a href="#giao-trinh">Giáo trình</a></div>
+          <a class="nav-chapter-title" href="#ghi-nho">Summary &amp; Review</a>
+          <div class="toc">
+            <a href="#tu-kiem-tra">Practice Exercises</a>
+            <a href="#thuat-ngu">Glossary</a>
+            <a href="#giao-trinh">Textbook Reference</a>
+          </div>
         </div>
       </nav>
     </aside>
     <main class="page" id="main" tabindex="-1"><article class="content">
       <header class="hero">
-        <div class="eyebrow">Buổi 2 · Chương 3–5</div>
-        <h1>Tiến trình, luồng và lập lịch CPU</h1>
+        <div class="eyebrow">Buổi 2 · Chapter 3–5</div>
+        <h1>Processes, Threads &amp; Concurrency, CPU Scheduling</h1>
+        <p class="title-vi">Tiến trình, luồng và lập lịch CPU</p>
         <p class="lead">Tệp <code>baihoc.txt</code> đã mở. Bạn gõ một từ để tìm trong khi trình soạn thảo vẫn đang quét tài liệu và nhạc vẫn phát. Trên máy một lõi, mỗi công việc cần một lượt CPU. Nếu bộ lập lịch chọn quét nốt cả tệp trước, phím vừa gõ và đoạn nhạc tiếp theo phải đợi. Muốn chia lượt hợp lý, trước hết cần biết công việc nào đã sẵn sàng và làm sao nó tiếp tục đúng chỗ sau khi nhường lõi.</p>
-        <p class="reading-cue">Trong <a href="buoi-1.html#mo-phong-cpu">lượt đọc tệp ở buổi trước</a>, ổ báo đã đọc xong, nhưng trình phát nhạc vẫn được giữ lượt. Ta sẽ bắt đầu từ khoảnh khắc đó.</p>
+        <p class="reading-cue">Trong <a href="buoi-1.html#mo-phong-cpu">lượt đọc tệp ở buổi trước</a>, ổ báo đã đọc xong, nhưng trình phát nhạc vẫn được giữ lượt. Ta sẽ bắt đầu từ khoảnh khắc đó, và đặt ba câu hỏi theo thứ tự: kernel phải nhớ gì về mỗi công việc để dừng nó giữa chừng rồi cho chạy tiếp? Một ứng dụng chia mình thành nhiều dòng thực thi bằng cách nào? Và khi nhiều dòng cùng sẵn sàng, chọn dòng nào?</p>
+        <div class="meta">
+          <div>
+            <h4>Sau buổi này, bạn giải thích được</h4>
+            <ul>
+              <li>PCB chứa gì và vì sao chuyển ngữ cảnh tốn chi phí;</li>
+              <li><code>fork</code>, <code>exec</code>, <code>wait</code> phối hợp ra sao, zombie và mồ côi từ đâu ra;</li>
+              <li>khi nào nên dùng luồng thay cho tiến trình, và giới hạn của việc thêm lõi;</li>
+              <li>tự tính lịch FCFS, SJF, SRTF, RR, ưu tiên, MLFQ và so sánh bằng số liệu.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>Cần biết trước</h4>
+            <p>Buổi 1: ngắt, timer, chế độ kép và system call. Biết đọc mã C có con trỏ.</p>
+            <h4>Mạch của buổi học</h4>
+            <p>Chương 3 dựng nên <em>đơn vị</em> mà kernel quản lý. Chương 4 chia nhỏ đơn vị đó. Chương 5 quyết định đơn vị nào được chạy. Mỗi chương trả lời một câu hỏi mà chương trước để lại.</p>
+          </div>
+        </div>
       </header>
 
       <section aria-labelledby="chuong-3">
-        <h2 id="chuong-3"><span class="sec">3</span>Tiến trình giữ lại điều gì khi CPU đổi việc?</h2>
-        <h3 id="trang-thai">3.1–3.2 · Từ chương trình đến tiến trình đang chạy</h3>
-        <p>Mở hai bản độc lập của trình soạn thảo và gõ ở một bên. Hai cửa sổ xuất phát từ cùng tệp thực thi, nhưng mỗi bên đang sửa một nội dung và có thể dừng ở một lệnh khác nhau. Hệ điều hành gọi mỗi lần thực thi có trạng thái và tài nguyên riêng như vậy là một <dfn>tiến trình</dfn> (<span class="en">process</span>). Kernel đặt một định danh (<span class="en">process identifier, PID</span>) để theo dõi từng tiến trình.</p>
+        <h2 id="chuong-3"><span class="sec">3</span><span>Processes <span class="vi">Tiến trình</span></span></h2>
+        <h3 id="trang-thai">3.1 · Process Concept <span class="vi">Khái niệm tiến trình</span></h3>
+        <div class="box problem"><div class="box-h">Thí nghiệm tư duy: dừng giữa chừng</div><p>Trình soạn thảo đang ở giữa vòng lặp đếm từ, biến đếm đang là 1.207 và nằm trong một thanh ghi. Timer ngắt, kernel cho trình phát nhạc chạy 4 ms, rồi trả CPU lại. Muốn trình soạn thảo chạy tiếp như chưa hề bị gián đoạn, kernel phải cất đi những gì? Thử liệt kê trước khi đọc tiếp.</p></div>
+        <p>Danh sách tối thiểu gồm: lệnh kế tiếp nằm ở đâu, giá trị mọi thanh ghi, và bộ nhớ của chương trình, gồm mã, biến, vùng đệm và ngăn xếp lời gọi hàm. Kernel còn cần biết chương trình đang mở những tệp nào và nó đang chờ gì. Chương trình nằm trên ổ không có những thứ đó. Nó là thực thể <em>thụ động</em>. Khi được nạp và chạy, nó trở thành thực thể <em>chủ động</em> có đủ trạng thái trên, gọi là <dfn>tiến trình</dfn> (<span class="en">process</span>). Mở hai cửa sổ trình soạn thảo từ cùng một tệp thực thi cho ra hai tiến trình: chung mã, nhưng mỗi bên có dữ liệu riêng và có thể dừng ở hai lệnh khác nhau. Kernel gán cho mỗi tiến trình một định danh (<span class="en">process identifier, PID</span>).</p>
         <p>Tiến trình nhìn thấy một <dfn>không gian địa chỉ</dfn> (<span class="en">address space</span>). Khi mở tệp, nó thực thi lệnh trong vùng mã, dùng biến toàn cục ở vùng dữ liệu, có thể xin vùng đệm từ vùng cấp phát động (<span class="en">heap</span>) và giữ biến cục bộ cùng địa chỉ trở về của lời gọi hàm trên ngăn xếp (<span class="en">stack</span>). Bộ đếm chương trình (<span class="en">program counter, PC</span>) và các thanh ghi CPU ghi lại dòng thực thi đang ở đâu và đang tính với giá trị nào.</p>
         <figure class="fig">
           <div class="process-layout">
@@ -115,10 +148,36 @@
           </svg>
           <figcaption>Khi hết lượt, tiến trình đi theo đường phía trên. Khi phải đợi thiết bị, nó đi vòng xuống dưới. Cả hai đường tới <em>Sẵn sàng</em> đều còn một bước cấp CPU. Các lý do chờ khác cũng có thể đi theo đường dưới.</figcaption>
         </figure>
+        <div class="box predict"><div class="box-h">Đoán trước</div><p>Khi ổ báo đọc xong, A rời hàng chờ thiết bị. A sẽ vào thẳng CPU hay vào hàng sẵn sàng? Nếu lúc đó B đang chạy, điều gì quyết định B có bị ngắt lượt không?</p></div>
         <div id="mo-phong-tien-trinh" data-lab="process"></div>
-        <p>Việc đọc tệp thường có nhiều đợt chạy ngắn xen với thời gian đợi thiết bị. Đó là việc thiên về I/O (<span class="en">I/O-bound</span>). Việc lập chỉ mục trên dữ liệu đã nằm trong RAM có thể dành phần lớn thời gian để tính, tức thiên về CPU (<span class="en">CPU-bound</span>). Sự khác biệt này sẽ ảnh hưởng đến cách ta chia lượt CPU ở Chương 5.</p>
+        <h3 id="lap-lich-tien-trinh">3.2 · Process Scheduling <span class="vi">Lập lịch tiến trình</span></h3>
+        <p>Mục tiêu của đa chương trình là để CPU luôn có việc. Mục tiêu của chia sẻ thời gian là đổi CPU giữa các tiến trình đủ thường xuyên để người dùng tương tác được với từng chương trình. Thành phần chọn tiến trình sẵn sàng tiếp theo cho CPU là <dfn>bộ lập lịch tiến trình</dfn> (<span class="en">process scheduler</span>). Việc đọc tệp thường có nhiều đợt chạy ngắn xen với thời gian đợi thiết bị. Đó là việc thiên về I/O (<span class="en">I/O-bound</span>). Việc lập chỉ mục trên dữ liệu đã nằm trong RAM có thể dành phần lớn thời gian để tính, tức thiên về CPU (<span class="en">CPU-bound</span>). Sự khác biệt này sẽ ảnh hưởng đến cách ta chia lượt CPU ở Chương 5.</p>
+        <p>Các “hàng” trong sơ đồ trạng thái là cấu trúc dữ liệu thật trong kernel. Hàng sẵn sàng thường là một danh sách liên kết các PCB. Mỗi thiết bị hay sự kiện có một <dfn>hàng chờ</dfn> (<span class="en">wait queue</span>) riêng. Đường đi của một tiến trình vì vậy là một vòng lặp: được chọn, chạy, rồi rời CPU vì một trong vài lý do, và cuối cùng quay về hàng sẵn sàng.</p>
+        <figure class="fig">
+          <svg class="teaching-svg wide" viewBox="0 0 640 240" role="img" aria-labelledby="queue-map-title">
+            <title id="queue-map-title">Sơ đồ hàng đợi: hàng sẵn sàng gồm các PCB, CPU, và các lối quay về qua hàng chờ</title>
+            <defs><marker id="queue-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrowhead" d="M0 0L10 5L0 10z"/></marker></defs>
+            <text class="annotation" x="20" y="20">hàng sẵn sàng (danh sách PCB)</text>
+            <rect class="ready-node" x="20" y="30" width="58" height="36" rx="6"/><text class="annotation" x="49" y="53" text-anchor="middle">PCB 7</text>
+            <rect class="ready-node" x="96" y="30" width="58" height="36" rx="6"/><text class="annotation" x="125" y="53" text-anchor="middle">PCB 2</text>
+            <rect class="ready-node" x="172" y="30" width="58" height="36" rx="6"/><text class="annotation" x="201" y="53" text-anchor="middle">PCB 9</text>
+            <g class="route" marker-end="url(#queue-arrow)"><path d="M78 48H94"/><path d="M154 48H170"/><path d="M230 48H298"/><path d="M380 48H426"/><path d="M400 110H334"/><path d="M400 210H334"/><path d="M8 210V48H18"/></g>
+            <rect class="running-node" x="300" y="28" width="80" height="40" rx="8"/><text x="340" y="53" text-anchor="middle">CPU</text>
+            <text class="annotation" x="432" y="53">kết thúc</text>
+            <path class="route" d="M400 48V210M190 110H8M400 160H8M190 210H8"/>
+            <rect class="waiting-node" x="190" y="94" width="142" height="32" rx="6"/><text class="annotation" x="261" y="115" text-anchor="middle">hàng chờ I/O</text>
+            <rect class="waiting-node" x="190" y="194" width="142" height="32" rx="6"/><text class="annotation" x="261" y="215" text-anchor="middle">chờ tiến trình con</text>
+            <text class="annotation" x="410" y="114">yêu cầu I/O</text>
+            <text class="annotation" x="410" y="164">hết lượng tử (ngắt timer)</text>
+            <text class="annotation" x="410" y="214">fork() rồi wait()</text>
+          </svg>
+          <figcaption><b>Sơ đồ hàng đợi.</b> Hình chữ nhật là hàng, mũi tên là đường đi của PCB. Tiến trình rời CPU vì phải chờ I/O, vì hết lượng tử hay vì chờ tiến trình con, rồi quay về hàng sẵn sàng khi sự kiện xảy ra. Lối chờ một ngắt khác cũng theo cùng kiểu đó.</figcaption>
+        </figure>
+        <p>Bộ lập lịch CPU chạy rất thường xuyên, thường ít nhất một lần mỗi 100 ms, nên mỗi lần chuyển ngữ cảnh phải nhanh. Chuyển ngữ cảnh là <em>chi phí thuần</em>: trong lúc đó không tiến trình nào làm được việc có ích. Thời gian chuyển thường cỡ vài micro giây và phụ thuộc phần cứng. Có bộ xử lý cung cấp nhiều bộ thanh ghi, nên chuyển ngữ cảnh chỉ cần đổi con trỏ sang bộ khác. Số tiến trình đang nằm trong bộ nhớ gọi là <dfn>mức độ đa chương trình</dfn> (<span class="en">degree of multiprogramming</span>). Khi bộ nhớ quá tải, một số hệ thống tạm đưa cả tiến trình ra ổ rồi nạp lại sau. Kỹ thuật này gọi là <span class="en">swapping</span>, sẽ quay lại ở Buổi 4.</p>
+        <p>Điện thoại đặt ra ràng buộc khác: màn hình nhỏ, pin có hạn. iOS thời đầu chỉ cho một ứng dụng tiền cảnh chạy, các ứng dụng khác bị tạm dừng. Về sau iOS cho chạy một số loại việc nền có giới hạn. Android từ đầu đã cho ứng dụng nền chạy tiếp qua <em>service</em>, một thành phần không có giao diện, nên ứng dụng phát nhạc vẫn chạy khi bị đẩy ra hậu cảnh.</p>
 
-        <h3 id="tao-tien-trinh">3.3 · Tạo tiến trình con để chạy công việc riêng</h3>
+        <h3 id="tao-tien-trinh">3.3 · Operations on Processes <span class="vi">Các thao tác trên tiến trình</span></h3>
+        <p>Mọi tiến trình đều do một tiến trình khác tạo ra, nên chúng hợp thành một cây. Trên Linux, gốc cây là <code>systemd</code> với PID 1, tiến trình đầu tiên mà kernel tạo khi khởi động. Nó sinh ra các dịch vụ và phiên đăng nhập, phiên đăng nhập sinh ra shell, shell sinh ra các lệnh bạn gõ. Lệnh <code>ps -el</code> hay <code>pstree</code> cho bạn xem cây này trên máy thật.</p>
         <p>Giả sử trình soạn thảo gọi một tiện ích lập chỉ mục để lấy kết quả qua một kênh riêng. Trên Unix, <code>fork()</code> tạo một <dfn>tiến trình con</dfn> (<span class="en">child process</span>). Hai bên tiếp tục từ sau lời gọi. Tiến trình cha nhận PID của con, con nhận 0. Giá trị âm báo thất bại cho bên gọi. Con bắt đầu với bản sao logic của không gian địa chỉ cha. Các mô tả tệp được thừa kế có thể tham chiếu đến cùng đối tượng tệp mở, nên cần đóng các đầu kênh mà mỗi bên không dùng.</p>
         <p>Bên con gọi một hàm thuộc họ <code>exec</code> để thay ảnh chương trình trong chính tiến trình đó bằng tiện ích mới. PID giữ nguyên và khi thành công lệnh chạy bắt đầu tại chương trình mới. Bên cha có thể làm việc tiếp, hoặc dùng <code>wait()</code> hay <code>waitpid()</code> để thu trạng thái thoát của con khi cần. Lịch chạy quyết định bên nào chạy trước. Windows dùng cách gọi khác, chẳng hạn <code>CreateProcess()</code> tạo tiến trình cùng luồng ban đầu cho chương trình đã chỉ định.</p>
         <figure class="fig">
@@ -130,9 +189,11 @@
           <figcaption><b>Một lời gọi thành công tạo hai đường thực thi.</b> Mỗi nhánh nhận giá trị trả về riêng. Sau <code>exec</code>, nhánh con vẫn mang PID 41. Vị trí hai nhánh thể hiện quan hệ cha–con, không ấn định thứ tự chạy.</figcaption>
         </figure>
         <p>Khi con thoát, kernel thu hồi phần lớn tài nguyên và giữ một mục có trạng thái thoát để cha thu nhận. Con đã thoát nhưng còn mục này được gọi là <dfn>tiến trình zombie</dfn>. Nếu cha kết thúc lúc con còn sống, con trở thành <dfn>tiến trình mồ côi</dfn> (<span class="en">orphan process</span>). Trên hệ Unix/Linux, một tiến trình nhận nuôi thích hợp sẽ thu trạng thái khi con thoát. Một số hệ thống có thể chấm dứt các tiến trình con theo dây chuyền. Các quy tắc đó thuộc vòng đời tiến trình và khác với việc tạm chờ CPU hay I/O.</p>
+        <p>Đôi khi chính hệ thống phải chủ động kết thúc tiến trình. Điện thoại Android thiếu bộ nhớ sẽ thu hồi tiến trình theo một <em>thứ bậc quan trọng</em>: tiến trình tiền cảnh mà người dùng đang thao tác, tiến trình còn hiện trên màn hình, tiến trình chạy service như phát nhạc, tiến trình hậu cảnh, và tiến trình rỗng không còn thành phần nào. Android kết thúc từ cuối danh sách lên. Ứng dụng được khuyến khích lưu trạng thái trước khi bị đẩy ra hậu cảnh, để người dùng quay lại vẫn thấy như cũ.</p>
 
-        <h3 id="ipc">3.4–3.7 · Tiến trình trao dữ liệu cho nhau thế nào?</h3>
-        <p>Tiện ích lập chỉ mục có không gian địa chỉ riêng. Để gửi các mục tìm thấy về trình soạn thảo, hai bên dùng <dfn>giao tiếp liên tiến trình</dfn> (<span class="en">interprocess communication, IPC</span>). Ở đây tiện ích là <dfn>bên sản xuất</dfn> (<span class="en">producer</span>) và trình soạn thảo là <dfn>bên tiêu thụ</dfn> (<span class="en">consumer</span>). Cần xác định cả nơi dữ liệu đi qua lẫn lúc bên nhận có quyền dùng dữ liệu ấy.</p>
+        <h3 id="ipc">3.4 · Interprocess Communication <span class="vi">Giao tiếp liên tiến trình</span></h3>
+        <p>Vì sao lại tách công việc ra thành nhiều tiến trình rồi phải tìm cách cho chúng nói chuyện? Giáo trình nêu ba lý do: <em>chia sẻ thông tin</em> (nhiều ứng dụng cùng cần một dữ liệu, như nội dung vừa sao chép), <em>tăng tốc tính toán</em> (chia việc chạy song song trên nhiều lõi), và <em>mô-đun hóa</em> (tách hệ thống thành các phần độc lập). Trình duyệt Chrome là ví dụ rõ nhất. Nó tách thành một tiến trình <em>browser</em> quản lý giao diện, ổ đĩa và mạng; các tiến trình <em>renderer</em> hiển thị trang web, thường mỗi trang một tiến trình chạy trong vùng cách ly (<span class="en">sandbox</span>); và các tiến trình <em>plug-in</em>. Một trang web làm sập renderer của nó thì các tab khác vẫn chạy. Cái giá là các tiến trình phải trao dữ liệu qua kernel.</p>
+        <p>Tiện ích lập chỉ mục cũng có không gian địa chỉ riêng. Để gửi các mục tìm thấy về trình soạn thảo, hai bên dùng <dfn>giao tiếp liên tiến trình</dfn> (<span class="en">interprocess communication, IPC</span>). Ở đây tiện ích là <dfn>bên sản xuất</dfn> (<span class="en">producer</span>) và trình soạn thảo là <dfn>bên tiêu thụ</dfn> (<span class="en">consumer</span>). Cần xác định cả nơi dữ liệu đi qua lẫn lúc bên nhận có quyền dùng dữ liệu ấy.</p>
         <figure class="fig">
           <div class="ipc-routes">
             <div><strong>Bộ nhớ dùng chung</strong><ol class="visual-flow"><li>Tiện ích ghi</li><li class="kernel-zone">Vùng nhớ chung</li><li>Soạn thảo đọc</li></ol></div>
@@ -140,8 +201,31 @@
           </div>
           <figcaption><b>Hai cách chuyển một mục chỉ mục.</b> Ở hàng trên, hai bên truy cập cùng vùng nhớ đã ánh xạ. Ở hàng dưới, phía gửi và nhận dùng thao tác do kênh IPC cung cấp. Mũi tên cho biết chiều dữ liệu trong ví dụ.</figcaption>
         </figure>
-        <p>Với <dfn>bộ nhớ dùng chung</dfn> (<span class="en">shared memory</span>), hệ điều hành giúp hai bên ánh xạ cùng một vùng. Sau thiết lập, các lần đọc và ghi vùng dùng chung có thể diễn ra trực tiếp. Ví dụ POSIX dùng <code>shm_open()</code>, đặt kích thước khi tạo mới và ánh xạ bằng <code>mmap()</code>. Với bộ đệm vòng (<span class="en">circular buffer</span>), chỉ số ghi và đọc quay lại đầu khi chạm cuối. Bên sản xuất ghi xong một mục rồi mới công bố rằng ô đã có dữ liệu. Bên tiêu thụ chỉ đọc ô đã công bố và giải phóng ô khi dùng xong. Hai bên cần quy tắc đồng bộ để đọc đúng và tránh ghi đè. Buổi 3 sẽ giải thích các công cụ thực hiện quy tắc đó.</p>
-        <p>Với <dfn>truyền thông điệp</dfn> (<span class="en">message passing</span>), chương trình dùng các thao tác gửi và nhận. Giao tiếp trực tiếp có thể nêu tên bên nhận. Giao tiếp gián tiếp gửi tới <dfn>hộp thư</dfn> (<span class="en">mailbox</span>) hay cổng (<span class="en">port</span>). Khi nhiều bên cùng nhận, cơ chế phải quy định ai nhận mỗi tin. Thao tác <dfn>chặn</dfn> (<span class="en">blocking</span>) chờ điều kiện hoàn tất, ví dụ chờ có tin khi nhận. Thao tác <dfn>không chặn</dfn> (<span class="en">nonblocking</span>) trả quyền điều khiển ngay, có thể kèm trạng thái để ứng dụng biết nên thử lại.</p>
+        <h3 id="ipc-bo-nho-chung">3.5 · IPC in Shared-Memory Systems <span class="vi">IPC bằng bộ nhớ dùng chung</span></h3>
+        <p>Với <dfn>bộ nhớ dùng chung</dfn> (<span class="en">shared memory</span>), hệ điều hành giúp hai bên ánh xạ cùng một vùng. Sau thiết lập, các lần đọc và ghi vùng dùng chung có thể diễn ra trực tiếp. Ví dụ POSIX dùng <code>shm_open()</code>, đặt kích thước khi tạo mới và ánh xạ bằng <code>mmap()</code>. Bộ nhớ dùng chung nhanh vì sau khi thiết lập, mỗi lần trao dữ liệu không cần gọi kernel. Đổi lại, chính hai tiến trình phải tự thống nhất cách đọc ghi.</p>
+        <p>Giáo trình minh họa bằng một <dfn>bộ đệm vòng</dfn> (<span class="en">circular buffer</span>) có <code>BUFFER_SIZE</code> ô nằm trong vùng nhớ chung, cùng hai chỉ số. <code>in</code> trỏ tới ô trống kế tiếp mà bên sản xuất sẽ ghi, <code>out</code> trỏ tới ô đầy đầu tiên mà bên tiêu thụ sẽ đọc. Cả hai quay về 0 khi chạm cuối mảng.</p>
+        <div class="algo"><div class="algo-h">Bên sản xuất và bên tiêu thụ trên bộ đệm vòng <small>theo giáo trình, mục 3.5</small></div>
+<pre><code><span class="c">/* bên sản xuất */</span>
+while (true) {
+    <span class="c">/* tạo một mục next_produced */</span>
+    while (((in + 1) % BUFFER_SIZE) == out)
+        ; <span class="c">/* đầy: không làm gì, chờ */</span>
+    buffer[in] = next_produced;
+    in = (in + 1) % BUFFER_SIZE;
+}
+
+<span class="c">/* bên tiêu thụ */</span>
+while (true) {
+    while (in == out)
+        ; <span class="c">/* rỗng: chờ */</span>
+    next_consumed = buffer[out];
+    out = (out + 1) % BUFFER_SIZE;
+    <span class="c">/* dùng mục next_consumed */</span>
+}</code></pre></div>
+        <div class="box predict"><div class="box-h">Tìm điểm lạ</div><p>Với <code>BUFFER_SIZE = 4</code>, bộ đệm này chứa được tối đa bao nhiêu mục cùng lúc? Hãy thử cho bên sản xuất ghi liên tục từ trạng thái rỗng <code>in = out = 0</code> và xem nó dừng ở đâu.</p></div>
+        <p>Nó dừng sau ba mục, khi <code>in = 3</code> và <code>(3 + 1) % 4 = 0 = out</code>. Một ô luôn bị bỏ trống, và đó là chủ ý. Nếu cho ghi cả ô thứ tư, <code>in</code> quay về 0 và lại bằng <code>out</code>, giống hệt trạng thái rỗng. Chỉ nhìn hai chỉ số, bên tiêu thụ không phân biệt được “đầy” với “rỗng”. Hy sinh một ô là cách đơn giản nhất để hai trạng thái trông khác nhau. Một cách khác là thêm biến đếm số mục. Buổi 3 sẽ cho thấy biến đếm dùng chung đó lại sinh ra lỗi nếu hai bên cập nhật cùng lúc mà không đồng bộ.</p>
+        <h3 id="ipc-thong-diep">3.6 · IPC in Message-Passing Systems <span class="vi">IPC bằng truyền thông điệp</span></h3>
+        <p>Với <dfn>truyền thông điệp</dfn> (<span class="en">message passing</span>), chương trình dùng hai thao tác <code>send(message)</code> và <code>receive(message)</code>, và kernel lo việc chuyển tin. Cách này dễ cài đặt trên nhiều máy hơn bộ nhớ dùng chung, nhưng mỗi tin phải đi qua kernel. Thiết kế một kênh liên lạc phải trả lời ba câu hỏi: gọi tên bên kia thế nào (<span class="en">naming</span>), có chờ hay không (<span class="en">synchronization</span>), và tin đợi ở đâu (<span class="en">buffering</span>). Giao tiếp trực tiếp có thể nêu tên bên nhận. Giao tiếp gián tiếp gửi tới <dfn>hộp thư</dfn> (<span class="en">mailbox</span>) hay cổng (<span class="en">port</span>). Khi nhiều bên cùng nhận, cơ chế phải quy định ai nhận mỗi tin. Thao tác <dfn>chặn</dfn> (<span class="en">blocking</span>) chờ điều kiện hoàn tất, ví dụ chờ có tin khi nhận. Thao tác <dfn>không chặn</dfn> (<span class="en">nonblocking</span>) trả quyền điều khiển ngay, có thể kèm trạng thái để ứng dụng biết nên thử lại.</p>
         <div class="tbl-wrap"><table class="tbl">
           <caption>Dung lượng quyết định khi nào bên gửi có thể tiến tiếp.</caption>
           <thead><tr><th scope="col">Dung lượng kênh</th><th scope="col">Khi gửi bằng thao tác chặn</th></tr></thead>
@@ -151,17 +235,20 @@
             <tr><th scope="row">Không giới hạn trong mô hình</th><td>Bên gửi luôn có chỗ để xếp tin. Bộ nhớ thật có giới hạn.</td></tr>
           </tbody>
         </table></div>
+        <div class="box predict"><div class="box-h">Đoán trước</div><p>Bên gửi liên tục gửi tin trong khi bên nhận chưa kịp nhận. Với hộp thư 1 ô, bên gửi bị chặn ở tin thứ mấy? Với 2 ô thì sao? Và khi hộp thư rỗng, ai phải đợi?</p></div>
         <div id="mo-phong-ipc" data-lab="ipc"></div>
-        <p>Các hệ thống cung cấp nhiều kênh IPC với quy ước khác nhau. Mach chuyển thông điệp qua cổng. Windows dùng <span class="en">Advanced Local Procedure Call</span> (ALPC) cho giao tiếp cục bộ giữa các tiến trình. Trên Unix, <code>pipe()</code> tạo <dfn>ống dẫn</dfn> (<span class="en">pipe</span>) dạng dòng byte một chiều. Một cặp tiến trình cha–con thường dùng hai đầu được thừa kế qua <code>fork()</code>. Khi mọi đầu ghi đã đóng, bên đọc nhận cuối dòng sau khi lấy hết byte còn đệm. Ống dẫn có tên (<span class="en">named pipe</span>, chẳng hạn FIFO trên Unix) cho các tiến trình tìm kênh theo tên và có thể dùng giữa các tiến trình không có quan hệ cha–con.</p>
+        <h3 id="vi-du-ipc">3.7 · Examples of IPC Systems <span class="vi">Các ví dụ hệ thống IPC</span></h3>
+        <p>Các hệ thống cung cấp nhiều kênh IPC với quy ước khác nhau. Với bộ nhớ dùng chung POSIX, bên sản xuất gọi <code>shm_open()</code> để tạo đối tượng, <code>ftruncate()</code> để đặt kích thước và <code>mmap()</code> để ánh xạ nó vào không gian địa chỉ. Bên tiêu thụ mở cùng tên rồi ánh xạ, và gọi <code>shm_unlink()</code> khi xong. Mach chuyển thông điệp qua cổng. Windows dùng <span class="en">Advanced Local Procedure Call</span> (ALPC) cho giao tiếp cục bộ giữa các tiến trình. Trên Unix, <code>pipe()</code> tạo <dfn>ống dẫn</dfn> (<span class="en">pipe</span>) dạng dòng byte một chiều. Một cặp tiến trình cha–con thường dùng hai đầu được thừa kế qua <code>fork()</code>. Khi mọi đầu ghi đã đóng, bên đọc nhận cuối dòng sau khi lấy hết byte còn đệm. Ống dẫn có tên (<span class="en">named pipe</span>, chẳng hạn FIFO trên Unix) cho các tiến trình tìm kênh theo tên và có thể dùng giữa các tiến trình không có quan hệ cha–con.</p>
 
-        <h3 id="client-server">3.8 · Từ hai tiến trình trên một máy đến máy khách và máy chủ</h3>
+        <h3 id="client-server">3.8 · Communication in Client–Server Systems <span class="vi">Giao tiếp trong hệ khách–chủ</span></h3>
         <p>Nếu tiện ích chạy trên máy khác, trình soạn thảo là <dfn>máy khách</dfn> (<span class="en">client</span>) gửi yêu cầu tới <dfn>máy chủ</dfn> (<span class="en">server</span>). <dfn>Socket</dfn> là đầu mút giao tiếp. Một dịch vụ mạng có thể lắng nghe tại địa chỉ IP và số cổng. Với TCP, khách kết nối đến dịch vụ và hai phía nhận được một dòng byte có thứ tự. Ứng dụng phải tự xác định ranh giới từng yêu cầu trong dòng byte. UDP gửi từng datagram và ứng dụng phải tính đến khả năng mất hoặc đảo thứ tự gói.</p>
-        <p><dfn>Gọi thủ tục từ xa</dfn> (<span class="en">remote procedure call, RPC</span>) bọc việc gửi yêu cầu thành thao tác giống gọi hàm. Mã đại diện ở máy khách (<span class="en">client stub</span>) đóng gói tham số (<span class="en">marshalling</span>). Phía máy chủ giải mã, gọi thủ tục và gửi kết quả về. Nếu khách chờ quá lâu, có thể yêu cầu chưa tới, máy chủ chưa xong, hoặc phản hồi đã mất sau khi việc thực hiện xong. Gửi lại một thao tác có tác dụng phụ có thể lặp tác dụng đó. Mã định danh yêu cầu và cơ chế nhận biết yêu cầu đã xử lý giúp kiểm soát việc gửi lại trong phạm vi bảo đảm của giao thức.</p>
+        <p><dfn>Gọi thủ tục từ xa</dfn> (<span class="en">remote procedure call, RPC</span>) che đi việc gửi nhận, để lời gọi tới máy khác trông giống một lời gọi hàm. Mã đại diện ở máy khách (<span class="en">client stub</span>) tìm cổng của dịch vụ trên máy chủ, đóng gói tham số (<span class="en">marshalling</span>) rồi gửi đi. Stub phía máy chủ mở gói, gọi thủ tục thật và gửi kết quả về theo cùng cách.</p>
+        <p>Trò che giấu này vấp phải ba chỗ mà lời gọi hàm thường không có. Thứ nhất, <em>biểu diễn dữ liệu</em>: máy khách có thể lưu số nguyên theo kiểu <span class="en">big-endian</span>, máy chủ theo kiểu <span class="en">little-endian</span>. RPC giải quyết bằng một dạng biểu diễn trung lập như XDR (<span class="en">external data representation</span>), bên gửi đổi sang XDR, bên nhận đổi về dạng của mình. Thứ hai, <em>lỗi mạng</em>: nếu khách chờ quá lâu, có thể yêu cầu chưa tới, máy chủ chưa xong, hoặc phản hồi đã mất. Gửi lại một thao tác như “trừ 100.000 đồng” có thể trừ hai lần. Để bảo đảm <em>nhiều nhất một lần</em> (<span class="en">at most once</span>), mỗi yêu cầu mang dấu thời gian, và máy chủ nhớ lịch sử để bỏ qua bản gửi lại. Để bảo đảm <em>đúng một lần</em> (<span class="en">exactly once</span>), máy chủ còn phải gửi xác nhận (ACK), và khách gửi lại định kỳ cho tới khi nhận được ACK. Thứ ba, <em>tìm cổng</em>: khách có thể dùng cổng cố định đã biết trước, hoặc hỏi một dịch vụ mai mối (<span class="en">matchmaker</span>) chạy ở cổng cố định để biết cổng hiện tại của dịch vụ. Android dùng cơ chế RPC qua <span class="en">binder</span> cho giao tiếp giữa các tiến trình trên cùng một máy.</p>
       </section>
 
       <section aria-labelledby="chuong-4">
-        <h2 id="chuong-4"><span class="sec">4</span>Nhiều luồng chia việc trong một ứng dụng ra sao?</h2>
-        <h3 id="chia-luong">4.1–4.2 · Giữ giao diện phản hồi trong lúc lập chỉ mục</h3>
+        <h2 id="chuong-4"><span class="sec">4</span><span>Threads &amp; Concurrency <span class="vi">Luồng và tính đồng thời</span></span></h2>
+        <h3 id="chia-luong">4.1 · Overview <span class="vi">Tổng quan về luồng</span></h3>
         <p>Giả sử tiện ích lập chỉ mục được tích hợp vào trình soạn thảo. Nếu cùng một dòng thực thi vừa xử lý phím vừa quét hết tệp, sự kiện gõ phím có thể phải chờ hết lần quét. Ta có thể dùng một <dfn>luồng</dfn> (<span class="en">thread</span>) cho giao diện và một luồng cho việc quét. Mỗi luồng có định danh, PC, tập thanh ghi và stack riêng. Các luồng cùng tiến trình dùng chung mã, vùng dữ liệu, heap và những tài nguyên như tệp mở. Ví dụ, luồng quét có thể tạo chỉ mục trên heap, còn luồng giao diện nhận thông báo khi chỉ mục đã sẵn sàng để đọc.</p>
         <figure class="fig">
           <div class="virtual-stack thread-map">
@@ -171,7 +258,8 @@
           </div>
           <figcaption><b>Phần riêng và phần dùng chung.</b> Hai stack giúp hai lời gọi hàm tiếp tục độc lập. Dải dưới là tài nguyên chung. Đưa một con trỏ vùng heap cho luồng kia có thể giúp trao dữ liệu, nhưng hai bên vẫn phải thống nhất lúc nào dữ liệu có thể được đọc.</figcaption>
         </figure>
-        <p>Tách luồng giúp ứng dụng có cơ hội phản hồi khi một luồng chờ I/O, giúp chia sẻ dữ liệu trong cùng tiến trình và thường giảm chi phí tạo việc hoặc đổi lượt so với các tiến trình riêng. Nhiều lõi còn cho phép xử lý nhiều phần cùng lúc. Đổi lại, các luồng cùng địa chỉ có thể làm hỏng dữ liệu chung nếu phối hợp sai. Hai luồng cùng đọc biến đếm giá trị 10, mỗi luồng tính 11 rồi ghi 11, sẽ làm mất một lần tăng. Thứ tự xen kẽ của các thao tác quyết định kết quả. Chương về đồng bộ sẽ giải thích cách giữ cả phép cập nhật nhất quán.</p>
+        <p>Giáo trình gọi tên bốn lợi ích của lập trình đa luồng. <dfn>Khả năng đáp ứng</dfn> (<span class="en">responsiveness</span>): giao diện vẫn nhận phím khi luồng quét đang bận. <dfn>Chia sẻ tài nguyên</dfn> (<span class="en">resource sharing</span>): các luồng mặc nhiên dùng chung bộ nhớ và tệp mở, không cần dựng IPC. <dfn>Tính kinh tế</dfn> (<span class="en">economy</span>): tạo luồng và chuyển ngữ cảnh giữa các luồng rẻ hơn nhiều so với tiến trình. <dfn>Khả năng mở rộng</dfn> (<span class="en">scalability</span>): trên máy nhiều lõi, các luồng của cùng một tiến trình chạy song song được. Đổi lại, các luồng cùng địa chỉ có thể làm hỏng dữ liệu chung nếu phối hợp sai. Hai luồng cùng đọc biến đếm giá trị 10, mỗi luồng tính 11 rồi ghi 11, sẽ làm mất một lần tăng. Thứ tự xen kẽ của các thao tác quyết định kết quả. Chương về đồng bộ sẽ giải thích cách giữ cả phép cập nhật nhất quán.</p>
+        <h3 id="lap-trinh-da-loi">4.2 · Multicore Programming <span class="vi">Lập trình đa lõi</span></h3>
         <p><dfn>Thực thi đồng thời</dfn> (<span class="en">concurrency</span>) cho phép nhiều công việc cùng tiến triển trong một khoảng thời gian. Trên một lõi, bộ lập lịch có thể xen kẽ lượt của chúng. <dfn>Thực thi song song</dfn> (<span class="en">parallelism</span>) xảy ra khi nhiều công việc thực sự chạy cùng thời điểm, chẳng hạn hai lõi xử lý hai đoạn tệp độc lập. Chia giao diện và quét tệp theo chức năng là <dfn>song song tác vụ</dfn> (<span class="en">task parallelism</span>) khi chúng thực sự chạy cùng lúc. Chia văn bản và chạy cùng phép đếm trên nhiều phần là <dfn>song song dữ liệu</dfn> (<span class="en">data parallelism</span>).</p>
         <figure class="fig">
           <div class="parallel-example">
@@ -182,11 +270,13 @@
           </div>
           <figcaption><b>G xử lý giao diện, L lập chỉ mục.</b> Mỗi cột là một đơn vị thời gian. Hàng đầu cho thấy CPU xen kẽ G và L. Cột đầu của hai hàng sau cho thấy G và L thực thi cùng lúc trên hai lõi.</figcaption>
         </figure>
-        <p>Muốn tăng tốc, trước tiên tìm các vùng việc độc lập, chia tải tương đối đều, xem cách dữ liệu được chia, liệt kê những phụ thuộc và kiểm thử nhiều thứ tự thực thi. Khi đếm từ, chọn ranh giới đoạn sao cho một từ không bị tính hai lần hoặc bỏ sót. Sau khi hoàn tất bốn đoạn, vẫn cần ghép các bảng đếm. Nếu ba lõi xong sớm mà đoạn cuối quá lớn, bước ghép vẫn phải đợi lõi giữ đoạn dài nhất.</p>
+        <p>Có nhiều lõi chưa có nghĩa là chương trình tự nhanh lên. Giáo trình nêu năm thách thức khi lập trình cho hệ đa lõi: <em>xác định tác vụ</em> (<span class="en">identifying tasks</span>) độc lập có thể chạy song song; <em>cân bằng</em> (<span class="en">balance</span>) để các tác vụ đóng góp lượng việc tương đương; <em>chia dữ liệu</em> (<span class="en">data splitting</span>) theo cùng cách chia tác vụ; xử lý <em>phụ thuộc dữ liệu</em> (<span class="en">data dependency</span>) bằng đồng bộ; và <em>kiểm thử, gỡ lỗi</em> (<span class="en">testing and debugging</span>) khi có vô số thứ tự thực thi. Khi đếm từ, chọn ranh giới đoạn sao cho một từ không bị tính hai lần hoặc bỏ sót. Sau khi hoàn tất bốn đoạn, vẫn cần ghép các bảng đếm. Nếu ba lõi xong sớm mà đoạn cuối quá lớn, bước ghép vẫn phải đợi lõi giữ đoạn dài nhất.</p>
         <div class="box math"><div class="box-h">Định luật Amdahl</div><p>Nếu phần phải chạy tuần tự chiếm tỷ lệ <var>S</var> trong thời gian chạy một lõi, với <var>N</var> lõi, mức tăng tốc lý tưởng bị chặn trên bởi <code>1 / (S + (1 − S) / N)</code>. Công thức giả sử phần còn lại chia đều và bỏ qua chi phí điều phối. Quét bốn đoạn bằng 8 đơn vị rồi ghép bằng 2 đơn vị cho <var>S</var> = 0,2. Chạy trên 2 lõi lý tưởng mất 6 đơn vị, nhanh khoảng 1,67 lần. Bốn lõi mất 4 đơn vị, nhanh 2,5 lần. Khi tăng số lõi vô hạn, riêng 2 đơn vị ghép đã giới hạn tăng tốc ở 5 lần.</p></div>
+        <div class="box predict"><div class="box-h">Đoán trước</div><p>Công thức Amdahl với <var>S</var> = 0,2 hứa gì cho 8 lõi? Nhưng việc quét chỉ được chia thành bốn đoạn. Chạy mô phỏng với 1, 2 và 4 lõi, rồi tự suy: với 8 lõi, thời gian thực sự là bao nhiêu, và giả thiết nào của công thức đã không còn đúng?</p></div>
         <div id="mo-phong-da-loi" data-lab="parallel"></div>
+        <p>Với 8 lõi, Amdahl hứa tăng tốc <code>1 / (0,2 + 0,8 / 8) ≈ 3,33</code> lần, tức khoảng 3 đơn vị. Thực tế vẫn là 4 đơn vị: bốn đoạn chỉ dùng được bốn lõi, bốn lõi còn lại rỗi. Công thức ngầm giả sử phần song song chia nhỏ được tùy ý. Muốn dùng hết 8 lõi, phải chia tệp thành ít nhất 8 đoạn, và chi phí chia và ghép lại tăng theo. Định luật Amdahl cho <em>giới hạn trên</em>, không phải lời hứa.</p>
 
-        <h3 id="anh-xa">4.3–4.4 · Từ luồng do thư viện tạo đến luồng kernel lập lịch</h3>
+        <h3 id="anh-xa">4.3 · Multithreading Models <span class="vi">Các mô hình đa luồng</span></h3>
         <p>Tách giao diện và quét tệp thành hai luồng mới giải quyết cách chia việc trong chương trình. Nếu thư viện đặt cả hai lên cùng một đơn vị mà kernel cấp CPU, khi đơn vị đó bị chặn, giao diện cũng mất đường chạy. Để đọc các mô hình dưới đây, hãy theo dõi hai cấp. <dfn>Luồng cấp người dùng</dfn> (<span class="en">user thread</span>) có thể do thư viện quản lý. <dfn>Luồng cấp kernel</dfn> (<span class="en">kernel thread</span> trong mô hình của giáo trình) là thực thể mà kernel có thể lập lịch trực tiếp.</p>
         <div class="tbl-wrap"><table class="tbl">
           <caption>Đọc mỗi ánh xạ từ số luồng người dùng sang số luồng kernel.</caption>
@@ -197,29 +287,112 @@
             <tr><th scope="row">Nhiều–nhiều</th><td>Thư viện ghép nhiều luồng người dùng lên một nhóm luồng kernel. Mô hình hai cấp còn cho phép ràng buộc một số luồng vào luồng kernel riêng.</td><td>Nếu còn luồng kernel khả dụng, thư viện có thể tiếp tục chạy luồng khác. Việc điều phối giữa hai cấp phức tạp hơn.</td></tr>
           </tbody>
         </table></div>
-        <p><dfn>Thư viện luồng</dfn> (<span class="en">thread library</span>) cung cấp API tạo và quản lý luồng. Pthreads là đặc tả POSIX. Với <code>pthread_create()</code>, luồng mới bắt đầu ở hàm đã chỉ định. <code>pthread_join()</code> cho luồng gọi đợi luồng kia hoàn tất và có thể lấy giá trị trả về. Windows có API như <code>CreateThread()</code> và hàm đợi nhận handle. Java trong giáo trình minh họa <code>Thread.start()</code> để bắt đầu luồng với công việc <code>Runnable</code>, và <code>join()</code> để đợi. Gọi <code>run()</code> trực tiếp giống gọi phương thức thông thường trên luồng hiện tại. Trong ví dụ giao diện, nếu luồng giao diện gọi <code>join()</code> ngay sau khi giao việc, nó lại phải đợi lập chỉ mục. Có thể để nó tiếp tục nhận thao tác và xử lý thông báo hoàn tất sau.</p>
+        <figure class="fig">
+          <svg class="teaching-svg wide" viewBox="0 0 640 214" role="img" aria-labelledby="thread-models-title">
+            <title id="thread-models-title">Ba mô hình ánh xạ luồng người dùng lên luồng kernel</title>
+            <g class="annotation-row"><text class="annotation" x="110" y="18" text-anchor="middle">nhiều–một</text><text class="annotation" x="320" y="18" text-anchor="middle">một–một</text><text class="annotation" x="530" y="18" text-anchor="middle">nhiều–nhiều</text></g>
+            <path class="ln-dash" d="M4 104H636"/>
+            <text class="annotation" x="8" y="96">user</text><text class="annotation" x="8" y="122">kernel</text>
+            <g class="route">
+              <path d="M50 58L110 150M90 58L110 150M130 58L110 150M170 58L110 150"/>
+              <path d="M260 58V150M300 58V150M340 58V150M380 58V150"/>
+              <path d="M470 58L490 150M470 58L560 150M510 58L490 150M510 58L560 150M550 58L490 150M550 58L560 150M590 58L490 150M590 58L560 150"/>
+            </g>
+            <g class="ready-node"><circle cx="50" cy="52" r="13"/><circle cx="90" cy="52" r="13"/><circle cx="130" cy="52" r="13"/><circle cx="170" cy="52" r="13"/>
+              <circle cx="260" cy="52" r="13"/><circle cx="300" cy="52" r="13"/><circle cx="340" cy="52" r="13"/><circle cx="380" cy="52" r="13"/>
+              <circle cx="470" cy="52" r="13"/><circle cx="510" cy="52" r="13"/><circle cx="550" cy="52" r="13"/><circle cx="590" cy="52" r="13"/></g>
+            <g class="running-node"><circle cx="110" cy="158" r="15"/><circle cx="260" cy="158" r="15"/><circle cx="300" cy="158" r="15"/><circle cx="340" cy="158" r="15"/><circle cx="380" cy="158" r="15"/><circle cx="490" cy="158" r="15"/><circle cx="560" cy="158" r="15"/></g>
+            <g class="annotation-row"><text class="annotation" x="110" y="198" text-anchor="middle">một luồng chặn: cả nhóm chặn</text><text class="annotation" x="320" y="198" text-anchor="middle">song song thật, tốn luồng kernel</text><text class="annotation" x="530" y="198" text-anchor="middle">linh hoạt, điều phối phức tạp</text></g>
+          </svg>
+          <figcaption><b>Ánh xạ luồng người dùng (hàng trên) lên luồng kernel (hàng dưới).</b> Kernel chỉ thấy và lập lịch các vòng tròn hàng dưới. Thư viện Green threads trên Solaris thời đầu và GNU Portable Threads dùng mô hình nhiều–một. Linux và Windows dùng một–một. Nhiều–nhiều linh hoạt nhất trên giấy, nhưng khó cài đặt. Khi máy có nhiều lõi, việc giới hạn số luồng kernel bớt quan trọng, nên phần lớn hệ thống hiện nay chọn một–một.</figcaption>
+        </figure>
+        <h3 id="thu-vien-luong">4.4 · Thread Libraries <span class="vi">Thư viện luồng</span></h3>
+        <p><dfn>Thư viện luồng</dfn> (<span class="en">thread library</span>) cung cấp API tạo và quản lý luồng. Pthreads là đặc tả POSIX. Với <code>pthread_create()</code>, luồng mới bắt đầu ở hàm đã chỉ định. <code>pthread_join()</code> cho luồng gọi đợi luồng kia hoàn tất và có thể lấy giá trị trả về. Windows có API như <code>CreateThread()</code> và hàm đợi nhận handle. Java trong giáo trình minh họa <code>Thread.start()</code> để bắt đầu luồng với công việc <code>Runnable</code>, và <code>join()</code> để đợi. Gọi <code>run()</code> trực tiếp giống gọi phương thức thông thường trên luồng hiện tại.</p>
+        <div class="algo"><div class="algo-h">Tính tổng 1 + 2 + … + N trên một luồng riêng bằng Pthreads <small>theo giáo trình, mục 4.4.1</small></div>
+<pre><code>#include &lt;pthread.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
 
-        <h3 id="giao-viec">4.5 · Giao tác vụ rồi để thư viện quản lý luồng</h3>
+int sum;                          <span class="c">/* dữ liệu dùng chung giữa các luồng */</span>
+void *runner(void *param);        <span class="c">/* hàm mà luồng mới sẽ chạy */</span>
+
+int main(int argc, char *argv[]) {
+    pthread_t tid;                <span class="c">/* định danh luồng */</span>
+    pthread_attr_t attr;          <span class="c">/* thuộc tính luồng */</span>
+    pthread_attr_init(&amp;attr);     <span class="c">/* dùng thuộc tính mặc định */</span>
+    pthread_create(&amp;tid, &amp;attr, runner, argv[1]);
+    pthread_join(tid, NULL);      <span class="c">/* chờ luồng con kết thúc */</span>
+    printf("sum = %d\n", sum);
+}
+
+void *runner(void *param) {
+    int upper = atoi(param);
+    sum = 0;
+    for (int i = 1; i &lt;= upper; i++)
+        sum += i;
+    pthread_exit(0);
+}</code></pre></div>
+        <p>Ví dụ này theo chiến lược <dfn>đa luồng đồng bộ</dfn> (<span class="en">synchronous threading</span>): luồng cha tạo con rồi chờ con xong mới đọc <code>sum</code>, nên hai bên không cần khóa. Ngược lại, với <dfn>đa luồng bất đồng bộ</dfn> (<span class="en">asynchronous threading</span>), cha tạo con rồi chạy tiếp ngay, hai bên chạy độc lập và thường ít chia sẻ dữ liệu. Luồng giao diện của trình soạn thảo nên đi theo kiểu thứ hai. Nếu nó gọi <code>join()</code> ngay sau khi giao việc, nó lại phải đợi lập chỉ mục. Trên Windows, <code>CreateThread()</code> tạo luồng, còn <code>WaitForSingleObject()</code> hoặc <code>WaitForMultipleObjects()</code> đóng vai trò của <code>pthread_join()</code>.</p>
+
+        <h3 id="giao-viec">4.5 · Implicit Threading <span class="vi">Luồng ngầm định</span></h3>
         <p>Tạo một luồng mới mỗi lần có một đoạn tệp khiến ứng dụng phải quản lý nhiều vòng đời và có thể tạo nhiều luồng hơn số việc máy xử lý hiệu quả. Với <dfn>luồng ngầm định</dfn> (<span class="en">implicit threading</span>), lập trình viên mô tả tác vụ, còn thư viện hoặc trình biên dịch quản lý nhiều chi tiết của luồng.</p>
         <figure class="fig">
           <ol class="visual-flow"><li><strong>Hàng tác vụ</strong><small>Đoạn A, B, C, D</small></li><li class="kernel-zone"><strong>Nhóm luồng</strong><small>Hai luồng lấy việc khi rảnh</small></li><li><strong>Kết quả từng phần</strong><small>Dùng để ghép chỉ mục</small></li></ol>
           <figcaption><b>Luồng được tái sử dụng.</b> Sau khi xử lý đoạn A, cùng luồng có thể lấy đoạn C. Bốn tác vụ chỉ cần hai luồng trong ví dụ. Công việc ghép phải đợi đủ kết quả.</figcaption>
         </figure>
-        <p>Một <dfn>nhóm luồng</dfn> (<span class="en">thread pool</span>) giữ các luồng thợ để lấy việc từ hàng. Tái sử dụng luồng tránh chi phí tạo cho mỗi yêu cầu. Giới hạn số luồng giúp khống chế số công việc chạy đồng thời. Nếu tốc độ đưa việc vào thường xuyên cao hơn tốc độ xử lý, hàng tác vụ vẫn có thể dài lên. Trong Java, <code>Executor</code> nhận công việc và <code>Future</code> có thể đại diện cho kết quả sẽ có. Đọc kết quả bằng <code>get()</code> có thể chặn nếu tác vụ chưa xong.</p>
+        <p>Một <dfn>nhóm luồng</dfn> (<span class="en">thread pool</span>) giữ các luồng thợ để lấy việc từ hàng. Tái sử dụng luồng tránh chi phí tạo cho mỗi yêu cầu. Giới hạn số luồng giúp khống chế số công việc chạy đồng thời. Nếu tốc độ đưa việc vào thường xuyên cao hơn tốc độ xử lý, hàng tác vụ vẫn có thể dài lên. Kích thước nhóm có thể chọn theo số lõi, lượng bộ nhớ và số yêu cầu đồng thời dự kiến, và có kiến trúc điều chỉnh kích thước động theo tải. Trong Java, <code>Executor</code> nhận công việc và <code>Future</code> có thể đại diện cho kết quả sẽ có. Đọc kết quả bằng <code>get()</code> có thể chặn nếu tác vụ chưa xong.</p>
         <p>Với <dfn>tách–ghép</dfn> (<span class="en">fork–join</span>), một tác vụ lớn tách thành nhiều tác vụ con rồi đợi chúng để ghép. Chẳng hạn chia đôi khoảng dòng đến khi mỗi đoạn đủ nhỏ, đếm từ ở các lá, rồi cộng các bảng đếm theo chiều ngược lại. Đây là mô hình phân rã tác vụ. Các việc con có thể được chạy trên nhóm luồng sẵn có. Khung Fork/Join của Java có thể để luồng rảnh lấy tác vụ đang chờ từ luồng khác (<span class="en">work stealing</span>). Ngưỡng dừng chia giúp tránh tạo quá nhiều tác vụ nhỏ.</p>
-        <p>Các cách khác trong giáo trình gồm <dfn>OpenMP</dfn>, dùng chỉ thị để trình biên dịch và thư viện tổ chức vùng song song, <dfn>Grand Central Dispatch</dfn> (GCD), nhận khối công việc vào hàng tuần tự hoặc đồng thời, và <dfn>Intel Threading Building Blocks</dfn> (TBB), cung cấp mẫu như <code>parallel_for</code> trong C++. Với một vòng lặp đếm độc lập theo khối, các công cụ này đảm nhận nhiều việc chia lượt. Người viết vẫn phải xác định dữ liệu chung, điều kiện ghép và các thao tác có phụ thuộc.</p>
+        <p>Ba công cụ khác trong giáo trình cho thấy cùng một ý tưởng ở ba mức. <dfn>OpenMP</dfn> dùng chỉ thị biên dịch (<span class="en">compiler directive</span>) cho C, C++ và Fortran. Bạn đánh dấu một <em>vùng song song</em> (<span class="en">parallel region</span>), và thư viện tự tạo số luồng bằng số lõi:</p>
+        <div class="algo"><div class="algo-h">Cộng hai mảng song song bằng OpenMP</div>
+<pre><code>#pragma omp parallel for
+for (i = 0; i &lt; N; i++)
+    c[i] = a[i] + b[i];     <span class="c">/* các vòng lặp được chia cho các luồng */</span></code></pre></div>
+        <p><dfn>Grand Central Dispatch</dfn> (GCD) của macOS và iOS nhận các <em>khối</em> công việc (<span class="en">block</span>, viết dạng <code>^{ … }</code>) vào <em>hàng điều phối</em> (<span class="en">dispatch queue</span>). Hàng tuần tự (<span class="en">serial</span>) chạy từng khối theo thứ tự FIFO, hàng đồng thời (<span class="en">concurrent</span>) chạy nhiều khối cùng lúc trên một nhóm luồng do GCD quản lý. <dfn>Intel Threading Building Blocks</dfn> (TBB) là thư viện C++ cung cấp mẫu như <code>parallel_for(size_t(0), n, [=](size_t i){ apply(v[i]); })</code>. Thư viện chia khoảng lặp thành các tác vụ và dùng <span class="en">work stealing</span> để cân bằng tải. Dù dùng công cụ nào, người viết vẫn phải xác định dữ liệu chung, điều kiện ghép và những thao tác có phụ thuộc.</p>
 
-        <h3 id="vong-doi-luong">4.6–4.7 · Chờ, dừng và quản lý luồng</h3>
-        <p>Trong chương trình POSIX nhiều luồng, <code>fork()</code> chỉ sao chép luồng gọi sang tiến trình con. Nếu một luồng khác đang giữ khóa, trạng thái khóa có thể được sao chép mà bên giữ khóa lại vắng mặt ở con. Mẫu con gọi <code>exec</code> sớm tránh phụ thuộc vào các luồng đã mất. Khi <code>exec</code> thành công, ảnh chương trình cũ cùng các luồng cũ được thay bằng chương trình mới bắt đầu với một luồng.</p>
-        <p><dfn>Tín hiệu</dfn> (<span class="en">signal</span>) báo một sự kiện trong các hệ Unix. Tín hiệu đồng bộ như lỗi do một lệnh phát sinh gắn với luồng thực thi lệnh. Với tín hiệu hướng đến cả tiến trình, hệ thống có thể chuyển đến một luồng phù hợp theo quy tắc và mặt nạ tín hiệu. Chương trình cũng có thể giao một luồng chuyên đợi một tập tín hiệu đã chặn ở các luồng khác.</p>
-        <p>Khi bạn đóng tệp, tác vụ lập chỉ mục có thể cần dừng. <dfn>Hủy bất đồng bộ</dfn> (<span class="en">asynchronous cancellation</span>) có thể dừng luồng trước khi nó dọn vùng đệm hay trả khóa. <dfn>Hủy trì hoãn</dfn> (<span class="en">deferred cancellation</span>) cho phép hủy tại những điểm đã định, nơi luồng có thể bảo đảm việc dọn dẹp. <dfn>Dữ liệu cục bộ theo luồng</dfn> (<span class="en">thread-local storage, TLS</span>) cho mỗi luồng một bản riêng của dữ liệu, hữu ích khi mỗi luồng cần tích lũy bảng đếm riêng qua nhiều lời gọi hàm.</p>
-        <p>Với ánh xạ nhiều–nhiều, thư viện còn cần biết lúc luồng làm nền cho nó bị chặn. Cơ chế <dfn>kích hoạt bộ lập lịch</dfn> (<span class="en">scheduler activations</span>) trong giáo trình minh họa kernel báo sự kiện cho thư viện bằng <span class="en">upcall</span> để thư viện điều phối lại các luồng của nó. Các ví dụ Windows và Linux trong sách dùng ánh xạ một–một. Windows lưu ngữ cảnh luồng và các thông tin cần cho lập lịch. Linux biểu diễn đơn vị thực thi bằng cấu trúc tác vụ và dùng các tùy chọn của <code>clone()</code> để xác định tài nguyên nào được chia sẻ. Hai cách tổ chức đều cho kernel theo dõi và cấp CPU cho từng đơn vị thực thi.</p>
+        <h3 id="vong-doi-luong">4.6 · Threading Issues <span class="vi">Các vấn đề khi dùng luồng</span></h3>
+        <p>Thêm luồng vào một tiến trình làm nảy sinh những câu hỏi mà mô hình một luồng chưa từng đặt ra. Mỗi câu hỏi dưới đây xuất phát từ một thao tác vốn rất rõ nghĩa khi tiến trình chỉ có một dòng thực thi.</p>
+        <h4 id="fork-exec-luong">4.6.1 · The fork() and exec() System Calls <span class="vi">fork() và exec() trong chương trình đa luồng</span></h4>
+        <p>Một luồng gọi <code>fork()</code>: tiến trình con nên có mọi luồng của cha, hay chỉ luồng vừa gọi? Một số hệ UNIX cung cấp cả hai phiên bản. Trong POSIX, <code>fork()</code> chỉ sao chép luồng gọi. Nếu lúc đó một luồng khác đang giữ khóa, trạng thái khóa được sao chép sang con nhưng luồng giữ khóa thì không, nên khóa có thể bị giữ mãi trong con. Nếu con gọi <code>exec()</code> ngay sau <code>fork()</code>, vấn đề biến mất: <code>exec()</code> thay toàn bộ chương trình, kể cả mọi luồng, bằng chương trình mới bắt đầu với một luồng. Vì vậy chỉ sao chép luồng gọi là lựa chọn hợp lý cho mẫu <code>fork()</code> rồi <code>exec()</code>.</p>
+        <h4 id="tin-hieu">4.6.2 · Signal Handling <span class="vi">Xử lý tín hiệu</span></h4>
+        <p><dfn>Tín hiệu</dfn> (<span class="en">signal</span>) báo cho tiến trình UNIX rằng một sự kiện đã xảy ra. Mọi tín hiệu đi qua ba bước: được <em>sinh ra</em> khi sự kiện xảy ra, được <em>chuyển tới</em> tiến trình, và được <em>xử lý</em>. Tín hiệu <em>đồng bộ</em>, như truy cập bộ nhớ trái phép hay chia cho 0, sinh ra từ chính lệnh của tiến trình. Tín hiệu <em>bất đồng bộ</em>, như <kbd>Ctrl</kbd>+<kbd>C</kbd> hay hết giờ của một bộ định thời, đến từ bên ngoài. Mỗi tín hiệu có một <span class="en">default signal handler</span> do kernel chạy, và chương trình có thể thay bằng <span class="en">user-defined signal handler</span>.</p>
+        <p>Với tiến trình đa luồng, câu hỏi là chuyển tín hiệu cho luồng nào. Giáo trình nêu bốn lựa chọn: cho đúng luồng mà tín hiệu áp dụng, cho mọi luồng, cho một số luồng nhất định, hoặc cho một luồng được chỉ định nhận mọi tín hiệu. Tín hiệu đồng bộ phải tới đúng luồng gây ra nó. <kbd>Ctrl</kbd>+<kbd>C</kbd> nên tới mọi luồng. POSIX cho mỗi luồng một mặt nạ tín hiệu để chặn những tín hiệu nó không muốn nhận, và cung cấp <code>pthread_kill(tid, signal)</code> để gửi tín hiệu tới một luồng cụ thể, bên cạnh <code>kill(pid, signal)</code> gửi cho cả tiến trình. Windows không có tín hiệu nhưng mô phỏng bằng <span class="en">asynchronous procedure call</span> (APC) gửi tới một luồng cụ thể.</p>
+        <h4 id="huy-luong">4.6.3 · Thread Cancellation <span class="vi">Hủy luồng</span></h4>
+        <p>Khi bạn đóng tệp, luồng lập chỉ mục, gọi là <em>luồng đích</em> (<span class="en">target thread</span>), cần dừng trước khi xong. <dfn>Hủy bất đồng bộ</dfn> (<span class="en">asynchronous cancellation</span>) dừng luồng đích ngay lập tức. Nếu nó đang giữ khóa hay đang cập nhật dở một cấu trúc dùng chung, mọi thứ ở lại trong trạng thái hỏng, và tài nguyên của nó có thể không được thu hồi. <dfn>Hủy trì hoãn</dfn> (<span class="en">deferred cancellation</span>) chỉ đặt cờ yêu cầu hủy. Luồng đích tự kiểm tra cờ ở những <em>điểm hủy</em> (<span class="en">cancellation point</span>), nơi nó biết mình đang ở trạng thái an toàn.</p>
+        <div class="algo"><div class="algo-h">Hủy trì hoãn trong Pthreads</div>
+<pre><code><span class="c">/* luồng giao diện */</span>
+pthread_cancel(tid);           <span class="c">/* chỉ là yêu cầu hủy */</span>
+pthread_join(tid, NULL);       <span class="c">/* chờ luồng đích thực sự dừng */</span>
+
+<span class="c">/* luồng lập chỉ mục */</span>
+while (con_doan_can_quet) {
+    quet_mot_doan();
+    pthread_testcancel();      <span class="c">/* điểm hủy: an toàn để dừng ở đây */</span>
+}</code></pre></div>
+        <p>Hủy trì hoãn là chế độ mặc định của Pthreads. Một số lời gọi chặn, như <code>read()</code>, cũng là điểm hủy. Luồng có thể đăng ký <em>trình dọn dẹp</em> (<span class="en">cleanup handler</span>) để trả khóa và giải phóng vùng đệm khi bị hủy. Trên Linux, việc hủy luồng được cài đặt bằng tín hiệu.</p>
+        <h4 id="tls">4.6.4 · Thread-Local Storage <span class="vi">Dữ liệu cục bộ theo luồng</span></h4>
+        <p>Các luồng dùng chung dữ liệu toàn cục, nhưng đôi khi mỗi luồng cần một bản riêng có tầm sống vượt qua từng lời gọi hàm, chẳng hạn mã giao dịch hay bảng đếm từ riêng. Biến cục bộ không đủ vì chỉ sống trong một lời gọi. <dfn>Dữ liệu cục bộ theo luồng</dfn> (<span class="en">thread-local storage, TLS</span>) giống biến <code>static</code>, nhưng mỗi luồng có một bản. Trình biên dịch gcc hỗ trợ từ khóa <code>__thread</code>, và C11 có <code>_Thread_local</code>. Khi dùng nhóm luồng, TLS cho phép mỗi luồng thợ tích lũy kết quả mà không phải khóa.</p>
+        <h4 id="kich-hoat-lap-lich">4.6.5 · Scheduler Activations <span class="vi">Kích hoạt bộ lập lịch</span></h4>
+        <p>Mô hình nhiều–nhiều và hai cấp cần thư viện luồng và kernel trao đổi với nhau. Nhiều hệ thống đặt giữa hai bên một cấu trúc gọi là <dfn>tiến trình nhẹ</dfn> (<span class="en">lightweight process, LWP</span>). Với thư viện, LWP là một <em>bộ xử lý ảo</em> để nó xếp luồng người dùng lên chạy. Mỗi LWP gắn với một luồng kernel, và chính luồng kernel đó được hệ điều hành lập lịch trên CPU thật. Nếu luồng kernel bị chặn chờ I/O, LWP cũng bị chặn, và luồng người dùng trên đó dừng theo.</p>
+        <p>Cơ chế <dfn>kích hoạt bộ lập lịch</dfn> (<span class="en">scheduler activations</span>) để kernel báo cho thư viện những sự kiện như vậy bằng một <dfn>upcall</dfn>. Khi một luồng sắp bị chặn, kernel gửi upcall kèm một LWP mới. Trình xử lý upcall trong thư viện lưu trạng thái luồng bị chặn và xếp một luồng người dùng khác lên LWP mới. Khi sự kiện chặn kết thúc, kernel gửi upcall khác để báo luồng kia đã có thể chạy tiếp.</p>
+
+        <h3 id="vi-du-luong">4.7 · Operating-System Examples <span class="vi">Luồng trong Windows và Linux</span></h3>
+        <p>Cả hai hệ trong giáo trình dùng ánh xạ một–một. Một luồng Windows gồm định danh luồng, tập thanh ghi, ngăn xếp user và ngăn xếp kernel, cùng vùng lưu trữ riêng. Ba cấu trúc chính mô tả nó: <code>ETHREAD</code> (khối luồng điều hành) trỏ tới tiến trình chứa luồng và hàm bắt đầu; <code>KTHREAD</code> (khối luồng kernel) chứa thông tin lập lịch và đồng bộ cùng ngăn xếp kernel; <code>TEB</code> (khối môi trường luồng) nằm trong không gian người dùng, chứa định danh luồng, ngăn xếp user và TLS. Hai cấu trúc đầu chỉ kernel truy cập được.</p>
+        <p>Linux không phân biệt tiến trình với luồng. Nó gọi chung là <em>tác vụ</em> (<span class="en">task</span>), mỗi tác vụ được mô tả bằng một <code>struct task_struct</code>. Lời gọi <code>clone()</code> nhận các cờ quyết định tác vụ con dùng chung những gì với cha. Không đặt cờ nào thì <code>clone()</code> giống <code>fork()</code>. Đặt cả bốn cờ dưới đây thì con chia sẻ gần như mọi thứ, tức là một luồng.</p>
+        <div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th scope="col">Cờ</th><th scope="col">Ý nghĩa khi đặt</th></tr></thead>
+          <tbody>
+            <tr><th scope="row"><code>CLONE_FS</code></th><td>Dùng chung thông tin hệ thống tệp, như thư mục làm việc hiện tại.</td></tr>
+            <tr><th scope="row"><code>CLONE_VM</code></th><td>Dùng chung không gian bộ nhớ.</td></tr>
+            <tr><th scope="row"><code>CLONE_SIGHAND</code></th><td>Dùng chung các trình xử lý tín hiệu.</td></tr>
+            <tr><th scope="row"><code>CLONE_FILES</code></th><td>Dùng chung bảng tệp đang mở.</td></tr>
+          </tbody>
+        </table></div>
       </section>
 
       <section aria-labelledby="chuong-5">
-        <h2 id="chuong-5"><span class="sec">5</span>Khi nhiều việc sẵn sàng, CPU chạy việc nào trước?</h2>
-        <h3 id="tieu-chi">5.1–5.2 · Lúc nào cần chọn và đo kết quả bằng gì?</h3>
-        <p>Giả sử lượt giải mã tiếp theo của trình phát nhạc và một lượt quét tệp đều đang sẵn sàng. Nếu quét hết tệp trong lượt đầu, việc giải mã ngắn phải đợi sau một đợt tính dài. Nếu chen lượt nhạc vào giữa, việc quét hoàn tất muộn hơn và CPU phải đổi lượt thêm. <dfn>Đợt CPU</dfn> (<span class="en">CPU burst</span>) là lượng thời gian CPU cần cho một đoạn thực thi trước khi việc chờ I/O hoặc kết thúc. Bộ lập lịch có thể chia đợt đó qua nhiều lượt. Để dễ tính, mô phỏng dùng một lõi và mỗi công việc chỉ có một đợt CPU.</p>
+        <h2 id="chuong-5"><span class="sec">5</span><span>CPU Scheduling <span class="vi">Lập lịch CPU</span></span></h2>
+        <h3 id="tieu-chi">5.1 · Basic Concepts <span class="vi">Khái niệm cơ bản</span></h3>
+        <p>Giả sử lượt giải mã tiếp theo của trình phát nhạc và một lượt quét tệp đều đang sẵn sàng. Nếu quét hết tệp trong lượt đầu, việc giải mã ngắn phải đợi sau một đợt tính dài. Nếu chen lượt nhạc vào giữa, việc quét hoàn tất muộn hơn và CPU phải đổi lượt thêm. Lập lịch có ý nghĩa nhờ một quan sát: tiến trình xen kẽ giữa các đợt dùng CPU và các đợt chờ I/O, gọi là <dfn>chu kỳ CPU–I/O</dfn> (<span class="en">CPU–I/O burst cycle</span>). Đo thực tế cho thấy phần lớn đợt CPU rất ngắn, chỉ một số ít đợt dài. <dfn>Đợt CPU</dfn> (<span class="en">CPU burst</span>) là lượng thời gian CPU cần cho một đoạn thực thi trước khi việc chờ I/O hoặc kết thúc. Bộ lập lịch có thể chia đợt đó qua nhiều lượt. Để dễ tính, mô phỏng dùng một lõi và mỗi công việc chỉ có một đợt CPU.</p>
         <p><dfn>Bộ lập lịch CPU</dfn> (<span class="en">CPU scheduler</span>) chọn từ các việc sẵn sàng. <dfn>Bộ chuyển giao</dfn> (<span class="en">dispatcher</span>) thực hiện quyết định, chuẩn bị ngữ cảnh và chuyển điều khiển tới đúng chỗ công việc sẽ tiếp tục. Khoảng thời gian để dừng một việc và bắt đầu việc khác gọi là <dfn>độ trễ chuyển giao</dfn> (<span class="en">dispatch latency</span>). Giáo trình xét bốn thời điểm ra quyết định.</p>
         <div class="tbl-wrap"><table class="tbl">
           <caption>Việc đang chạy có thể còn muốn dùng CPU khi xảy ra hai sự kiện giữa bảng.</caption>
@@ -232,6 +405,8 @@
           </tbody>
         </table></div>
         <p>Với <dfn>lập lịch không thu hồi</dfn> (<span class="en">nonpreemptive scheduling</span>), việc đang chạy giữ CPU đến khi chờ hoặc kết thúc. Với <dfn>lập lịch có thu hồi</dfn> (<span class="en">preemptive scheduling</span>), hệ điều hành có thể lấy lại CPU khi việc vẫn chạy được, chẳng hạn sau một ngắt bộ định thời. Nhờ đó, giao diện có cơ hội đáp ứng sớm khi việc quét còn dài. Một lần thu hồi có chi phí và có thể để công việc dừng giữa chuỗi thao tác dùng dữ liệu chung.</p>
+        <h3 id="tieu-chi-danh-gia">5.2 · Scheduling Criteria <span class="vi">Tiêu chí lập lịch</span></h3>
+        <p>“Thuật toán nào tốt hơn?” chỉ trả lời được khi đã chọn thước đo. Giáo trình dùng năm tiêu chí. Hai tiêu chí đầu nên <em>lớn</em>: mức sử dụng CPU và thông lượng. Ba tiêu chí sau nên <em>nhỏ</em>: thời gian hoàn tất, thời gian chờ và thời gian đáp ứng. Thường ta tối ưu giá trị trung bình, nhưng với hệ tương tác, giảm <em>phương sai</em> của thời gian đáp ứng có khi quan trọng hơn: người dùng chịu được một hệ chậm vừa phải nhưng ổn định hơn một hệ lúc nhanh lúc khựng.</p>
         <div class="tbl-wrap"><table class="tbl">
           <caption>Đọc thời điểm từ trục thời gian. Chữ <var>a</var> là lúc đến, <var>s</var> là lúc chạy lần đầu và <var>f</var> là lúc kết thúc.</caption>
           <thead><tr><th scope="col">Thước đo</th><th scope="col">Cách tính và ý nghĩa</th></tr></thead>
@@ -245,31 +420,70 @@
         </table></div>
         <p>Nếu việc đến lúc 2, chạy từ 3 đến 5, đợi I/O từ 5 đến 8, rồi chạy từ 9 đến 10, nó hoàn tất sau 8 đơn vị. Nó đợi CPU tổng cộng 2 đơn vị ở các khoảng 2–3 và 8–9, đáp ứng sau 1 đơn vị. Khoảng 5–8 là chờ thiết bị. Với phần mềm tương tác, thời gian đáp ứng và độ đều giữa các lượt ảnh hưởng cảm nhận của người dùng. Khi chạy hàng loạt tác vụ, thời gian hoàn tất và thông lượng có thể quan trọng hơn.</p>
 
-        <h3 id="thuat-toan">5.3 · Những quy tắc có thể dùng để chọn CPU</h3>
-        <h4>Đến trước và việc ngắn trước</h4>
+        <h3 id="thuat-toan">5.3 · Scheduling Algorithms <span class="vi">Các thuật toán lập lịch</span></h3>
+        <p>Trước khi đặt tên thuật toán nào, hãy xem thứ tự quan trọng tới mức nào. Ba việc cùng đến lúc 0: P1 cần 24 ms CPU, P2 và P3 mỗi việc cần 3 ms. Đây là ví dụ kinh điển của giáo trình.</p>
+        <figure class="fig">
+          <div class="gantt-compare">
+            <div class="gantt-head"><span>Cách xếp</span><span>Lịch trên một lõi, 0–30 ms</span><span>Chờ TB</span></div>
+            <div class="gantt-row"><b>P1, P2, P3</b><ol style="--t:30"><li data-job="1" style="grid-column:1/25">P1<small>0–24</small></li><li data-job="2" style="grid-column:25/28">P2</li><li data-job="3" style="grid-column:28/31">P3</li></ol><em>17 ms</em></div>
+            <div class="gantt-row"><b>P2, P3, P1</b><ol style="--t:30"><li data-job="2" style="grid-column:1/4">P2</li><li data-job="3" style="grid-column:4/7">P3</li><li data-job="1" style="grid-column:7/31">P1<small>6–30</small></li></ol><em class="good">3 ms</em></div>
+            <div class="gantt-row"><b>RR, q = 4</b><ol style="--t:30"><li data-job="1" style="grid-column:1/5">P1</li><li data-job="2" style="grid-column:5/8">P2</li><li data-job="3" style="grid-column:8/11">P3</li><li data-job="1" style="grid-column:11/31">P1<small>10–30</small></li></ol><em>5,66 ms</em></div>
+          </div>
+          <figcaption><b>Cùng ba việc, ba thứ tự.</b> Xếp việc dài trước, P2 phải chờ 24 ms và P3 chờ 27 ms, trung bình (0 + 24 + 27) / 3 = 17 ms. Chỉ đảo thứ tự, trung bình còn (6 + 0 + 3) / 3 = 3 ms. Xoay vòng với lượng tử 4 ms không cần biết trước độ dài, nhưng vẫn để hai việc ngắn chạy xong sớm: P1 chờ 6, P2 chờ 4, P3 chờ 7.</figcaption>
+        </figure>
+        <p>Ba hàng trên chứa gần như cả mạch của mục này. Thuật toán đơn giản nhất phục vụ theo thứ tự đến, và có thể rơi vào hàng đầu tiên. Muốn đạt hàng thứ hai thì phải biết trước độ dài từng việc, điều mà bộ lập lịch thật không biết. Hàng thứ ba từ bỏ việc đoán độ dài và chia lượt đều. Mỗi thuật toán dưới đây sinh ra để sửa một khuyết điểm của thuật toán trước nó, và mang theo một cái giá mới.</p>
+        <h4 id="fcfs">5.3.1 · First-Come, First-Served Scheduling <span class="vi">Đến trước phục vụ trước</span></h4>
         <p><dfn>Đến trước phục vụ trước</dfn> (<span class="en">first-come, first-served, FCFS</span>) lấy đầu hàng theo thứ tự vào hàng. Công việc chạy đến hết đợt CPU. Nếu chỉ mục A cần 8 đơn vị và chạy từ mốc 0, việc ngắn B đến lúc 1 phải đợi đến 8. Trong hệ có I/O, nhiều việc ngắn có thể cùng bị dồn sau một việc dài. Thiết bị có lúc rỗi vì những việc đó chưa chạy đến lần yêu cầu I/O, rồi CPU có thể thiếu việc khi cả nhóm cùng chờ thiết bị. Giáo trình gọi đó là <dfn>hiệu ứng đoàn xe</dfn> (<span class="en">convoy effect</span>).</p>
+        <h4 id="sjf">5.3.2 · Shortest-Job-First Scheduling <span class="vi">Việc ngắn nhất trước</span></h4>
         <p><dfn>Việc ngắn trước</dfn> (<span class="en">shortest-job-first, SJF</span>) chọn việc có đợt CPU tiếp theo ngắn nhất trong số việc sẵn sàng. Phiên bản không thu hồi để A tiếp tục nếu A đã chạy. Khi mọi việc cùng có mặt và biết trước các độ dài, xếp tăng dần cho thời gian chờ trung bình nhỏ nhất. Nếu đổi một cặp liền kề từ dài–ngắn thành ngắn–dài, việc ngắn giảm thời gian đợi nhiều hơn phần mà việc dài phải đợi thêm. Các việc sau cặp vẫn bắt đầu ở mốc cũ.</p>
         <p>Phiên bản thu hồi là <dfn>thời gian còn lại ngắn nhất trước</dfn> (<span class="en">shortest remaining time first, SRTF</span>). Khi một việc mới đến, so đợt của nó với phần còn lại của việc đang chạy. B cần 4 đơn vị và đến lúc 1 khi A còn 7, nên B có thể lấy CPU. Trong thực tế, bộ lập lịch thường phải ước lượng đợt tiếp theo. Một cách là <dfn>trung bình mũ</dfn> (<span class="en">exponential averaging</span>) <code>ước lượng mới = α × lần đo mới + (1 − α) × ước lượng cũ</code>, với <var>α</var> từ 0 đến 1. Nếu lần đo mới là 2, ước lượng cũ là 6 và <var>α</var> = 0,5, lần dự đoán kế là 4. Việc dài có thể đợi lâu nếu liên tục có việc ngắn đến.</p>
-        <h4>Chia lượt và dùng độ ưu tiên</h4>
-        <p><dfn>Xoay vòng</dfn> (<span class="en">round robin, RR</span>) cấp cho đầu hàng tối đa một <dfn>lượng tử thời gian</dfn> (<span class="en">time quantum</span>). Nếu việc chưa hết đợt khi lượng tử hết, nó về cuối hàng. Việc đã sẵn sàng có cơ hội nhận lượt đầu sớm hơn khi có một đợt dài đang chạy. Lượng tử quá lớn khiến RR gần giống FCFS. Lượng tử quá nhỏ so với chi phí chuyển ngữ cảnh dành nhiều thời gian cho đổi lượt. Nếu A đang chạy một mình và hết lượng tử, A có thể được chọn lại.</p>
+        <h4 id="rr">5.3.3 · Round-Robin Scheduling <span class="vi">Xoay vòng</span></h4>
+        <p><dfn>Xoay vòng</dfn> (<span class="en">round robin, RR</span>) cấp cho đầu hàng tối đa một <dfn>lượng tử thời gian</dfn> (<span class="en">time quantum</span>). Nếu việc chưa hết đợt khi lượng tử hết, nó về cuối hàng. Việc đã sẵn sàng có cơ hội nhận lượt đầu sớm hơn khi có một đợt dài đang chạy. Lượng tử quá lớn khiến RR gần giống FCFS. Lượng tử quá nhỏ so với chi phí chuyển ngữ cảnh dành nhiều thời gian cho đổi lượt. Với lượng tử 1 ms và mỗi lần chuyển mất 0,1 ms, gần 10% thời gian CPU chỉ để đổi lượt. Hệ thống thật thường dùng lượng tử 10–100 ms, trong khi chuyển ngữ cảnh chỉ mất dưới 10 µs. Kinh nghiệm được giáo trình nêu: khoảng 80% đợt CPU nên ngắn hơn lượng tử. Nếu A đang chạy một mình và hết lượng tử, A có thể được chọn lại.</p>
+        <h4 id="uu-tien">5.3.4 · Priority Scheduling <span class="vi">Lập lịch theo độ ưu tiên</span></h4>
         <p><dfn>Lập lịch ưu tiên</dfn> (<span class="en">priority scheduling</span>) chọn theo độ ưu tiên gán cho công việc. Ví dụ ở đây dùng số nhỏ cho ưu tiên cao. Nhạc có thể cần lượt sớm để nạp bộ đệm đúng nhịp. Bản thu hồi có thể ngắt công việc khi một việc ưu tiên cao hơn xuất hiện. Bản không thu hồi chỉ so ưu tiên khi CPU có thể cấp lượt mới. Nếu việc ưu tiên thấp chờ mãi vì thường xuyên có việc ưu tiên cao, đó là <dfn>đói tài nguyên</dfn> (<span class="en">starvation</span>). <dfn>Tăng ưu tiên theo thời gian chờ</dfn> (<span class="en">aging</span>) giúp các việc đã đợi lâu có cơ hội tiến lên. Các việc cùng mức có thể chia lượt bằng RR.</p>
-        <h4>Nhiều hàng và phản hồi qua các lượt đã dùng</h4>
+        <h4 id="mlq">5.3.5 · Multilevel Queue Scheduling <span class="vi">Hàng đợi đa mức</span></h4>
         <p><dfn>Hàng đợi đa mức</dfn> (<span class="en">multilevel queue, MLQ</span>) phân công việc vào những hàng cố định theo lớp. Ví dụ việc tương tác vào hàng cao dùng RR, việc nền vào hàng thấp dùng FCFS. Cần quy định cả cách chọn giữa các hàng. Có thể luôn chọn hàng cao nếu có việc, hoặc cấp mỗi hàng một phần thời gian CPU. Với ưu tiên tuyệt đối, hàng thấp có thể chờ rất lâu.</p>
+        <h4 id="mlfq">5.3.6 · Multilevel Feedback Queue Scheduling <span class="vi">Hàng đợi phản hồi đa mức</span></h4>
         <p><dfn>Hàng đợi phản hồi đa mức</dfn> (<span class="en">multilevel feedback queue, MLFQ</span>) cho phép việc chuyển hàng. Ở ví dụ sau, mọi việc vào Q0 với lượng tử 2, việc dùng hết lượt mà còn việc xuống Q1 với lượng tử 4, rồi xuống Q2 dùng FCFS. Lượt ngắn ở Q0 giúp việc mới sớm có cơ hội chạy. Ở hàng dưới, việc dài được lượt lớn hơn khi các hàng trên trống. Nếu việc mới vào Q0 lúc Q1 đang chạy, ví dụ thu hồi Q1 và giữ lượng tử Q1 còn lại. Mô phỏng dùng các đợt CPU hữu hạn và chỉ minh họa hạ mức. Chính sách thực tế phải quy định cách nâng mức, chẳng hạn nâng việc đã đợi lâu để giảm nguy cơ đói tài nguyên.</p>
         <figure class="fig">
           <ol class="visual-flow feedback-map"><li class="kernel-zone"><strong>Q0 · RR, 2 đơn vị</strong><small>Việc mới vào đây</small></li><li><strong>Q1 · RR, 4 đơn vị</strong><small>Việc đã hết lượt Q0</small></li><li><strong>Q2 · FCFS</strong><small>Việc đã hết lượt Q1</small></li></ol>
           <figcaption><b>Hai quyết định của MLFQ.</b> Mũi tên biểu thị hạ mức khi dùng hết lượt mà vẫn còn việc. Khi cấp CPU, bộ lập lịch luôn kiểm tra Q0 trước, đến Q1 rồi Q2. Vì vậy việc ở Q2 có thể bị ngắt khi một việc mới vào Q0.</figcaption>
         </figure>
-        <p>Với tập “Việc nền đến trước”, dừng ở lượt M vừa xuất hiện. Dự đoán còn bao lâu M mới nhận CPU theo FCFS, rồi thử RR với lượng tử 2. Khi tới cuối lịch, đối chiếu thời gian đáp ứng của M và thời gian chờ trung bình với cùng một mốc FCFS. Hai số có thể thay đổi khác nhau vì một số đo riêng M và số kia tính mọi việc.</p>
+        <h4 id="so-sanh-thuat-toan">Nhìn lại sáu thuật toán <span class="vi">Mỗi bước sửa gì, trả giá gì</span></h4>
+        <div class="tbl-wrap"><table class="tbl">
+          <caption>Chuỗi cải tiến: mỗi dòng sửa một vấn đề của dòng trên và trả một cái giá.</caption>
+          <thead><tr><th scope="col">Thuật toán</th><th scope="col">Sửa được gì</th><th scope="col">Cái giá</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">FCFS</th><td>Đơn giản, công bằng theo thứ tự đến.</td><td>Hiệu ứng đoàn xe. Không thu hồi, nên không hợp với hệ tương tác.</td></tr>
+            <tr><th scope="row">SJF / SRTF</th><td>Thời gian chờ trung bình nhỏ nhất.</td><td>Phải đoán độ dài đợt CPU. Việc dài có thể đói.</td></tr>
+            <tr><th scope="row">RR</th><td>Không cần đoán. Mọi việc sớm nhận lượt, đáp ứng tốt.</td><td>Thời gian chờ trung bình thường dài hơn SJF. Phụ thuộc lượng tử.</td></tr>
+            <tr><th scope="row">Ưu tiên</th><td>Phản ánh tầm quan trọng của công việc.</td><td>Đói tài nguyên, cần aging.</td></tr>
+            <tr><th scope="row">MLQ</th><td>Mỗi lớp việc một chính sách riêng.</td><td>Việc bị gắn cố định vào lớp.</td></tr>
+            <tr><th scope="row">MLFQ</th><td>Tự học từ hành vi: việc ngắn, tương tác nổi lên trên.</td><td>Nhiều tham số phải chỉnh: số hàng, lượng tử, quy tắc nâng hạ.</td></tr>
+          </tbody>
+        </table></div>
+        <div class="box predict"><div class="box-h">Đoán trước</div><p>Với tập “Việc nền đến trước”, việc giải mã nhạc M đến ở mốc 5 và chỉ cần 1 đơn vị. Theo FCFS, M phải đợi bao lâu? Đổi sang RR lượng tử 2 thì sao? Ghi hai con số ra giấy trước khi chạy.</p></div>
+        <p>Chạy hết lịch rồi so hai số đo: đối chiếu thời gian đáp ứng của M và thời gian chờ trung bình với cùng một mốc FCFS. Hai số có thể thay đổi khác nhau vì một số đo riêng M và số kia tính mọi việc.</p>
         <div id="mo-phong-lap-lich" data-lab="schedule"></div>
 
-        <h3 id="lap-lich-da-loi">5.4–5.5 · Ai tranh CPU trong hệ nhiều luồng và nhiều lõi?</h3>
+        <h3 id="lap-lich-da-loi">5.4 · Thread Scheduling <span class="vi">Lập lịch luồng</span></h3>
         <p>Trong mô hình có bộ lập lịch cấp người dùng, <dfn>phạm vi tranh chấp trong tiến trình</dfn> (<span class="en">process-contention scope, PCS</span>) chọn luồng từ các luồng của cùng tiến trình để gán cho thực thể thực thi cấp kernel. <dfn>Phạm vi tranh chấp toàn hệ thống</dfn> (<span class="en">system-contention scope, SCS</span>) là lựa chọn của kernel giữa các luồng cấp kernel trong hệ thống. Pthreads có các hằng <code>PTHREAD_SCOPE_PROCESS</code> và <code>PTHREAD_SCOPE_SYSTEM</code> để yêu cầu phạm vi khi hệ thống hỗ trợ. Với ánh xạ một–một như ví dụ Linux trong sách, việc tranh CPU xảy ra ở cấp kernel.</p>
+        <h3 id="lap-lich-da-xu-ly">5.5 · Multi-Processor Scheduling <span class="vi">Lập lịch đa bộ xử lý</span></h3>
         <p>Trong cách tổ chức đa xử lý bất đối xứng (<span class="en">asymmetric multiprocessing</span>), một bộ xử lý chính có thể lo quyết định lập lịch. Trong đa xử lý đối xứng (<span class="en">symmetric multiprocessing, SMP</span>), các bộ xử lý tự lập lịch. Một hàng chung giúp lõi rỗi tìm việc, nhưng nhiều lõi truy cập cùng hàng nên cần phối hợp. Với hàng riêng theo lõi, đường chọn cục bộ đơn giản hơn. Nếu lõi 1 có bốn việc còn lõi 2 rỗi, <dfn>cân bằng tải</dfn> (<span class="en">load balancing</span>) có thể đẩy việc từ lõi bận (<span class="en">push migration</span>) hoặc kéo việc về lõi rỗi (<span class="en">pull migration</span>).</p>
         <p>Giữ luồng lập chỉ mục ở lõi cũ có thể tận dụng dữ liệu còn trong cache. Xu hướng đó gọi là <dfn>tính gắn kết bộ xử lý</dfn> (<span class="en">processor affinity</span>). Gắn kết mềm là cố gắng giữ. Gắn kết cứng giới hạn tập lõi được phép chạy. Trên máy <dfn>truy cập bộ nhớ không đồng nhất</dfn> (<span class="en">non-uniform memory access, NUMA</span>), bộ nhớ gần một bộ xử lý thường truy cập nhanh hơn bộ nhớ thuộc nút khác, nên chuyển luồng có thể làm các lần truy cập hiện tại trở nên đắt hơn. Bộ lập lịch phải cân nhắc lợi ích chạy sớm với chi phí mất tính cục bộ.</p>
-        <p>Một lõi vật lý có thể cung cấp nhiều luồng phần cứng (<span class="en">hardware threads</span>) dùng chung tài nguyên bên trong lõi. Hệ điều hành thấy các bộ xử lý logic, còn phần cứng điều phối việc dùng các tài nguyên thực thi để tận dụng những lúc một luồng bị nghẽn. Hai luồng logic trên cùng lõi có thể tranh tài nguyên của lõi. Trên máy có lõi không đồng nhất (<span class="en">heterogeneous multiprocessing</span>), hệ điều hành còn có thể chọn lõi nhanh cho công việc cần phản hồi gấp, hoặc lõi tiết kiệm điện cho công việc nhẹ hay nền.</p>
+        <p>Bộ xử lý hiện đại nhanh hơn bộ nhớ nhiều lần. Khi lõi truy cập dữ liệu không có trong cache, nó phải ngồi chờ bộ nhớ, có khi chiếm tới một nửa thời gian. Hiện tượng này gọi là <dfn>memory stall</dfn>. Giải pháp phần cứng là đặt hai hay nhiều <dfn>luồng phần cứng</dfn> (<span class="en">hardware threads</span>) trên một lõi: khi luồng này chờ bộ nhớ, lõi chuyển sang luồng kia. Intel gọi kỹ thuật này là <span class="en">hyper-threading</span>, tên chung là <span class="en">simultaneous multithreading</span> (SMT) hay <span class="en">chip multithreading</span> (CMT).</p>
+        <figure class="fig">
+          <div class="gantt-compare stall-chart">
+            <div class="gantt-head"><span>Luồng phần cứng</span><span>C: tính toán · M: chờ bộ nhớ</span><span>Lõi bận</span></div>
+            <div class="gantt-row"><b>1 luồng</b><ol style="--t:12"><li data-job="1" style="grid-column:1/2">C</li><li data-job="3" style="grid-column:2/4">M</li><li data-job="1" style="grid-column:4/5">C</li><li data-job="3" style="grid-column:5/7">M</li><li data-job="1" style="grid-column:7/8">C</li><li data-job="3" style="grid-column:8/10">M</li><li data-job="1" style="grid-column:10/11">C</li><li data-job="3" style="grid-column:11/13">M</li></ol><em>33%</em></div>
+            <div class="gantt-row"><b>Luồng 0</b><ol style="--t:12"><li data-job="1" style="grid-column:1/2">C</li><li data-job="3" style="grid-column:2/4">M</li><li data-job="1" style="grid-column:4/5">C</li><li data-job="3" style="grid-column:5/7">M</li><li data-job="1" style="grid-column:7/8">C</li><li data-job="3" style="grid-column:8/10">M</li><li data-job="1" style="grid-column:10/11">C</li><li data-job="3" style="grid-column:11/13">M</li></ol><em></em></div>
+            <div class="gantt-row"><b>Luồng 1</b><ol style="--t:12"><li data-job="2" style="grid-column:2/3">C</li><li data-job="3" style="grid-column:3/5">M</li><li data-job="2" style="grid-column:5/6">C</li><li data-job="3" style="grid-column:6/8">M</li><li data-job="2" style="grid-column:8/9">C</li><li data-job="3" style="grid-column:9/11">M</li><li data-job="2" style="grid-column:11/12">C</li><li data-job="3" style="grid-column:12/13">M</li></ol><em class="good">67%</em></div>
+          </div>
+          <figcaption><b>Lấp khoảng chờ bộ nhớ.</b> Một luồng phần cứng chỉ giữ lõi bận một phần ba thời gian. Với hai luồng, lúc luồng 0 chờ bộ nhớ thì lõi tính cho luồng 1, nên tỉ lệ bận tăng gấp đôi dù mỗi luồng không chạy nhanh hơn. Số liệu chỉ để minh họa.</figcaption>
+        </figure>
+        <p>Có hai cách đan luồng trên một lõi. <dfn>Đa luồng thô</dfn> (<span class="en">coarse-grained multithreading</span>) chỉ đổi luồng khi gặp sự kiện chờ lâu như memory stall, và mỗi lần đổi phải xả pipeline nên tốn kém. <dfn>Đa luồng mịn</dfn> (<span class="en">fine-grained multithreading</span>) đổi luồng ở ranh giới từng chu kỳ lệnh, nhờ phần cứng có logic chuyển luồng riêng nên chi phí nhỏ. Hệ điều hành thấy mỗi luồng phần cứng như một CPU logic, nên giờ có <em>hai cấp lập lịch</em>: OS chọn luồng phần mềm cho từng CPU logic, còn lõi chọn luồng phần cứng nào chạy ở mỗi chu kỳ. Hai luồng logic trên cùng lõi vẫn tranh tài nguyên bên trong lõi, nên OS biết điều này thì nên đặt hai luồng bận lên hai lõi khác nhau trước. Trên máy có lõi không đồng nhất (<span class="en">heterogeneous multiprocessing</span>), hệ điều hành còn có thể chọn lõi nhanh cho công việc cần phản hồi gấp, hoặc lõi tiết kiệm điện cho công việc nhẹ hay nền.</p>
 
-        <h3 id="thoi-gian-thuc">5.6 · Khi hoàn tất muộn cũng là một lỗi</h3>
+        <h3 id="thoi-gian-thuc">5.6 · Real-Time CPU Scheduling <span class="vi">Lập lịch CPU thời gian thực</span></h3>
         <p>Trình phát nhạc cần cấp dữ liệu trước khi bộ đệm cạn. Nếu chậm, âm thanh có thể đứt quãng. <dfn>Thời gian thực mềm</dfn> (<span class="en">soft real-time</span>) ưu tiên kết quả đúng hạn, có thể chịu suy giảm khi có lần muộn. Trong <dfn>thời gian thực cứng</dfn> (<span class="en">hard real-time</span>), việc đáp ứng hạn đã cam kết là yêu cầu của hệ thống. Ưu tiên cao giúp công việc bắt đầu sớm hơn, còn bảo đảm đúng hạn cần xét cả tải và giới hạn thời gian trong trường hợp xấu.</p>
         <p><dfn>Độ trễ ngắt</dfn> (<span class="en">interrupt latency</span>) là thời gian từ lúc ngắt xuất hiện đến khi trình xử lý bắt đầu. Độ trễ chuyển giao xảy ra sau quyết định cần chuyển việc. Công việc ưu tiên cao cũng có thể đợi tài nguyên do việc ưu tiên thấp giữ. Khi một việc ưu tiên trung bình liên tục chiếm CPU và cản việc ưu tiên thấp giải phóng tài nguyên, công việc ưu tiên cao bị trì hoãn. Đó là <dfn>đảo ưu tiên</dfn> (<span class="en">priority inversion</span>). Một cách xử lý là <dfn>kế thừa ưu tiên</dfn> (<span class="en">priority inheritance</span>), tạm nâng ưu tiên của bên giữ tài nguyên cho đến khi nó giải phóng tài nguyên.</p>
         <p>Với tác vụ định kỳ, mỗi lần phát hành cách nhau <dfn>chu kỳ</dfn> (<span class="en">period</span>) <var>T</var>. Mỗi lần cần <var>C</var> đơn vị CPU và có <dfn>hạn tương đối</dfn> (<span class="en">relative deadline</span>) <var>D</var> tính từ lúc phát hành. Hạn tuyệt đối là lúc phát hành cộng <var>D</var>. Kiểm soát tiếp nhận (<span class="en">admission control</span>) xét xem có thể nhận việc mới mà vẫn đáp ứng cam kết cho cả tập việc hay không.</p>
@@ -283,37 +497,163 @@
         </figure>
         <p>Trong mô hình một lõi lý tưởng, các tác vụ định kỳ độc lập với hạn bằng chu kỳ và có thể bị thu hồi tạo tải tổng <code>Σ(C / T)</code>. EDF có thể đáp ứng mọi hạn nếu tổng tải không vượt 1 trong mô hình đó. Với <var>n</var> tác vụ, ngưỡng tải đủ để RMS bảo đảm là <code>n × (2^(1/n) − 1)</code>, khoảng 0,83 cho hai tác vụ. Ví dụ A và B tạo tải <code>2/5 + 4/7 ≈ 0,97</code>. Vượt ngưỡng đủ của RMS cần xét lịch cụ thể, như đã làm ở mốc 7. Giáo trình cũng giới thiệu <dfn>chia CPU theo tỷ lệ</dfn> (<span class="en">proportional share</span>), cấp phần thời gian dựa trên tỷ lệ cổ phần, và các chính sách thời gian thực POSIX như <code>SCHED_FIFO</code> và <code>SCHED_RR</code>, khác nhau ở cách xử lý các luồng cùng mức ưu tiên.</p>
 
-        <h3 id="danh-gia">5.7–5.8 · Hệ điều hành thật và cách đánh giá lịch</h3>
-        <p>Mỗi hệ điều hành kết hợp nhiều cơ chế. Các ví dụ sau mô tả thiết kế trong ấn bản năm 2018. Bộ lập lịch công bằng CFS của Linux (<span class="en">Completely Fair Scheduler</span>) dùng <dfn>thời gian chạy ảo</dfn> (<span class="en">virtual runtime</span>) để theo dõi phần CPU mà tác vụ đã nhận có xét trọng số. Tác vụ có thời gian ảo nhỏ hơn được ưu tiên chạy. Windows chọn luồng sẵn sàng theo mức ưu tiên và có thể tăng tạm mức ưu tiên khi một luồng thoát chờ, chẳng hạn sau I/O. Solaris tổ chức theo lớp lập lịch. Lớp chia sẻ thời gian điều chỉnh ưu tiên và lượng tử dựa trên hành vi của luồng. Những ví dụ này cho thấy cách phối hợp phản hồi, ưu tiên và phân chia CPU.</p>
-        <p><dfn>Mô hình tất định</dfn> (<span class="en">deterministic modeling</span>) dùng một tập việc cố định để tính chính xác trong các giả sử đã nêu, như mô phỏng một lõi ở trên. Với tải ngẫu nhiên, <dfn>mô hình hàng đợi</dfn> (<span class="en">queueing model</span>) dùng tốc độ đến và phân bố thời gian phục vụ. Khi hàng ở chế độ ổn định, định luật Little cho kỳ vọng dài hạn <code>L = λ × W</code>, với <var>L</var> là số việc trung bình, <var>λ</var> là tốc độ qua hàng và <var>W</var> là thời gian trung bình trong cùng hàng. Nếu trung bình 2 việc mỗi giây đi qua hàng sẵn sàng và mỗi việc ở đó 1,5 giây, trung bình có 3 việc trong hàng.</p>
+        <h3 id="vi-du-lap-lich">5.7 · Operating-System Examples <span class="vi">Lập lịch trong Linux, Windows và Solaris</span></h3>
+        <p>Mỗi hệ điều hành kết hợp nhiều cơ chế. Các ví dụ sau mô tả thiết kế trong ấn bản năm 2018. Bộ lập lịch công bằng CFS của Linux (<span class="en">Completely Fair Scheduler</span>) dùng <dfn>thời gian chạy ảo</dfn> (<span class="en">virtual runtime</span>) để theo dõi phần CPU mà tác vụ đã nhận có xét trọng số. Tác vụ có thời gian ảo nhỏ hơn được ưu tiên chạy, và CFS giữ các tác vụ sẵn sàng trong một cây đỏ–đen sắp theo thời gian ảo để lấy ra tác vụ nhỏ nhất thật nhanh. Bối cảnh hiện nay: từ Linux 6.6 (cuối năm 2023), bộ lập lịch mặc định chuyển sang EEVDF (<span class="en">earliest eligible virtual deadline first</span>). EEVDF vẫn dựa trên thời gian chạy ảo có trọng số như CFS, nhưng chọn tác vụ theo hạn ảo sớm nhất, giúp tác vụ cần độ trễ thấp được phục vụ đều hơn. Windows chọn luồng sẵn sàng theo mức ưu tiên và có thể tăng tạm mức ưu tiên khi một luồng thoát chờ, chẳng hạn sau I/O. Solaris tổ chức theo lớp lập lịch. Lớp chia sẻ thời gian điều chỉnh ưu tiên và lượng tử dựa trên hành vi của luồng. Những ví dụ này cho thấy cách phối hợp phản hồi, ưu tiên và phân chia CPU.</p>
+        <div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th scope="col">Hệ</th><th scope="col">Thang ưu tiên</th><th scope="col">Cơ chế đáng chú ý</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Linux</th><td>Thời gian thực 0–99, thông thường 100–139. Giá trị <span class="en">nice</span> từ −20 đến +19 đổi thành trọng số.</td><td>CFS chia CPU theo tỉ lệ trọng số trong một <span class="en">targeted latency</span>, chọn tác vụ có <span class="en">vruntime</span> nhỏ nhất. Miền lập lịch (<span class="en">scheduling domain</span>) giúp cân bằng tải mà vẫn tôn trọng NUMA.</td></tr>
+            <tr><th scope="row">Windows</th><td>32 mức. Lớp biến đổi (<span class="en">variable class</span>) 1–15, lớp thời gian thực 16–31, mức 0 cho luồng quản lý bộ nhớ.</td><td>Bộ điều phối (<span class="en">dispatcher</span>) chạy luồng ưu tiên cao nhất. Luồng thoát khỏi chờ được tăng ưu tiên tạm thời, cửa sổ tiền cảnh được lượng tử dài hơn.</td></tr>
+            <tr><th scope="row">Solaris</th><td>Sáu lớp: chia sẻ thời gian (TS), tương tác (IA), thời gian thực (RT), hệ thống (SYS), chia phần công bằng (FSS), ưu tiên cố định (FP).</td><td>Bảng điều phối (<span class="en">dispatch table</span>) cho lớp TS: luồng dùng hết lượng tử bị hạ ưu tiên, luồng vừa thức dậy sau khi ngủ được nâng ưu tiên.</td></tr>
+          </tbody>
+        </table></div>
+        <h3 id="danh-gia">5.8 · Algorithm Evaluation <span class="vi">Đánh giá thuật toán</span></h3>
+        <p>Chọn thuật toán bắt đầu từ việc nêu rõ tiêu chí, chẳng hạn “tối đa mức dùng CPU với điều kiện thời gian đáp ứng không quá 300 ms”. Sau đó có bốn cách đánh giá, từ rẻ đến đắt. <dfn>Mô hình tất định</dfn> (<span class="en">deterministic modeling</span>), một dạng <span class="en">analytic evaluation</span>, dùng một tập việc cố định để tính chính xác trong các giả sử đã nêu, như mô phỏng một lõi ở trên. Với tải ngẫu nhiên, <dfn>mô hình hàng đợi</dfn> (<span class="en">queueing model</span>) dùng tốc độ đến và phân bố thời gian phục vụ. Khi hàng ở chế độ ổn định, định luật Little cho kỳ vọng dài hạn <code>L = λ × W</code>, với <var>L</var> là số việc trung bình, <var>λ</var> là tốc độ qua hàng và <var>W</var> là thời gian trung bình trong cùng hàng. Nếu trung bình 2 việc mỗi giây đi qua hàng sẵn sàng và mỗi việc ở đó 1,5 giây, trung bình có 3 việc trong hàng.</p>
         <p>Mô phỏng bằng dấu vết thu từ hệ thống cho phép chạy lại cùng tải để so nhiều chính sách. Cài đặt và đo trên hệ thống thật cho thấy cả chi phí mà mô hình bỏ qua, như chuyển ngữ cảnh, cache và phối hợp trên nhiều lõi. Kết quả của một tập việc ngắn giúp giải thích cơ chế. Khi đánh giá cho một hệ thống, cần chọn dấu vết đại diện và theo dõi thước đo tương ứng với mục tiêu của hệ đó.</p>
       </section>
 
       <section aria-labelledby="ghi-nho">
-        <h2 id="ghi-nho">Nhìn lại từ lúc đọc tệp đến lúc có kết quả</h2>
+        <h2 id="ghi-nho"><span>Summary &amp; Review <span class="vi">Tổng kết và ôn tập</span></span></h2>
         <p>Khi trình soạn thảo đọc tệp, yêu cầu chưa có dữ liệu có thể đưa dòng thực thi vào trạng thái chờ. Ngắt hoàn tất I/O cho nó trở lại hàng sẵn sàng. PCB và ngữ cảnh đã lưu cho phép nó tiếp tục đúng chỗ khi được cấp CPU. Trình soạn thảo có thể giao việc lập chỉ mục cho tiến trình khác và nhận kết quả qua IPC, hoặc dùng luồng cùng tiến trình để thuận tiện chia sẻ dữ liệu.</p>
         <p>Bộ lập lịch chọn giữa các luồng sẵn sàng và bộ chuyển giao thực hiện lựa chọn. Xen kẽ lượt tạo đồng thời trên một lõi. Nhiều lõi cho phép các phần độc lập chạy song song, nhưng bước ghép vẫn phụ thuộc vào việc hoàn thành các phần đó. Cách chia việc quyết định công việc nào có thể sẵn sàng. Chính sách lập lịch quyết định công việc sẵn sàng nào được chạy trước. Trong cả hai trường hợp, thứ tự truy cập dữ liệu dùng chung có thể ảnh hưởng đến kết quả. Đó là câu hỏi mở đầu cho buổi về đồng bộ.</p>
 
-        <h3 id="tu-kiem-tra">Câu hỏi và bài tập tự kiểm tra</h3>
+        <h3 id="tu-kiem-tra">Practice Exercises <span class="vi">Câu hỏi và bài tập tự kiểm tra</span></h3>
         <p>Thử viết câu trả lời hoặc vẽ lịch trước khi mở lời giải. Câu 7 và 8 dùng tập “Việc nền đến trước”. A đến ở 0 và cần 8 đơn vị CPU, B đến ở 1 và cần 4, C đến ở 2 và cần 2, còn M đến ở 5 và cần 1.</p>
-        <details class="quiz"><summary>1. Ổ lưu trữ báo đã đọc xong, nhưng CPU đang chạy trình phát nhạc. Trình soạn thảo chuyển sang trạng thái nào?</summary><p>Sang <em>sẵn sàng</em>. Tiến trình đã có điều kiện tiếp tục nhưng phải được cấp CPU. Nếu lúc này kernel cho trình phát nhạc tiếp tục, ngắt đã được xử lý mà hai tiến trình chưa đổi lượt. Khi đổi lượt thật, ngữ cảnh được lưu và khôi phục để mỗi bên tiếp tục từ đúng chỗ.</p></details>
-        <details class="quiz"><summary>2. PID 70 gọi fork và con có PID 71. Con chạy exec rồi thoát, còn cha chưa đợi. Ai nhận giá trị nào và còn mục nào trong bảng tiến trình?</summary><p>Cha nhận 71 từ <code>fork()</code>, con nhận 0. <code>exec</code> giữ PID 71. Mục của PID 71 còn giữ trạng thái thoát nên con là zombie cho đến khi cha thu trạng thái bằng một lời gọi đợi phù hợp.</p></details>
-        <details class="quiz"><summary>3. Hộp thư chặn có một ô. Bên gửi đẩy X rồi gọi gửi Y ngay. Bên nhận chưa đọc. Bên nào có thể tiến tiếp?</summary><p>X chiếm ô duy nhất. Lần gửi Y phải đợi còn chỗ. Bên nhận có thể lấy X, làm trống ô. Khi bên gửi tiếp tục và ghi được Y, lần nhận sau mới có thể lấy Y. Với hai ô, cả hai lần gửi có thể hoàn tất trước lần nhận đầu.</p></details>
-        <details class="quiz"><summary>4. RPC ghi thêm một mục. Máy khách hết thời gian chờ. Vì sao gửi lại ngay có thể tạo hai mục?</summary><p>Máy chủ có thể đã ghi nhưng phản hồi bị mất. Gửi lại như yêu cầu mới có thể làm lần ghi thứ hai. Nếu giao thức dùng cùng mã yêu cầu khi gửi lại và phía máy chủ lưu thông tin đã xử lý, nó có thể trả lại kết quả cũ trong phạm vi thông tin đó còn hiệu lực.</p></details>
-        <details class="quiz"><summary>5. Hai luồng xử lý hai đoạn tệp. Máy một lõi có thể cho cả hai tiến triển thế nào? Nếu ánh xạ nhiều–một trên máy hai lõi thì sao?</summary><p>Máy một lõi có thể xen kẽ thực thi hai luồng. Với nhiều–một, hai luồng vẫn chia cùng một luồng kernel, nên hai lõi chưa đủ để chúng chạy song song. Nếu phần việc độc lập và ánh xạ một–một, mỗi luồng sẵn sàng có thể chạy trên một lõi.</p></details>
-        <details class="quiz"><summary>6. Một phép xử lý mất 24 ms trên một lõi, trong đó 6 ms buộc tuần tự. Tính thời gian lý tưởng trên ba lõi và trần tăng tốc.</summary><p>Phần chia được là 18 ms. Ba lõi chia đều, mất 6 ms cho phần này và 6 ms tuần tự, tổng 12 ms. Tăng tốc là 24/12 = 2 lần. Khi số lõi tăng vô hạn, thời gian còn ít nhất 6 ms và mức tăng tốc không vượt 4 lần.</p></details>
-        <details class="quiz"><summary>7. Dùng tập “Việc nền đến trước”, tính lịch FCFS và thời gian chờ trung bình.</summary><p>A chạy 0–8, B 8–12, C 12–14, M 14–15. Thời gian chờ lần lượt là 0, 7, 10 và 9, trung bình (0 + 7 + 10 + 9)/4 = 6,5 đơn vị. M đến lúc 5 và lần đầu chạy lúc 14, nên đáp ứng sau 9 đơn vị.</p></details>
-        <details class="quiz"><summary>8. Cùng tập đó, dùng RR lượng tử 2. Việc đến ở mốc 2 đứng ở đâu, và M được chạy lúc nào?</summary><p>B đã vào hàng tại 1. C tới đúng lúc A hết lượt tại 2, nên theo quy ước mô phỏng, hàng lúc đó là B, C, A. Lịch là A 0–2, B 2–4, C 4–6, A 6–8, B 8–10, M 10–11, A 11–13 và A 13–15. M đáp ứng sau 10 − 5 = 5 đơn vị. Lần hết lượt cuối của A vẫn được ghi riêng dù lõi có thể cấp tiếp cho chính A.</p></details>
-        <details class="quiz"><summary>9. A chạy từ 0 và cần 5 đơn vị. B đến lúc 2 cần 3 đơn vị. Theo SRTF, B có lấy CPU ngay trong mô phỏng không?</summary><p>Tại mốc 2, A còn 3 và B cần 3. Quy ước mô phỏng giữ việc đang chạy khi bằng nhau, nên A tiếp tục đến 5 và B chạy từ 5 tới 8. Nếu B chỉ cần 2 thì B lấy CPU tại 2, làm xong tại 4 rồi A chạy tiếp đến 7.</p></details>
-        <details class="quiz"><summary>10. Q1 đang chạy và còn 3 đơn vị lượng tử. Một việc mới vào Q0. Trong MLFQ của bài, Q1 xử lý thế nào?</summary><p>Việc Q0 được ưu tiên và lấy CPU. Việc dở ở Q1 trở về đầu Q1 với 3 đơn vị lượng tử còn lại. Chỉ khi hết lượng tử của Q1 và vẫn còn việc nó mới xuống Q2. Nhờ vậy, việc mới có thể phản hồi sớm và việc cũ giữ phần lượt đã được cấp mà chưa dùng.</p></details>
-        <details class="quiz"><summary>11. Lõi 1 có việc sẵn sàng, lõi 2 đang rỗi. Vì sao chuyển việc sang lõi 2 có thể vừa có lợi vừa có chi phí?</summary><p>Chuyển việc có thể giảm thời gian đợi CPU. Dữ liệu đang nóng trong cache của lõi 1 có thể phải nạp lại ở lõi 2. Với NUMA, việc cũng có thể phải truy cập bộ nhớ xa hơn. Hai yếu tố này giúp giải thích vì sao cân bằng tải và gắn kết lõi cần được xét cùng nhau.</p></details>
-        <details class="quiz"><summary>12. Ở mốc 5 của ví dụ thời gian thực, nếu hạn B₁ đổi từ 7 thành 11 và các mốc còn lại giữ nguyên đến thời điểm này, EDF chọn ai?</summary><p>Chọn A₂ vì hạn tuyệt đối của A₂ là 10, sớm hơn 11 của B₁. Quyết định dựa trên hạn của các việc sẵn sàng. Ngay sau khi A₂ hoàn tất, bộ lập lịch xét lại các việc còn sẵn sàng để chọn lượt tiếp.</p></details>
-
-        <h3 id="giao-trinh">Giáo trình</h3>
-        <p class="src">Biên soạn theo Abraham Silberschatz, Peter Baer Galvin và Greg Gagne, <cite>Operating System Concepts</cite>, ấn bản 10, Wiley, 2018. Chương 3 <span lang="en">Processes</span> (tr. 105–156), Chương 4 <span lang="en">Threads &amp; Concurrency</span> (tr. 159–198) và Chương 5 <span lang="en">CPU Scheduling</span> (tr. 199–254). Tình huống, dữ liệu mô phỏng, sơ đồ và bài tập được soạn cho PADOS.</p>
+        <details class="quiz"><summary><span class="q">1. Ổ lưu trữ báo đã đọc xong, nhưng CPU đang chạy trình phát nhạc. Trình soạn thảo chuyển sang trạng thái nào?</span></summary><div class="ans"><p>Sang <em>sẵn sàng</em>. Tiến trình đã có điều kiện tiếp tục nhưng phải được cấp CPU. Nếu lúc này kernel cho trình phát nhạc tiếp tục, ngắt đã được xử lý mà hai tiến trình chưa đổi lượt. Khi đổi lượt thật, ngữ cảnh được lưu và khôi phục để mỗi bên tiếp tục từ đúng chỗ.</p></div></details>
+        <details class="quiz"><summary><span class="q">2. PID 70 gọi fork và con có PID 71. Con chạy exec rồi thoát, còn cha chưa đợi. Ai nhận giá trị nào và còn mục nào trong bảng tiến trình?</span></summary><div class="ans"><p>Cha nhận 71 từ <code>fork()</code>, con nhận 0. <code>exec</code> giữ PID 71. Mục của PID 71 còn giữ trạng thái thoát nên con là zombie cho đến khi cha thu trạng thái bằng một lời gọi đợi phù hợp.</p></div></details>
+        <details class="quiz"><summary><span class="q">3. Hộp thư chặn có một ô. Bên gửi đẩy X rồi gọi gửi Y ngay. Bên nhận chưa đọc. Bên nào có thể tiến tiếp?</span></summary><div class="ans"><p>X chiếm ô duy nhất. Lần gửi Y phải đợi còn chỗ. Bên nhận có thể lấy X, làm trống ô. Khi bên gửi tiếp tục và ghi được Y, lần nhận sau mới có thể lấy Y. Với hai ô, cả hai lần gửi có thể hoàn tất trước lần nhận đầu.</p></div></details>
+        <details class="quiz"><summary><span class="q">4. RPC ghi thêm một mục. Máy khách hết thời gian chờ. Vì sao gửi lại ngay có thể tạo hai mục?</span></summary><div class="ans"><p>Máy chủ có thể đã ghi nhưng phản hồi bị mất. Gửi lại như yêu cầu mới có thể làm lần ghi thứ hai. Nếu giao thức dùng cùng mã yêu cầu khi gửi lại và phía máy chủ lưu thông tin đã xử lý, nó có thể trả lại kết quả cũ trong phạm vi thông tin đó còn hiệu lực.</p></div></details>
+        <details class="quiz"><summary><span class="q">5. Hai luồng xử lý hai đoạn tệp. Máy một lõi có thể cho cả hai tiến triển thế nào? Nếu ánh xạ nhiều–một trên máy hai lõi thì sao?</span></summary><div class="ans"><p>Máy một lõi có thể xen kẽ thực thi hai luồng. Với nhiều–một, hai luồng vẫn chia cùng một luồng kernel, nên hai lõi chưa đủ để chúng chạy song song. Nếu phần việc độc lập và ánh xạ một–một, mỗi luồng sẵn sàng có thể chạy trên một lõi.</p></div></details>
+        <details class="quiz"><summary><span class="q">6. Một phép xử lý mất 24 ms trên một lõi, trong đó 6 ms buộc tuần tự. Tính thời gian lý tưởng trên ba lõi và trần tăng tốc.</span></summary><div class="ans"><p>Phần chia được là 18 ms. Ba lõi chia đều, mất 6 ms cho phần này và 6 ms tuần tự, tổng 12 ms. Tăng tốc là 24/12 = 2 lần. Khi số lõi tăng vô hạn, thời gian còn ít nhất 6 ms và mức tăng tốc không vượt 4 lần.</p></div></details>
+        <details class="quiz"><summary><span class="q">7. Dùng tập “Việc nền đến trước”, tính lịch FCFS và thời gian chờ trung bình.</span></summary><div class="ans"><p>A chạy 0–8, B 8–12, C 12–14, M 14–15. Thời gian chờ lần lượt là 0, 7, 10 và 9, trung bình (0 + 7 + 10 + 9)/4 = 6,5 đơn vị. M đến lúc 5 và lần đầu chạy lúc 14, nên đáp ứng sau 9 đơn vị.</p></div></details>
+        <details class="quiz"><summary><span class="q">8. Cùng tập đó, dùng RR lượng tử 2. Việc đến ở mốc 2 đứng ở đâu, và M được chạy lúc nào?</span></summary><div class="ans"><p>B đã vào hàng tại 1. C tới đúng lúc A hết lượt tại 2, nên theo quy ước mô phỏng, hàng lúc đó là B, C, A. Lịch là A 0–2, B 2–4, C 4–6, A 6–8, B 8–10, M 10–11, A 11–13 và A 13–15. M đáp ứng sau 10 − 5 = 5 đơn vị. Lần hết lượt cuối của A vẫn được ghi riêng dù lõi có thể cấp tiếp cho chính A.</p></div></details>
+        <details class="quiz"><summary><span class="q">9. A chạy từ 0 và cần 5 đơn vị. B đến lúc 2 cần 3 đơn vị. Theo SRTF, B có lấy CPU ngay trong mô phỏng không?</span></summary><div class="ans"><p>Tại mốc 2, A còn 3 và B cần 3. Quy ước mô phỏng giữ việc đang chạy khi bằng nhau, nên A tiếp tục đến 5 và B chạy từ 5 tới 8. Nếu B chỉ cần 2 thì B lấy CPU tại 2, làm xong tại 4 rồi A chạy tiếp đến 7.</p></div></details>
+        <details class="quiz"><summary><span class="q">10. Q1 đang chạy và còn 3 đơn vị lượng tử. Một việc mới vào Q0. Trong MLFQ của bài, Q1 xử lý thế nào?</span></summary><div class="ans"><p>Việc Q0 được ưu tiên và lấy CPU. Việc dở ở Q1 trở về đầu Q1 với 3 đơn vị lượng tử còn lại. Chỉ khi hết lượng tử của Q1 và vẫn còn việc nó mới xuống Q2. Nhờ vậy, việc mới có thể phản hồi sớm và việc cũ giữ phần lượt đã được cấp mà chưa dùng.</p></div></details>
+        <details class="quiz"><summary><span class="q">11. Lõi 1 có việc sẵn sàng, lõi 2 đang rỗi. Vì sao chuyển việc sang lõi 2 có thể vừa có lợi vừa có chi phí?</span></summary><div class="ans"><p>Chuyển việc có thể giảm thời gian đợi CPU. Dữ liệu đang nóng trong cache của lõi 1 có thể phải nạp lại ở lõi 2. Với NUMA, việc cũng có thể phải truy cập bộ nhớ xa hơn. Hai yếu tố này giúp giải thích vì sao cân bằng tải và gắn kết lõi cần được xét cùng nhau.</p></div></details>
+        <details class="quiz"><summary><span class="q">12. Ở mốc 5 của ví dụ thời gian thực, nếu hạn B₁ đổi từ 7 thành 11 và các mốc còn lại giữ nguyên đến thời điểm này, EDF chọn ai?</span></summary><div class="ans"><p>Chọn A₂ vì hạn tuyệt đối của A₂ là 10, sớm hơn 11 của B₁. Quyết định dựa trên hạn của các việc sẵn sàng. Ngay sau khi A₂ hoàn tất, bộ lập lịch xét lại các việc còn sẵn sàng để chọn lượt tiếp.</p></div></details>
+        <details class="quiz"><summary><span class="q">13. Bộ đệm vòng của mục 3.5 có <code>BUFFER_SIZE = 8</code>. Bên sản xuất chứa được tối đa bao nhiêu mục cùng lúc? Vì sao không phải 8?</span></summary><div class="ans"><p>Tối đa 7 mục. Bộ đệm rỗng khi <code>in == out</code>. Nếu cho ghi đủ 8 mục, <code>in</code> quay vòng và lại bằng <code>out</code>, nên không còn phân biệt được đầy với rỗng. Điều kiện đầy <code>(in + 1) % 8 == out</code> chủ ý bỏ trống một ô.</p></div></details>
+        <details class="quiz"><summary><span class="q">14. Ba việc P1 = 24, P2 = 3, P3 = 3 ms cùng đến lúc 0. Tính thời gian chờ trung bình theo SJF và theo RR với lượng tử 4. Vì sao RR vẫn được dùng dù kém SJF?</span></summary><div class="ans"><p>SJF chạy P2, P3, P1, thời gian chờ 0, 3, 6, trung bình 3 ms. RR chạy P1 0–4, P2 4–7, P3 7–10, rồi P1 10–30. P1 chờ 6, P2 chờ 4, P3 chờ 7, trung bình 17/3 ≈ 5,67 ms. RR không cần biết trước độ dài đợt CPU, và mọi việc đều sớm nhận lượt đầu, nên hợp với hệ tương tác.</p></div></details>
+        <details class="quiz"><summary><span class="q">15. Luồng giao diện gọi <code>pthread_cancel()</code> khi luồng lập chỉ mục đang giữ một mutex. So sánh hệ quả của hủy bất đồng bộ và hủy trì hoãn.</span></summary><div class="ans"><p>Hủy bất đồng bộ có thể dừng luồng ngay khi nó còn giữ mutex hoặc đang sửa dở dữ liệu chung, nên mutex có thể bị giữ mãi và dữ liệu không nhất quán. Hủy trì hoãn chỉ đặt yêu cầu. Luồng đích dừng ở điểm hủy như <code>pthread_testcancel()</code>, nơi nó đã trả khóa, hoặc chạy trình dọn dẹp để trả khóa trước khi kết thúc.</p></div></details>
+        <details class="quiz"><summary><span class="q">16. Máy có 2 lõi, mỗi lõi 2 luồng phần cứng, nên OS thấy 4 CPU logic. Có đúng 2 luồng phần mềm bận tính toán. Nên đặt chúng thế nào và vì sao?</span></summary><div class="ans"><p>Nên đặt hai luồng lên hai lõi vật lý khác nhau. Hai luồng phần cứng trên cùng một lõi dùng chung đơn vị thực thi và cache của lõi, nên đặt chung một lõi sẽ để lõi kia rỗi và hai luồng tranh nhau tài nguyên. Đây là lý do OS cần biết cấu trúc hai cấp lập lịch.</p></div></details>
+        <details class="quiz"><summary><span class="q">17. Gọi <code>clone()</code> với cờ <code>CLONE_VM</code> nhưng không có <code>CLONE_FILES</code>. Tác vụ con dùng chung gì với cha, và có gì riêng?</span></summary><div class="ans"><p>Con dùng chung không gian bộ nhớ, nên mọi thay đổi biến của bên này bên kia đều thấy. Bảng tệp đang mở thì con nhận một bản sao riêng, nên tệp mà con mở hay đóng sau đó không ảnh hưởng bảng của cha.</p></div></details>
+        <h3 id="thuat-ngu">Glossary <span class="vi">Bảng thuật ngữ Anh–Việt</span></h3>
+        <p>Các thuật ngữ được định nghĩa trong buổi học, sắp theo tên tiếng Anh. Cột cuối dẫn về mục nơi thuật ngữ xuất hiện lần đầu.</p>
+        <details class="quiz glossary"><summary><span class="q">Mở bảng 104 thuật ngữ</span></summary><div class="ans">
+          <div class="tbl-wrap"><table class="tbl glossary-table">
+            <thead><tr><th scope="col">Thuật ngữ</th><th scope="col">Tiếng Việt</th><th scope="col">Mục</th></tr></thead>
+            <tbody>
+              <tr><th scope="row" lang="en">address space</th><td>không gian địa chỉ</td><td><a href="#trang-thai">3.1</a></td></tr>
+              <tr><th scope="row" lang="en">aging</th><td>tăng ưu tiên theo thời gian chờ</td><td><a href="#uu-tien">5.3.4</a></td></tr>
+              <tr><th scope="row" lang="en">Amdahl&#x27;s law</th><td>định luật Amdahl</td><td><a href="#lap-trinh-da-loi">4.2</a></td></tr>
+              <tr><th scope="row" lang="en">asynchronous cancellation</th><td>hủy bất đồng bộ</td><td><a href="#huy-luong">4.6.3</a></td></tr>
+              <tr><th scope="row" lang="en">asynchronous threading</th><td>đa luồng bất đồng bộ</td><td><a href="#thu-vien-luong">4.4</a></td></tr>
+              <tr><th scope="row" lang="en">blocking</th><td>chặn</td><td><a href="#ipc-thong-diep">3.6</a></td></tr>
+              <tr><th scope="row" lang="en">cancellation point</th><td>điểm hủy</td><td><a href="#huy-luong">4.6.3</a></td></tr>
+              <tr><th scope="row" lang="en">child process</th><td>tiến trình con</td><td><a href="#tao-tien-trinh">3.3</a></td></tr>
+              <tr><th scope="row" lang="en">circular buffer</th><td>bộ đệm vòng</td><td><a href="#ipc-bo-nho-chung">3.5</a></td></tr>
+              <tr><th scope="row" lang="en">client</th><td>máy khách</td><td><a href="#client-server">3.8</a></td></tr>
+              <tr><th scope="row" lang="en">coarse-grained multithreading</th><td>đa luồng thô</td><td><a href="#lap-lich-da-xu-ly">5.5</a></td></tr>
+              <tr><th scope="row" lang="en">concurrency</th><td>thực thi đồng thời</td><td><a href="#lap-trinh-da-loi">4.2</a></td></tr>
+              <tr><th scope="row" lang="en">consumer</th><td>bên tiêu thụ</td><td><a href="#ipc">3.4</a></td></tr>
+              <tr><th scope="row" lang="en">context switch</th><td>chuyển ngữ cảnh</td><td><a href="#trang-thai">3.1</a></td></tr>
+              <tr><th scope="row" lang="en">convoy effect</th><td>hiệu ứng đoàn xe</td><td><a href="#fcfs">5.3.1</a></td></tr>
+              <tr><th scope="row" lang="en">CPU burst</th><td>đợt CPU</td><td><a href="#tieu-chi">5.1</a></td></tr>
+              <tr><th scope="row" lang="en">CPU scheduler</th><td>bộ lập lịch CPU</td><td><a href="#tieu-chi">5.1</a></td></tr>
+              <tr><th scope="row" lang="en">CPU utilization</th><td>mức sử dụng CPU</td><td><a href="#tieu-chi-danh-gia">5.2</a></td></tr>
+              <tr><th scope="row" lang="en">CPU–I/O burst cycle</th><td>chu kỳ CPU–I/O</td><td><a href="#tieu-chi">5.1</a></td></tr>
+              <tr><th scope="row" lang="en">data parallelism</th><td>song song dữ liệu</td><td><a href="#lap-trinh-da-loi">4.2</a></td></tr>
+              <tr><th scope="row" lang="en">deferred cancellation</th><td>hủy trì hoãn</td><td><a href="#huy-luong">4.6.3</a></td></tr>
+              <tr><th scope="row" lang="en">degree of multiprogramming</th><td>mức độ đa chương trình</td><td><a href="#lap-lich-tien-trinh">3.2</a></td></tr>
+              <tr><th scope="row" lang="en">deterministic modeling</th><td>mô hình tất định</td><td><a href="#danh-gia">5.8</a></td></tr>
+              <tr><th scope="row" lang="en">dispatch latency</th><td>độ trễ chuyển giao</td><td><a href="#tieu-chi">5.1</a></td></tr>
+              <tr><th scope="row" lang="en">dispatcher</th><td>bộ chuyển giao</td><td><a href="#tieu-chi">5.1</a></td></tr>
+              <tr><th scope="row" lang="en">earliest-deadline-first, EDF</th><td>hạn sớm nhất trước</td><td><a href="#thoi-gian-thuc">5.6</a></td></tr>
+              <tr><th scope="row" lang="en">economy</th><td>tính kinh tế</td><td><a href="#chia-luong">4.1</a></td></tr>
+              <tr><th scope="row" lang="en">exponential averaging</th><td>trung bình mũ</td><td><a href="#sjf">5.3.2</a></td></tr>
+              <tr><th scope="row" lang="en">fine-grained multithreading</th><td>đa luồng mịn</td><td><a href="#lap-lich-da-xu-ly">5.5</a></td></tr>
+              <tr><th scope="row" lang="en">first-come, first-served, FCFS</th><td>đến trước phục vụ trước</td><td><a href="#fcfs">5.3.1</a></td></tr>
+              <tr><th scope="row" lang="en">fork–join</th><td>tách–ghép</td><td><a href="#giao-viec">4.5</a></td></tr>
+              <tr><th scope="row" lang="en">hard real-time</th><td>thời gian thực cứng</td><td><a href="#thoi-gian-thuc">5.6</a></td></tr>
+              <tr><th scope="row" lang="en">hardware threads</th><td>luồng phần cứng</td><td><a href="#lap-lich-da-xu-ly">5.5</a></td></tr>
+              <tr><th scope="row" lang="en">implicit threading</th><td>luồng ngầm định</td><td><a href="#giao-viec">4.5</a></td></tr>
+              <tr><th scope="row" lang="en">interprocess communication, IPC</th><td>giao tiếp liên tiến trình</td><td><a href="#ipc">3.4</a></td></tr>
+              <tr><th scope="row" lang="en">interrupt latency</th><td>độ trễ ngắt</td><td><a href="#thoi-gian-thuc">5.6</a></td></tr>
+              <tr><th scope="row" lang="en">kernel thread</th><td>luồng cấp kernel</td><td><a href="#anh-xa">4.3</a></td></tr>
+              <tr><th scope="row" lang="en">lightweight process, LWP</th><td>tiến trình nhẹ</td><td><a href="#kich-hoat-lap-lich">4.6.5</a></td></tr>
+              <tr><th scope="row" lang="en">load balancing</th><td>cân bằng tải</td><td><a href="#lap-lich-da-xu-ly">5.5</a></td></tr>
+              <tr><th scope="row" lang="en">mailbox</th><td>hộp thư</td><td><a href="#ipc-thong-diep">3.6</a></td></tr>
+              <tr><th scope="row" lang="en">many-to-many model</th><td>mô hình nhiều–nhiều</td><td><a href="#anh-xa">4.3</a></td></tr>
+              <tr><th scope="row" lang="en">many-to-one model</th><td>mô hình nhiều–một</td><td><a href="#anh-xa">4.3</a></td></tr>
+              <tr><th scope="row" lang="en">marshalling</th><td>đóng gói tham số</td><td><a href="#client-server">3.8</a></td></tr>
+              <tr><th scope="row" lang="en">memory stall</th><td>thời gian lõi chờ bộ nhớ</td><td><a href="#lap-lich-da-xu-ly">5.5</a></td></tr>
+              <tr><th scope="row" lang="en">message passing</th><td>truyền thông điệp</td><td><a href="#ipc-thong-diep">3.6</a></td></tr>
+              <tr><th scope="row" lang="en">multilevel feedback queue, MLFQ</th><td>hàng đợi phản hồi đa mức</td><td><a href="#mlfq">5.3.6</a></td></tr>
+              <tr><th scope="row" lang="en">multilevel queue, MLQ</th><td>hàng đợi đa mức</td><td><a href="#mlq">5.3.5</a></td></tr>
+              <tr><th scope="row" lang="en">non-uniform memory access, NUMA</th><td>truy cập bộ nhớ không đồng nhất</td><td><a href="#lap-lich-da-xu-ly">5.5</a></td></tr>
+              <tr><th scope="row" lang="en">nonblocking</th><td>không chặn</td><td><a href="#ipc-thong-diep">3.6</a></td></tr>
+              <tr><th scope="row" lang="en">nonpreemptive scheduling</th><td>lập lịch không thu hồi</td><td><a href="#tieu-chi">5.1</a></td></tr>
+              <tr><th scope="row" lang="en">one-to-one model</th><td>mô hình một–một</td><td><a href="#anh-xa">4.3</a></td></tr>
+              <tr><th scope="row" lang="en">orphan process</th><td>tiến trình mồ côi</td><td><a href="#tao-tien-trinh">3.3</a></td></tr>
+              <tr><th scope="row" lang="en">parallelism</th><td>thực thi song song</td><td><a href="#lap-trinh-da-loi">4.2</a></td></tr>
+              <tr><th scope="row" lang="en">period</th><td>chu kỳ</td><td><a href="#thoi-gian-thuc">5.6</a></td></tr>
+              <tr><th scope="row" lang="en">pipe</th><td>ống dẫn</td><td><a href="#vi-du-ipc">3.7</a></td></tr>
+              <tr><th scope="row" lang="en">preemptive scheduling</th><td>lập lịch có thu hồi</td><td><a href="#tieu-chi">5.1</a></td></tr>
+              <tr><th scope="row" lang="en">priority inheritance</th><td>kế thừa ưu tiên</td><td><a href="#thoi-gian-thuc">5.6</a></td></tr>
+              <tr><th scope="row" lang="en">priority inversion</th><td>đảo ưu tiên</td><td><a href="#thoi-gian-thuc">5.6</a></td></tr>
+              <tr><th scope="row" lang="en">priority scheduling</th><td>lập lịch ưu tiên</td><td><a href="#uu-tien">5.3.4</a></td></tr>
+              <tr><th scope="row" lang="en">process</th><td>tiến trình</td><td><a href="#trang-thai">3.1</a></td></tr>
+              <tr><th scope="row" lang="en">process control block, PCB</th><td>khối điều khiển tiến trình</td><td><a href="#trang-thai">3.1</a></td></tr>
+              <tr><th scope="row" lang="en">process scheduler</th><td>bộ lập lịch tiến trình</td><td><a href="#lap-lich-tien-trinh">3.2</a></td></tr>
+              <tr><th scope="row" lang="en">process-contention scope, PCS</th><td>phạm vi tranh chấp trong tiến trình</td><td><a href="#lap-lich-da-loi">5.4</a></td></tr>
+              <tr><th scope="row" lang="en">processor affinity</th><td>tính gắn kết bộ xử lý</td><td><a href="#lap-lich-da-xu-ly">5.5</a></td></tr>
+              <tr><th scope="row" lang="en">producer</th><td>bên sản xuất</td><td><a href="#ipc">3.4</a></td></tr>
+              <tr><th scope="row" lang="en">proportional share</th><td>chia CPU theo tỷ lệ</td><td><a href="#thoi-gian-thuc">5.6</a></td></tr>
+              <tr><th scope="row" lang="en">queueing model</th><td>mô hình hàng đợi</td><td><a href="#danh-gia">5.8</a></td></tr>
+              <tr><th scope="row" lang="en">rate-monotonic scheduling, RMS</th><td>lập lịch theo tần suất đơn điệu</td><td><a href="#thoi-gian-thuc">5.6</a></td></tr>
+              <tr><th scope="row" lang="en">ready</th><td>sẵn sàng</td><td><a href="#trang-thai">3.1</a></td></tr>
+              <tr><th scope="row" lang="en">ready queue</th><td>hàng sẵn sàng</td><td><a href="#trang-thai">3.1</a></td></tr>
+              <tr><th scope="row" lang="en">relative deadline</th><td>hạn tương đối</td><td><a href="#thoi-gian-thuc">5.6</a></td></tr>
+              <tr><th scope="row" lang="en">remote procedure call, RPC</th><td>gọi thủ tục từ xa</td><td><a href="#client-server">3.8</a></td></tr>
+              <tr><th scope="row" lang="en">resource sharing</th><td>chia sẻ tài nguyên</td><td><a href="#chia-luong">4.1</a></td></tr>
+              <tr><th scope="row" lang="en">response time</th><td>thời gian đáp ứng</td><td><a href="#tieu-chi-danh-gia">5.2</a></td></tr>
+              <tr><th scope="row" lang="en">responsiveness</th><td>khả năng đáp ứng</td><td><a href="#chia-luong">4.1</a></td></tr>
+              <tr><th scope="row" lang="en">round robin, RR</th><td>xoay vòng</td><td><a href="#rr">5.3.3</a></td></tr>
+              <tr><th scope="row" lang="en">scalability</th><td>khả năng mở rộng</td><td><a href="#chia-luong">4.1</a></td></tr>
+              <tr><th scope="row" lang="en">scheduler activations</th><td>kích hoạt bộ lập lịch</td><td><a href="#kich-hoat-lap-lich">4.6.5</a></td></tr>
+              <tr><th scope="row" lang="en">server</th><td>máy chủ</td><td><a href="#client-server">3.8</a></td></tr>
+              <tr><th scope="row" lang="en">shared memory</th><td>bộ nhớ dùng chung</td><td><a href="#ipc-bo-nho-chung">3.5</a></td></tr>
+              <tr><th scope="row" lang="en">shortest remaining time first, SRTF</th><td>thời gian còn lại ngắn nhất trước</td><td><a href="#sjf">5.3.2</a></td></tr>
+              <tr><th scope="row" lang="en">shortest-job-first, SJF</th><td>việc ngắn trước</td><td><a href="#sjf">5.3.2</a></td></tr>
+              <tr><th scope="row" lang="en">signal</th><td>tín hiệu</td><td><a href="#tin-hieu">4.6.2</a></td></tr>
+              <tr><th scope="row" lang="en">socket</th><td>đầu mút giao tiếp mạng</td><td><a href="#client-server">3.8</a></td></tr>
+              <tr><th scope="row" lang="en">soft real-time</th><td>thời gian thực mềm</td><td><a href="#thoi-gian-thuc">5.6</a></td></tr>
+              <tr><th scope="row" lang="en">starvation</th><td>đói tài nguyên</td><td><a href="#uu-tien">5.3.4</a></td></tr>
+              <tr><th scope="row" lang="en">synchronous threading</th><td>đa luồng đồng bộ</td><td><a href="#thu-vien-luong">4.4</a></td></tr>
+              <tr><th scope="row" lang="en">system-contention scope, SCS</th><td>phạm vi tranh chấp toàn hệ thống</td><td><a href="#lap-lich-da-loi">5.4</a></td></tr>
+              <tr><th scope="row" lang="en">target thread</th><td>luồng đích bị hủy</td><td><a href="#huy-luong">4.6.3</a></td></tr>
+              <tr><th scope="row" lang="en">task parallelism</th><td>song song tác vụ</td><td><a href="#lap-trinh-da-loi">4.2</a></td></tr>
+              <tr><th scope="row" lang="en">thread</th><td>luồng</td><td><a href="#chia-luong">4.1</a></td></tr>
+              <tr><th scope="row" lang="en">thread library</th><td>thư viện luồng</td><td><a href="#thu-vien-luong">4.4</a></td></tr>
+              <tr><th scope="row" lang="en">thread pool</th><td>nhóm luồng</td><td><a href="#giao-viec">4.5</a></td></tr>
+              <tr><th scope="row" lang="en">thread-local storage, TLS</th><td>dữ liệu cục bộ theo luồng</td><td><a href="#tls">4.6.4</a></td></tr>
+              <tr><th scope="row" lang="en">throughput</th><td>thông lượng</td><td><a href="#tieu-chi-danh-gia">5.2</a></td></tr>
+              <tr><th scope="row" lang="en">time quantum</th><td>lượng tử thời gian</td><td><a href="#rr">5.3.3</a></td></tr>
+              <tr><th scope="row" lang="en">turnaround time</th><td>thời gian hoàn tất</td><td><a href="#tieu-chi-danh-gia">5.2</a></td></tr>
+              <tr><th scope="row" lang="en">upcall</th><td>lời gọi ngược từ kernel lên thư viện luồng</td><td><a href="#kich-hoat-lap-lich">4.6.5</a></td></tr>
+              <tr><th scope="row" lang="en">user thread</th><td>luồng cấp người dùng</td><td><a href="#anh-xa">4.3</a></td></tr>
+              <tr><th scope="row" lang="en">virtual runtime</th><td>thời gian chạy ảo</td><td><a href="#vi-du-lap-lich">5.7</a></td></tr>
+              <tr><th scope="row" lang="en">wait queue</th><td>hàng chờ</td><td><a href="#lap-lich-tien-trinh">3.2</a></td></tr>
+              <tr><th scope="row" lang="en">waiting</th><td>đang chờ</td><td><a href="#trang-thai">3.1</a></td></tr>
+              <tr><th scope="row" lang="en">waiting time</th><td>thời gian chờ</td><td><a href="#tieu-chi-danh-gia">5.2</a></td></tr>
+              <tr><th scope="row" lang="en">zombie process</th><td>tiến trình zombie, đã thoát nhưng cha chưa thu trạng thái</td><td><a href="#tao-tien-trinh">3.3</a></td></tr>
+            </tbody>
+          </table></div>
+        </div></details>
+        <h3 id="giao-trinh">Textbook Reference <span class="vi">Giáo trình tham chiếu</span></h3>
+        <p class="src">Biên soạn theo Abraham Silberschatz, Peter Baer Galvin và Greg Gagne, <cite>Operating System Concepts</cite>, ấn bản 10, Wiley, 2018: Chapter 3 <span lang="en">Processes</span> (tr. 105–156); Chapter 4 <span lang="en">Threads &amp; Concurrency</span> (tr. 159–198); Chapter 5 <span lang="en">CPU Scheduling</span> (tr. 199–254). Tên chương và tên mục trong bài giữ đúng như giáo trình để bạn tra cứu song song. Tình huống, số liệu minh họa, sơ đồ, mô phỏng và bài tập được soạn riêng cho PADOS.</p>
         <nav class="pager" aria-label="Điều hướng khóa học">
-          <a href="buoi-1.html"><small>← Buổi trước</small>Nhập môn và cấu trúc hệ điều hành</a>
-          <a class="next" href="buoi-3.html"><small>Buổi tiếp →</small>Đồng bộ và bế tắc</a>
+          <a href="buoi-1.html"><small>← Buổi trước</small>Introduction &amp; Operating-System Structures</a>
+          <a class="next" href="buoi-3.html"><small>Buổi tiếp →</small>Synchronization Tools, Synchronization Examples, Deadlocks</a>
         </nav>
       </section>
     </article></main>

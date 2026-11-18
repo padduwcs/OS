@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Buổi 4 Hệ điều hành. Theo dõi cách dịch địa chỉ, xử lý lỗi trang và thay trang qua ví dụ, mô phỏng từng bước và bài tập có lời giải.">
-  <title>Buổi 4 · Bộ nhớ chính và bộ nhớ ảo · PADOS</title>
+  <title>Buổi 4 · Main Memory &amp; Virtual Memory · PADOS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
@@ -21,7 +21,7 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M9.5 4.5v15"/></svg>
     </button>
     <a class="brand" href="index.html">PADOS</a>
-    <span class="crumb">Buổi 4 · Bộ nhớ chính và bộ nhớ ảo</span>
+    <span class="crumb">Buổi 4 · Main Memory &amp; Virtual Memory</span>
     <span class="spacer"></span>
     <button class="icon-btn print-btn" type="button" title="In bài" aria-label="In bài" hidden>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V4h10v5"/><rect x="3.5" y="9" width="17" height="8" rx="2"/><rect x="7" y="14" width="10" height="6"/></svg>
@@ -35,49 +35,114 @@
     <aside class="sidebar" id="sidebar">
       <nav aria-label="Mục lục buổi học">
         <div class="nav-chapter">
-          <a class="nav-chapter-title" href="#chuong-9">Chương 9 · Bộ nhớ chính</a>
+          <a class="nav-chapter-title" href="#chuong-9">Chapter 9 · Main Memory</a>
           <div class="toc">
-            <a href="#dia-chi">9.1 · Địa chỉ và bảo vệ</a>
-            <a href="#cap-phat-lien-tuc">9.2 · Cấp phát liên tục</a>
-            <a href="#phan-trang">9.3 · Phân trang và TLB</a>
-            <a href="#bang-trang">9.4 · Cấu trúc bảng trang</a>
-            <a href="#hoan-doi">9.5–9.7 · Hoán đổi và kiến trúc</a>
+            <a href="#dia-chi">9.1 · Background</a>
+            <a href="#cap-phat-lien-tuc">9.2 · Contiguous Memory Allocation</a>
+            <a href="#phan-trang">9.3 · Paging</a>
+            <a href="#bang-trang">9.4 · Structure of the Page Table</a>
+            <a href="#hoan-doi">9.5 · Swapping</a>
+            <a href="#intel">9.6 · Example: Intel 32- and 64-bit Architectures</a>
+            <a href="#armv8">9.7 · Example: ARMv8 Architecture</a>
           </div>
         </div>
         <div class="nav-chapter">
-          <a class="nav-chapter-title" href="#chuong-10">Chương 10 · Bộ nhớ ảo</a>
+          <a class="nav-chapter-title" href="#chuong-10">Chapter 10 · Virtual Memory</a>
           <div class="toc">
-            <a href="#nap-theo-yeu-cau">10.1–10.2 · Nạp theo yêu cầu</a>
-            <a href="#sao-chep-khi-ghi">10.3 · Sao chép khi ghi</a>
-            <a href="#thay-trang">10.4 · Thuật toán thay trang</a>
-            <a href="#cap-khung">10.5–10.6 · Cấp khung và thrashing</a>
-            <a href="#bo-nho-kernel">10.7–10.8 · Nén và cấp phát cho kernel</a>
-            <a href="#lua-chon-thiet-ke">10.9–10.10 · Lựa chọn thiết kế</a>
+            <a href="#nap-theo-yeu-cau">10.1 · Background</a>
+            <a href="#phan-trang-theo-yeu-cau">10.2 · Demand Paging</a>
+            <a href="#sao-chep-khi-ghi">10.3 · Copy-on-Write</a>
+            <a href="#thay-trang">10.4 · Page Replacement</a>
+            <a href="#cap-khung">10.5 · Allocation of Frames</a>
+            <a href="#thrashing">10.6 · Thrashing</a>
+            <a href="#nen-bo-nho">10.7 · Memory Compression</a>
+            <a href="#bo-nho-kernel">10.8 · Allocating Kernel Memory</a>
+            <a href="#lua-chon-thiet-ke">10.9 · Other Considerations</a>
+            <a href="#vi-du-bo-nho-ao">10.10 · Operating-System Examples</a>
           </div>
         </div>
         <div class="nav-chapter">
-          <a class="nav-chapter-title" href="#ghi-nho">Ghi nhớ</a>
-          <div class="toc"><a href="#tu-kiem-tra">Câu hỏi tự kiểm tra</a><a href="#giao-trinh">Giáo trình</a></div>
+          <a class="nav-chapter-title" href="#ghi-nho">Summary &amp; Review</a>
+          <div class="toc">
+            <a href="#tu-kiem-tra">Practice Exercises</a>
+            <a href="#thuat-ngu">Glossary</a>
+            <a href="#giao-trinh">Textbook Reference</a>
+          </div>
         </div>
       </nav>
     </aside>
     <main class="page" id="main" tabindex="-1"><article class="content">
       <header class="hero">
-        <div class="eyebrow">Buổi 4 · Chương 9–10</div>
-        <h1>Bộ nhớ chính và bộ nhớ ảo</h1>
+        <div class="eyebrow">Buổi 4 · Chapter 9–10</div>
+        <h1>Main Memory &amp; Virtual Memory</h1>
+        <p class="title-vi">Bộ nhớ chính và bộ nhớ ảo</p>
         <p class="lead">An cuộn qua một bộ ảnh lớn. Ứng dụng có thể dùng cùng một địa chỉ để đọc một byte ảnh kể cả khi hệ điều hành đã dời dữ liệu sang vị trí khác trong RAM. Nếu vùng ảnh chưa được nạp, lần đọc còn có thể phải đợi ổ lưu trữ. Ta sẽ tính thử một địa chỉ, rồi theo chính lần đọc ấy khi dữ liệu cần dùng đang vắng.</p>
+        <p class="reading-cue">Buổi này kể một câu chuyện về những ảo giác có kiểm soát. Mỗi tiến trình tưởng mình sở hữu một dải bộ nhớ liền mạch, bắt đầu từ 0, và rộng hơn cả RAM thật. Phần cứng và kernel phối hợp để duy trì ảo giác đó, và ta sẽ lần lượt xem mỗi lớp ảo giác tốn bao nhiêu.</p>
+        <div class="meta">
+          <div>
+            <h4>Sau buổi này, bạn giải thích được</h4>
+            <ul>
+              <li>vì sao cần tách địa chỉ logic khỏi địa chỉ vật lý, và MMU dịch thế nào;</li>
+              <li>tự tính địa chỉ vật lý, thời gian truy cập hiệu dụng với TLB và lỗi trang;</li>
+              <li>chạy tay FIFO, OPT, LRU, Clock và nhận ra nghịch lý Belady;</li>
+              <li>vì sao hệ thống thrashing, và tập làm việc giúp gì.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>Cần biết trước</h4>
+            <p>Buổi 1: phân cấp lưu trữ, trap và chế độ kép. Buổi 2: PCB, chuyển ngữ cảnh, hàng chờ I/O. Biết đổi giữa thập phân và lũy thừa của 2.</p>
+            <h4>Mẹo tính nhanh</h4>
+            <p>Với trang kích thước 2<sup>k</sup>, số trang là các bit cao và độ lệch là k bit thấp của địa chỉ. Đổi địa chỉ sang nhị phân thường nhanh hơn chia.</p>
+          </div>
+        </div>
       </header>
 
       <section aria-labelledby="chuong-9">
-        <h2 id="chuong-9"><span class="sec">9</span>CPU tìm đúng byte trong RAM bằng cách nào?</h2>
-        <h3 id="dia-chi">9.1 · Từ địa chỉ chương trình đến địa chỉ trong RAM</h3>
-        <p>Ứng dụng xem ảnh và trình duyệt đều có thể phát lệnh đọc địa chỉ 120. Mỗi bên dùng số đó để chỉ dữ liệu của mình. Cần một phép dịch riêng cho từng ứng dụng để hai lượt đọc tới đúng nơi. Sau khi dịch, phần cứng có thể tìm bản sao nhanh trong cache. Nếu byte ảnh chỉ có trên thiết bị lưu trữ, hệ thống phải đưa dữ liệu vào bộ nhớ chính (RAM) để lệnh đọc bộ nhớ có thể dùng nó.</p>
+        <h2 id="chuong-9"><span class="sec">9</span><span>Main Memory <span class="vi">Bộ nhớ chính</span></span></h2>
+        <h3 id="dia-chi">9.1 · Background <span class="vi">Bối cảnh: địa chỉ và bảo vệ bộ nhớ</span></h3>
+        <h4 id="phan-cung-co-ban">9.1.1 · Basic Hardware <span class="vi">Phần cứng cơ bản</span></h4>
+        <p>CPU chỉ truy cập trực tiếp được hai nơi lưu trữ: thanh ghi bên trong nó và bộ nhớ chính. Đọc thanh ghi mất khoảng một chu kỳ, còn đọc RAM qua bus có thể mất nhiều chu kỳ, trong lúc đó CPU phải <em>stall</em>. Cache nằm giữa hai tầng để lấp khoảng cách này. Ngoài tốc độ, phần cứng còn phải bảo vệ: tiến trình này không được đọc ghi vùng nhớ của tiến trình khác hay của kernel. Ứng dụng xem ảnh và trình duyệt đều có thể phát lệnh đọc địa chỉ 120. Mỗi bên dùng số đó để chỉ dữ liệu của mình. Cần một phép dịch riêng cho từng ứng dụng để hai lượt đọc tới đúng nơi. Sau khi dịch, phần cứng có thể tìm bản sao nhanh trong cache. Nếu byte ảnh chỉ có trên thiết bị lưu trữ, hệ thống phải đưa dữ liệu vào bộ nhớ chính (RAM) để lệnh đọc bộ nhớ có thể dùng nó.</p>
+        <h4 id="gan-dia-chi">9.1.2 · Address Binding <span class="vi">Gắn địa chỉ</span></h4>
         <p>Mã nguồn dùng tên như <code>pixels</code>. Trình biên dịch có thể biểu diễn nó bằng độ lệch trong một mô-đun, rồi trình liên kết ghép các mô-đun. Việc xác định địa chỉ dùng khi chương trình chạy gọi là <dfn>gắn địa chỉ</dfn> (<span class="en" lang="en">address binding</span>). Nếu vị trí trong RAM đã biết khi biên dịch, có thể sinh địa chỉ tuyệt đối. Nếu chỉ biết lúc nạp, trình nạp sửa địa chỉ dựa trên vị trí cấp khi khởi chạy. Nếu cần đổi chỗ tiến trình trong lúc chạy, phần cứng dịch địa chỉ ở mỗi lần truy cập.</p>
+        <h4 id="dia-chi-logic">9.1.3 · Logical Versus Physical Address Space <span class="vi">Không gian địa chỉ logic và vật lý</span></h4>
         <p>Địa chỉ do CPU phát trong không gian của tiến trình gọi là <dfn>địa chỉ logic</dfn> hay <dfn>địa chỉ ảo</dfn> (<span class="en" lang="en">logical address</span>, <span class="en" lang="en">virtual address</span>). <dfn>Địa chỉ vật lý</dfn> (<span class="en" lang="en">physical address</span>) chỉ vị trí trong bộ nhớ vật lý. <dfn>Đơn vị quản lý bộ nhớ</dfn> (<span class="en" lang="en">memory-management unit</span>, MMU) dịch địa chỉ và kiểm tra quyền. Hai ứng dụng có thể cùng dùng địa chỉ ảo 120 vì mỗi ứng dụng có ánh xạ riêng.</p>
         <p>Trong một mô hình đơn giản, địa chỉ ảo là độ lệch kể từ đầu vùng được cấp. <dfn>Thanh ghi cơ sở</dfn> (<span class="en" lang="en">base register</span>, hay <span class="en" lang="en">relocation register</span> trong phép dịch này) chứa địa chỉ vật lý đầu vùng. <dfn>Thanh ghi giới hạn</dfn> (<span class="en" lang="en">limit register</span>) chứa kích thước vùng. Với cơ sở 8&nbsp;000 và giới hạn 600 byte, địa chỉ ảo 120 hợp lệ và dịch thành 8&nbsp;120. Độ lệch 600 vượt biên vì vùng chỉ có các độ lệch 0 đến 599. MMU chuyển quyền điều khiển sang kernel qua một ngoại lệ đồng bộ (<span class="en" lang="en">trap</span>). Chỉ kernel được đặt cặp thanh ghi. Khi <a href="buoi-2.html#trang-thai">chuyển ngữ cảnh</a>, nó nạp cặp tương ứng với tiến trình sắp chạy.</p>
-        <p><dfn>Nạp động</dfn> (<span class="en" lang="en">dynamic loading</span>) trì hoãn đưa một thủ tục vào bộ nhớ đến lần gọi cần nó, chẳng hạn bộ giải mã một định dạng hiếm. <dfn>Liên kết động</dfn> (<span class="en" lang="en">dynamic linking</span>) trì hoãn việc nối lời gọi với mã thư viện đến lúc nạp hoặc thực thi. Kỹ thuật đó cho phép nhiều tiến trình dùng chung một bản mã thư viện trong RAM, với dữ liệu riêng của mỗi tiến trình ở ánh xạ riêng. Sang Chương 10, việc chọn thời điểm nạp sẽ diễn ra ở mức trang.</p>
+        <figure class="fig">
+          <svg class="teaching-svg wide" viewBox="0 0 640 210" role="img" aria-labelledby="relocation-title">
+            <title id="relocation-title">MMU so địa chỉ logic với thanh ghi giới hạn rồi cộng thanh ghi cơ sở</title>
+            <defs><marker id="reloc-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrowhead" d="M0 0L10 5L0 10z"/></marker></defs>
+            <rect class="nd-acc" x="8" y="48" width="80" height="48" rx="9"/><text x="48" y="77" text-anchor="middle">CPU</text>
+            <path class="route" d="M88 72H160" marker-end="url(#reloc-arrow)"/>
+            <text class="annotation" x="124" y="62" text-anchor="middle">logic 120</text>
+            <rect class="z-violet" x="162" y="14" width="292" height="118" rx="12"/>
+            <text class="annotation" x="172" y="32">MMU</text>
+            <path class="cmp-diamond" d="M200 72l60-44 60 44-60 44z"/>
+            <text class="annotation" x="260" y="70" text-anchor="middle">&lt; giới hạn</text>
+            <text class="annotation" x="260" y="86" text-anchor="middle">600?</text>
+            <path class="route" d="M320 72H344" marker-end="url(#reloc-arrow)"/>
+            <text class="annotation" x="332" y="62" text-anchor="middle">đúng</text>
+            <circle class="nd-ok" cx="370" cy="72" r="24"/><text x="370" y="78" text-anchor="middle">+</text>
+            <text class="annotation" x="370" y="118" text-anchor="middle">cơ sở 8 000</text>
+            <path class="route" d="M394 72H486" marker-end="url(#reloc-arrow)"/>
+            <text class="annotation" x="440" y="64" text-anchor="middle">vật lý 8 120</text>
+            <g class="ram-strip">
+              <rect x="490" y="14" width="140" height="30"/><rect x="490" y="44" width="140" height="22"/>
+              <rect class="ram-own" x="490" y="66" width="140" height="64"/><rect x="490" y="130" width="140" height="66"/>
+            </g>
+            <text class="annotation" x="560" y="34" text-anchor="middle">kernel</text>
+            <text class="annotation" x="560" y="95" text-anchor="middle">vùng của tiến trình</text>
+            <text class="annotation" x="560" y="113" text-anchor="middle">8 000 – 8 599</text>
+            <text class="annotation" x="560" y="168" text-anchor="middle">tiến trình khác</text>
+            <path class="ln-min" d="M260 116V176H190" marker-end="url(#reloc-arrow)"/>
+            <text class="annotation" x="268" y="148">sai</text>
+            <rect class="nd-min" x="40" y="156" width="148" height="40" rx="8"/><text class="annotation" x="114" y="181" text-anchor="middle">trap vào kernel</text>
+          </svg>
+          <figcaption><b>Hai thanh ghi, hai việc.</b> Thanh ghi giới hạn chặn mọi địa chỉ vượt vùng của tiến trình, trước cả khi cộng. Thanh ghi cơ sở dời vùng đến đúng chỗ trong RAM. Tiến trình không bao giờ thấy số 8 000. Kernel có thể dời cả vùng sang chỗ khác chỉ bằng cách chép dữ liệu và sửa thanh ghi cơ sở.</figcaption>
+        </figure>
+        <h4 id="nap-dong">9.1.4–9.1.5 · Dynamic Loading and Dynamic Linking <span class="vi">Nạp động và liên kết động</span></h4>
+        <p><dfn>Nạp động</dfn> (<span class="en" lang="en">dynamic loading</span>) trì hoãn đưa một thủ tục vào bộ nhớ đến lần gọi cần nó, chẳng hạn bộ giải mã một định dạng hiếm. <dfn>Liên kết động</dfn> (<span class="en" lang="en">dynamic linking</span>) trì hoãn việc nối lời gọi với mã thư viện đến lúc nạp hoặc thực thi. Kỹ thuật đó cho phép nhiều tiến trình dùng chung một bản mã thư viện trong RAM, với dữ liệu riêng của mỗi tiến trình ở ánh xạ riêng. Những thư viện như vậy gọi là <dfn>thư viện dùng chung</dfn> (<span class="en" lang="en">shared libraries</span>), trên Windows là DLL. Cập nhật thư viện thì mọi chương trình dùng nó tự nhận bản mới. Khác với nạp động, liên kết động cần hệ điều hành giúp, vì chỉ OS mới cho phép nhiều tiến trình cùng thấy một vùng nhớ. Sang Chương 10, việc chọn thời điểm nạp sẽ diễn ra ở mức trang.</p>
 
-        <h3 id="cap-phat-lien-tuc">9.2 · Khi mỗi tiến trình cần một dải địa chỉ liền nhau</h3>
+        <h3 id="cap-phat-lien-tuc">9.2 · Contiguous Memory Allocation <span class="vi">Cấp phát bộ nhớ liên tục</span></h3>
         <p>Cặp thanh ghi cơ sở và giới hạn ở trên hoạt động vì cả vùng của tiến trình nằm liền nhau trong RAM. Đó là <dfn>cấp phát liên tục</dfn> (<span class="en" lang="en">contiguous allocation</span>). Khi có yêu cầu mới, hệ điều hành tìm một vùng trống (<span class="en" lang="en">hole</span>) đủ dài rồi giữ phần dư cho lần cấp sau. Khi trả bộ nhớ, nó có thể gộp các vùng trống kề nhau. Bảng và mô phỏng dùng KiB (1024 byte). Nếu các vùng cùng kích thước, mô phỏng ưu tiên địa chỉ thấp hơn.</p>
         <div class="tbl-wrap">
           <table class="tbl">
@@ -90,11 +155,13 @@
           </table>
         </div>
         <p>Sau hai yêu cầu 4 và 8 KiB, first fit để lại các vùng 4, 5 và 4 KiB. Dù còn 13 KiB, yêu cầu 10 KiB phải chờ vì vùng lớn nhất chỉ có 5 KiB. Đây là <dfn>phân mảnh ngoài</dfn> (<span class="en" lang="en">external fragmentation</span>). Với <dfn>phân mảnh trong</dfn> (<span class="en" lang="en">internal fragmentation</span>), chỗ thừa nằm bên trong khối đã cấp, chẳng hạn cấp theo đơn vị 4 KiB cho yêu cầu 3 KiB. <dfn>Dồn bộ nhớ</dfn> (<span class="en" lang="en">compaction</span>) có thể gom các vùng trống bằng cách di chuyển vùng đang dùng và cập nhật phép dịch lúc chạy. Di chuyển dữ liệu tốn thời gian và vùng đang phục vụ nhập/xuất (<span lang="en">input/output</span>, I/O) có thể phải giữ nguyên vị trí.</p>
+        <p>Phân mảnh ngoài nghiêm trọng tới mức nào? Phân tích thống kê với first fit cho ra <dfn>quy tắc 50 phần trăm</dfn> (<span class="en" lang="en">50-percent rule</span>): khi đã cấp <var>N</var> khối, khoảng 0,5<var>N</var> khối nữa bị mất vì phân mảnh. Nghĩa là gần <em>một phần ba</em> bộ nhớ có thể không dùng được. Dồn bộ nhớ chữa được triệu chứng nhưng đắt. Muốn chữa tận gốc, phải bỏ chính giả thiết gây ra vấn đề: rằng mỗi tiến trình phải nằm liền một dải.</p>
         <div id="mo-phong-cap-phat" data-memory-lab="allocation">
           <noscript><p>Bật JavaScript để thử cấp phát từng yêu cầu. Bảng trên cho kết quả của lượt đầu ở cả ba thuật toán.</p></noscript>
         </div>
 
-        <h3 id="phan-trang">9.3 · Phân trang, bảng trang và TLB</h3>
+        <h3 id="phan-trang">9.3 · Paging <span class="vi">Phân trang</span></h3>
+        <h4 id="phuong-phap-co-ban">9.3.1 · Basic Method <span class="vi">Phương pháp cơ bản</span></h4>
         <p>Khi RAM còn các vùng trống rời nhau, ta có thể tận dụng chúng bằng cách chia dữ liệu của ứng dụng thành từng khối. <dfn>Phân trang</dfn> (<span class="en" lang="en">paging</span>) chia không gian địa chỉ ảo thành các <dfn>trang</dfn> (<span class="en" lang="en">page</span>) bằng nhau và RAM thành các <dfn>khung trang</dfn> (<span class="en" lang="en">frame</span>) cùng kích thước. Vì mỗi trang vừa một khung, những trang cạnh nhau trong không gian ảo có thể nằm rải ra trong RAM.</p>
         <p>Để tìm dữ liệu, phần cứng dùng <dfn>bảng trang</dfn> (<span class="en" lang="en">page table</span>) do kernel quản lý cho từng không gian địa chỉ. Một <dfn>mục bảng trang</dfn> (<span class="en" lang="en">page-table entry</span>, PTE) có thể cho biết khung chứa trang, quyền truy cập và trang đã có mặt trong RAM hay chưa.</p>
         <figure class="fig">
@@ -127,14 +194,17 @@
         </figure>
         <p>Với địa chỉ ảo <var>a</var> và trang dài <var>S</var> byte, phép chia nguyên cho số trang <var>p</var> = ⌊<var>a</var> / <var>S</var>⌋ và phần dư <var>d</var> = <var>a</var> mod <var>S</var>. Tra <var>p</var> để tìm khung <var>f</var>, rồi ghép thành địa chỉ vật lý <var>f</var> × <var>S</var> + <var>d</var>. Nếu <var>S</var> = 256 = 2<sup>8</sup>, 8 bit thấp chứa <var>d</var> và các bit còn lại chứa <var>p</var>.</p>
         <p>Ba trang có thể dùng ba khung rời, nên việc cấp từng khung tránh phân mảnh ngoài ở đơn vị khung thông thường. Trang cuối vẫn có thể dư chỗ. Với 600 byte và trang 256 byte, cần 3 khung, tổng 768 byte, dư 168 byte. Đổi tiến trình không làm thay đổi công thức, nhưng phải dùng đúng bảng trang. Kernel đặt thanh ghi trỏ gốc bảng trang khi chuyển không gian địa chỉ.</p>
+        <h4 id="tlb">9.3.2 · Hardware Support <span class="vi">Hỗ trợ phần cứng: TLB</span></h4>
         <p>Sau khi đọc địa chỉ 585, ứng dụng đọc địa chỉ 600. Cả hai đều ở trang 2. Nếu phải tra lại bảng trang trong RAM, mô hình một cấp mất thêm một lượt truy cập trước mỗi lượt đọc dữ liệu. <dfn>Bộ đệm dịch địa chỉ</dfn> (<span class="en" lang="en">translation lookaside buffer</span>, TLB) giữ các ánh xạ và quyền vừa dùng. Nếu mục trang 2 còn ở đó, lần đọc 600 <dfn>trúng TLB</dfn> và có ngay số khung. <dfn>Trượt TLB</dfn> nghĩa là cần tra bảng trang. Nếu tra thấy trang hợp lệ đang vắng, kernel xử lý theo đường ở <a href="#nap-theo-yeu-cau">Chương 10</a>.</p>
         <p>Thêm mã không gian địa chỉ (<span class="en" lang="en">address-space identifier</span>, ASID) vào mục TLB cho phép giữ mục của nhiều tiến trình mà vẫn phân biệt cùng số trang. Nếu thiếu cơ chế phân biệt, khi đổi không gian cần vô hiệu hóa các mục liên quan. Khi kernel thay ánh xạ hoặc đổi quyền, nó cũng phải vô hiệu hóa bản dịch cũ trên các lõi có thể đang giữ nó. Với bảng một cấp, RAM 100 ns, TLB 5 ns được tra nối tiếp và tỷ lệ trúng 90%, thời gian trung bình là 0,9 × 105 + 0,1 × 205 = 115 ns, giả sử mọi trang đều hiện diện và bỏ qua các cache khác.</p>
-        <p>Quyền đọc, ghi và thực thi có thể gắn riêng cho từng trang. Ví dụ hai ứng dụng cùng ánh xạ mã giải mã ảnh chỉ đọc và được thực thi vào một khung, nhưng vùng điểm ảnh mà mỗi ứng dụng sửa sẽ có khung riêng. Một trang cũng có thể thuộc không gian ảo hợp lệ mà hiện chưa cư trú trong RAM. Mô phỏng dùng hai thông tin riêng để bạn thấy rõ sự khác nhau giữa thiếu trang và yêu cầu bị cấm.</p>
+        <h4 id="bao-ve-trang">9.3.3–9.3.4 · Protection and Shared Pages <span class="vi">Bảo vệ và trang dùng chung</span></h4>
+        <p>Mỗi mục bảng trang có thêm các bit bảo vệ. <dfn>Bit hợp lệ</dfn> (<span class="en" lang="en">valid–invalid bit</span>) cho biết trang có thuộc không gian địa chỉ của tiến trình hay không. Truy cập trang không hợp lệ gây trap vào kernel. Vì nhiều tiến trình chỉ dùng một phần nhỏ dải địa chỉ, có hệ thống dùng thêm thanh ghi độ dài bảng trang (<span class="en" lang="en">page-table length register</span>, PTLR) để khỏi lưu mục cho phần không dùng. Quyền đọc, ghi và thực thi có thể gắn riêng cho từng trang. Ví dụ hai ứng dụng cùng ánh xạ mã giải mã ảnh chỉ đọc và được thực thi vào một khung, nhưng vùng điểm ảnh mà mỗi ứng dụng sửa sẽ có khung riêng. Điều này chỉ an toàn khi mã là <dfn>mã tái nhập</dfn> (<span class="en" lang="en">reentrant code</span>), tức mã không bao giờ tự sửa chính nó. Thư viện C chuẩn là ví dụ điển hình: 40 tiến trình cùng dùng libc chỉ cần một bản mã trong RAM. Một trang cũng có thể thuộc không gian ảo hợp lệ mà hiện chưa cư trú trong RAM. Mô phỏng dùng hai thông tin riêng để bạn thấy rõ sự khác nhau giữa thiếu trang và yêu cầu bị cấm.</p>
+        <div class="box predict"><div class="box-h">Đoán trước</div><p>Hai địa chỉ trong cùng một trang: lần thứ hai có cần tra bảng trang không? Hai địa chỉ ở hai trang kề nhau thì sao? Và nếu TLB trúng nhưng lệnh là <em>ghi</em> vào trang chỉ đọc, MMU có cho qua không? Đoán cho từng tình huống rồi chạy.</p></div>
         <div id="mo-phong-dich-dia-chi" data-memory-lab="translation">
           <noscript><p>Bật JavaScript để theo dõi TLB. Trong sơ đồ trên, một lần tra thành công sẽ lưu ánh xạ trang 2 vào khung 9, nên lần đọc tiếp cùng trang có thể trúng TLB.</p></noscript>
         </div>
 
-        <h3 id="bang-trang">9.4 · Khi bảng trang tự nó đã chiếm nhiều RAM</h3>
+        <h3 id="bang-trang">9.4 · Structure of the Page Table <span class="vi">Cấu trúc bảng trang</span></h3>
         <p>Không gian ảo 32 bit với trang 4 KiB có 2<sup>20</sup> số trang. Một bảng phẳng với mỗi mục 4 byte tốn 4 MiB cho mỗi không gian địa chỉ, kể cả khi chỉ có vài vùng được dùng. Với <dfn>bảng trang nhiều cấp</dfn> (<span class="en" lang="en">hierarchical page table</span>), tách số trang thành nhiều nhóm bit. Trong ví dụ hai cấp dưới đây, 10 bit đầu chọn một mục ở thư mục, 10 bit kế chọn một mục trong bảng con, 12 bit cuối là độ lệch. Có thể bỏ qua việc cấp bảng con cho cả một vùng chưa dùng.</p>
         <figure class="fig">
           <div class="mem-bits">
@@ -158,16 +228,20 @@
           </table>
         </div>
 
-        <h3 id="hoan-doi">9.5–9.7 · Hoán đổi và ví dụ kiến trúc</h3>
-        <p><dfn>Hoán đổi</dfn> (<span class="en" lang="en">swapping</span>) theo mô hình cổ điển đưa ảnh bộ nhớ của cả tiến trình ra vùng lưu trữ hỗ trợ (<span class="en" lang="en">backing store</span>) để nhường RAM, rồi đưa vào lại khi cần chạy. Chi phí tăng theo lượng dữ liệu phải chuyển. Với phân trang, hệ điều hành có thể thu hồi từng trang và chỉ đọc lại trang được tham chiếu. Trang sạch có thể đọc lại từ tệp gốc, còn trang riêng đã sửa cần giữ nội dung nếu tiến trình còn dùng. Sách cũng mô tả cách các hệ di động giảm áp lực bộ nhớ bằng cách yêu cầu ứng dụng nhả dữ liệu có thể tái tạo hoặc kết thúc tiến trình khi cần.</p>
-        <p>Trong ví dụ <b>IA-32</b> của sách, phân đoạn (<span class="en" lang="en">segmentation</span>) cho phép tạo địa chỉ tuyến tính từ bộ chọn đoạn và độ lệch, rồi phân trang dịch tiếp sang địa chỉ vật lý. Với trang 4 KiB ở chế độ phân trang hai cấp cơ bản, cách tách là 10–10–12 như hình. Chế độ PAE (<span lang="en">Physical Address Extension</span>) thay đổi cấu trúc tra và mở rộng địa chỉ vật lý. <b>x86-64</b> trong cấu hình 48 bit được minh họa có bốn cấp, mỗi cấp chọn bằng 9 bit với trang 4 KiB. <b>ARMv8-A</b> cũng có thể dùng nhiều cấp và hỗ trợ các đơn vị dịch 4, 16 hoặc 64 KiB tùy cấu hình, với mục ở cấp trên có thể ánh xạ cả một khối lớn. Các phép tính trong bài dùng kích thước nhỏ để dễ làm tay.</p>
+        <h3 id="hoan-doi">9.5 · Swapping <span class="vi">Hoán đổi</span></h3>
+        <p><dfn>Hoán đổi chuẩn</dfn> (<span class="en" lang="en">standard swapping</span>) theo mô hình cổ điển đưa ảnh bộ nhớ của cả tiến trình ra vùng lưu trữ hỗ trợ (<span class="en" lang="en">backing store</span>) để nhường RAM, rồi đưa vào lại khi cần chạy. Chi phí tăng theo lượng dữ liệu phải chuyển. Hệ điều hành hiện đại hầu như không còn hoán đổi cả tiến trình. Với phân trang, chúng <dfn>đẩy trang ra</dfn> (<span class="en" lang="en">page out</span>) và <dfn>đưa trang vào</dfn> (<span class="en" lang="en">page in</span>) từng trang một, và chỉ đọc lại trang được tham chiếu. Trang sạch có thể đọc lại từ tệp gốc, còn trang riêng đã sửa cần giữ nội dung nếu tiến trình còn dùng. Sách cũng mô tả cách các hệ di động giảm áp lực bộ nhớ bằng cách yêu cầu ứng dụng nhả dữ liệu có thể tái tạo hoặc kết thúc tiến trình khi cần.</p>
+        <h3 id="intel">9.6 · Example: Intel 32- and 64-bit Architectures <span class="vi">Ví dụ: kiến trúc Intel 32 và 64 bit</span></h3>
+        <p>Trong ví dụ <b>IA-32</b> của sách, phân đoạn (<span class="en" lang="en">segmentation</span>) cho phép tạo địa chỉ tuyến tính từ bộ chọn đoạn và độ lệch, rồi phân trang dịch tiếp sang địa chỉ vật lý. Với trang 4 KiB ở chế độ phân trang hai cấp cơ bản, cách tách là 10–10–12 như hình. Chế độ PAE (<span lang="en">Physical Address Extension</span>) thay đổi cấu trúc tra và mở rộng địa chỉ vật lý. <b>x86-64</b> trong cấu hình 48 bit được minh họa có bốn cấp, mỗi cấp chọn bằng 9 bit với trang 4 KiB: 9 + 9 + 9 + 9 + 12 = 48. Bối cảnh hiện nay: CPU x86-64 mới hơn còn hỗ trợ phân trang năm cấp, mở rộng địa chỉ ảo lên 57 bit, và Linux đã hỗ trợ chế độ này. Mỗi cấp thêm vào giúp tiết kiệm bảng cho không gian thưa, nhưng làm một lần trượt TLB tốn thêm một lượt đọc bộ nhớ, nên TLB càng quan trọng. </p>
+        <h3 id="armv8">9.7 · Example: ARMv8 Architecture <span class="vi">Ví dụ: kiến trúc ARMv8</span></h3>
+        <p>Chip ARM có mặt trong gần như mọi điện thoại. <b>ARMv8-A</b> hỗ trợ ba kích thước <dfn>hạt dịch</dfn> (<span class="en" lang="en">translation granule</span>): 4 KiB, 16 KiB và 64 KiB. Với hạt 4 KiB, bảng trang có tối đa bốn cấp, và một mục ở cấp cao có thể trỏ thẳng tới một <em>vùng</em> (<span class="en" lang="en">region</span>) 1 GiB hoặc 2 MiB thay vì trỏ tới bảng cấp dưới. Nhờ đó cùng một cơ chế phục vụ cả trang nhỏ lẫn trang lớn. ARM có hai cấp TLB: các <em>micro TLB</em> riêng cho lệnh và dữ liệu nằm sát lõi, phía sau là một <em>main TLB</em> lớn hơn. Trượt cả hai thì phần cứng mới đi tra bảng trang. Các phép tính trong bài dùng kích thước nhỏ để dễ làm tay.</p>
       </section>
 
       <section aria-labelledby="chuong-10">
-        <h2 id="chuong-10"><span class="sec">10</span>Điều gì xảy ra khi trang cần đọc đang vắng?</h2>
-        <h3 id="nap-theo-yeu-cau">10.1–10.2 · Bộ nhớ ảo và nạp trang theo yêu cầu</h3>
-        <p>Ứng dụng xem ảnh có thể dành một dải địa chỉ ảo cho cả tệp. Đó là một ánh xạ tệp (<span class="en" lang="en">memory-mapped file</span>). Vùng đang xem cần dữ liệu ngay, còn phần An chưa cuộn tới có thể vẫn nằm trên ổ. <dfn>Bộ nhớ ảo</dfn> (<span class="en" lang="en">virtual memory</span>) cho ứng dụng dùng một không gian địa chỉ riêng, có thể lớn hơn phần RAM đang chiếm. Cùng cơ chế ánh xạ còn cho phép để các khoảng địa chỉ trống, chia sẻ mã thư viện, và cho vùng cấp phát động (<span lang="en">heap</span>) và ngăn xếp (<span lang="en">stack</span>) tăng trưởng riêng.</p>
-        <p>Với <dfn>phân trang theo yêu cầu</dfn> (<span class="en" lang="en">demand paging</span>), hệ thống có thể chờ đến lần tham chiếu đầu tiên mới đưa một trang vào RAM. Nếu CPU cần trang vắng, phần cứng gây <dfn>lỗi trang</dfn> (<span class="en" lang="en">page fault</span>) để chuyển quyền điều khiển vào kernel. Kernel đối chiếu địa chỉ và kiểu truy cập với thông tin vùng nhớ của tiến trình. Nếu địa chỉ thuộc vùng được phép, kernel có thể lấy dữ liệu từ tệp, từ vùng hoán đổi hoặc cấp một trang toàn số 0 (<span class="en" lang="en">zero-fill-on-demand</span>) cho vùng mới. Nếu truy cập trái phép, kernel báo lỗi truy cập cho tiến trình.</p>
+        <h2 id="chuong-10"><span class="sec">10</span><span>Virtual Memory <span class="vi">Bộ nhớ ảo</span></span></h2>
+        <h3 id="nap-theo-yeu-cau">10.1 · Background <span class="vi">Bối cảnh: vì sao cần bộ nhớ ảo</span></h3>
+        <p>Mọi kỹ thuật ở Chương 9 đều đòi cả tiến trình phải nằm trong RAM. Nhưng chương trình thật hiếm khi cần hết: mã xử lý lỗi hiếm khi chạy, mảng được khai báo lớn hơn mức dùng, nhiều tính năng gần như không ai bấm. Nếu chỉ cần nạp phần đang dùng, chương trình không còn bị giới hạn bởi dung lượng RAM, nhiều chương trình chạy cùng lúc hơn, và nạp hay hoán đổi cũng tốn ít I/O hơn. Ứng dụng xem ảnh có thể dành một dải địa chỉ ảo cho cả tệp. Đó là một ánh xạ tệp (<span class="en" lang="en">memory-mapped file</span>). Vùng đang xem cần dữ liệu ngay, còn phần An chưa cuộn tới có thể vẫn nằm trên ổ. <dfn>Bộ nhớ ảo</dfn> (<span class="en" lang="en">virtual memory</span>) cho ứng dụng dùng một không gian địa chỉ riêng, có thể lớn hơn phần RAM đang chiếm. Cùng cơ chế ánh xạ còn cho phép để các khoảng địa chỉ trống, chia sẻ mã thư viện, và cho vùng cấp phát động (<span lang="en">heap</span>) và ngăn xếp (<span lang="en">stack</span>) tăng trưởng riêng.</p>
+        <h3 id="phan-trang-theo-yeu-cau">10.2 · Demand Paging <span class="vi">Phân trang theo yêu cầu</span></h3>
+        <p>Với <dfn>phân trang theo yêu cầu</dfn> (<span class="en" lang="en">demand paging</span>), hệ thống chỉ nạp trang khi trang đó thật sự được cần. Trường hợp cực đoan, tiến trình bắt đầu với <em>không</em> trang nào trong RAM, gọi là <span class="en" lang="en">pure demand paging</span>. Nói cách khác, hệ thống có thể chờ đến lần tham chiếu đầu tiên mới đưa một trang vào RAM. Nếu CPU cần trang vắng, phần cứng gây <dfn>lỗi trang</dfn> (<span class="en" lang="en">page fault</span>) để chuyển quyền điều khiển vào kernel. Kernel đối chiếu địa chỉ và kiểu truy cập với thông tin vùng nhớ của tiến trình. Nếu địa chỉ thuộc vùng được phép, kernel có thể lấy dữ liệu từ tệp, từ vùng hoán đổi hoặc cấp một trang toàn số 0 (<span class="en" lang="en">zero-fill-on-demand</span>) cho vùng mới. Nếu truy cập trái phép, kernel báo lỗi truy cập cho tiến trình.</p>
         <figure class="fig">
           <ol class="mem-timeline">
             <li><b>CPU phát hiện trang vắng</b><span>Lệnh đọc bị gián đoạn, kernel kiểm tra ánh xạ và quyền.</span></li>
@@ -180,12 +254,13 @@
         </figure>
         <p>Nếu hết khung trống, kernel cần chọn một trang để nhường chỗ. Với <dfn>trang sạch</dfn> (<span class="en" lang="en">clean page</span>) có bản đọc lại được, nó có thể bỏ bản trong RAM. <dfn>Trang bẩn</dfn> (<span class="en" lang="en">dirty page</span>) chứa thay đổi mà bản đọc lại chưa có. Kernel phải lưu nội dung nếu tiến trình còn cần nó. Nó cũng phải vô hiệu hóa mục TLB cũ trước khi dùng khung cho trang khác. Lệnh gây lỗi sẽ được thử lại khi đã có ánh xạ mới. Với lệnh chạm nhiều địa chỉ, kiến trúc phải bảo đảm thử lại vẫn giữ đúng hiệu ứng của lệnh.</p>
         <p>Ở mô phỏng, thử cả trang sạch và trang bẩn. Ghi lại số lượt I/O được yêu cầu và quan sát ba thời điểm riêng biệt. Thiết bị đọc xong, tiến trình trở về hàng sẵn sàng, rồi CPU cấp lượt cho nó. Đây là <a href="buoi-2.html#trang-thai">đường về CPU đã học ở Buổi 2</a>.</p>
+        <div class="box predict"><div class="box-h">Đoán trước</div><p>Trang cần thu hồi là trang bẩn. So với trang sạch, kernel phải làm thêm mấy lượt I/O trước khi đọc được trang mới vào? Tiến trình bị lỗi đang ở trạng thái nào trong lúc đó?</p></div>
         <div id="mo-phong-loi-trang" data-memory-lab="fault">
           <noscript><p>Bật JavaScript để theo dõi bảng trang và khung RAM. Trục thời gian phía trên trình bày đường nạp hợp lệ từ tệp.</p></noscript>
         </div>
         <p>Lỗi trang cần đọc thiết bị có thể tốn hơn nhiều so với truy cập thông thường. Giả sử một lần thành công mất 100 ns và đường xử lý phải đọc thiết bị tốn tổng cộng 5 ms, tức 5&nbsp;000&nbsp;000 ns. Với tỷ lệ lỗi <var>q</var> = 1/100&nbsp;000, kỳ vọng là (1 − <var>q</var>) × 100 + <var>q</var> × 5&nbsp;000&nbsp;000 ≈ 150 ns. Một lỗi cần I/O là <dfn>lỗi trang lớn</dfn> (<span class="en" lang="en">major page fault</span>). Nếu kernel có thể xử lý ngay với dữ liệu đã có trong RAM hoặc trang 0 mới cấp thì đó là <dfn>lỗi trang nhỏ</dfn> (<span class="en" lang="en">minor page fault</span>). Phép tính trên giả định mọi lỗi đều cần I/O.</p>
 
-        <h3 id="sao-chep-khi-ghi">10.3 · Chỉ tạo bản riêng khi có người ghi</h3>
+        <h3 id="sao-chep-khi-ghi">10.3 · Copy-on-Write <span class="vi">Sao chép khi ghi</span></h3>
         <p>Giả sử ứng dụng tạo tiến trình con bằng <code>fork()</code> để xuất ảnh. Nếu sao chép toàn bộ vùng nhớ ngay, phần lớn dữ liệu có thể bị chép vô ích, nhất là khi tiến trình con sớm gọi <code>exec()</code> để chạy chương trình khác. Với <dfn>sao chép khi ghi</dfn> (<span class="en" lang="en">copy-on-write</span>, COW), hai tiến trình bắt đầu với các ánh xạ trỏ vào cùng khung. Trang riêng vốn được phép ghi được đánh dấu tạm chỉ đọc với thông tin COW để kernel nhận ra một lần ghi hợp lệ cần tạo bản riêng.</p>
         <figure class="fig">
           <div class="tbl-wrap mem-table">
@@ -200,10 +275,11 @@
           </div>
           <figcaption><b>Một ánh xạ tách thành hai.</b> So sánh cột của tiến trình con qua từng hàng. Chỉ trang C cần bản riêng vì đó là trang có lần ghi. Trang khác vẫn có thể chia sẻ.</figcaption>
         </figure>
-        <p>Kernel cấp khung mới, sao nội dung, sửa ánh xạ của bên ghi rồi vô hiệu hóa bản dịch TLB cũ trước khi lệnh thử lại. Nếu khung chỉ còn một bên giữ, kernel có thể cho bên đó ghi tại chỗ. Một trang chỉ đọc thật sự, chẳng hạn mã thư viện, vẫn chịu quy tắc bảo vệ riêng.</p>
+        <p>Kernel cấp khung mới, sao nội dung, sửa ánh xạ của bên ghi rồi vô hiệu hóa bản dịch TLB cũ trước khi lệnh thử lại. Nếu khung chỉ còn một bên giữ, kernel có thể cho bên đó ghi tại chỗ. Một trang chỉ đọc thật sự, chẳng hạn mã thư viện, vẫn chịu quy tắc bảo vệ riêng. Một số UNIX, như Linux và macOS, còn có <code>vfork()</code>: tiến trình cha bị tạm dừng, còn con dùng thẳng không gian địa chỉ của cha mà không có COW. Nếu con sửa trang nào, cha sẽ thấy thay đổi khi chạy tiếp, nên <code>vfork()</code> chỉ dành cho trường hợp con gọi <code>exec()</code> ngay lập tức.</p>
 
-        <h3 id="thay-trang">10.4 · Chọn trang nào để nhường khung?</h3>
+        <h3 id="thay-trang">10.4 · Page Replacement <span class="vi">Thay trang</span></h3>
         <p>Khi hết khung rảnh, <dfn>thay trang</dfn> (<span class="en" lang="en">page replacement</span>) chọn một trang đang cư trú để thu hồi khung. Chọn một trang sắp được dùng lại làm phát sinh thêm lỗi trang. Để so sánh cách chọn, ta dùng <dfn>chuỗi tham chiếu</dfn> (<span class="en" lang="en">reference string</span>) ghi số trang theo thứ tự CPU dùng. Mỗi lần chạm trang đã ở RAM là một lần trúng. Mỗi lần cần trang vắng được tính là một lỗi, kể cả khi còn khung trống.</p>
+        <p>Bốn thuật toán dưới đây kể một câu chuyện ba bước. FIFO là ý tưởng ngây thơ nhất: trang nào vào lâu nhất thì ra trước, bất kể nó còn được dùng hay không. OPT là lời giải lý tưởng, nhưng cần biết trước tương lai. LRU lấy quá khứ gần làm gương cho tương lai gần, dựa vào tính cục bộ. Clock là cách xấp xỉ LRU đủ rẻ để phần cứng hỗ trợ. Mỗi bước đổi một chút độ chính xác lấy khả năng cài đặt được.</p>
         <div class="tbl-wrap">
           <table class="tbl">
             <thead><tr><th scope="col">Thuật toán</th><th scope="col">Thông tin theo dõi</th><th scope="col">Cách chọn khi đầy</th></tr></thead>
@@ -217,15 +293,35 @@
         </div>
         <p>Thử chuỗi A, B, C, A, D với ba khung ban đầu trống. Ở lượt tham chiếu A thứ hai, A đã có trong RAM. FIFO vẫn xem A là trang vào đầu tiên. LRU ghi nhận A vừa được dùng, nên khi D cần chỗ, FIFO bỏ A còn LRU bỏ B. Tính chính xác LRU đòi theo dõi mọi lượt chạm, chẳng hạn với dấu thời gian hoặc thứ tự dùng, nên chi phí cập nhật cao. Clock chỉ cần biết trang có được dùng từ lần xóa bit gần nhất hay không. Nếu khung nào cũng có bit 1, kim đi đủ một vòng để xóa các bit rồi quay lại thay khung đầu tiên đã xét.</p>
         <p>OPT có số lỗi tối thiểu cho một chuỗi và một số khung cố định. Nếu cả hai ứng viên đều còn lượt dùng, giữ trang cần sớm hơn sẽ trì hoãn thời điểm cần nạp lại. Trong thực tế hệ điều hành thường chưa biết phần chuỗi tương lai, nên OPT được dùng làm mốc so sánh. LRU có <dfn>tính chất tập con</dfn> (<span lang="en">stack property</span>). Tại cùng một thời điểm, các trang trong <var>n</var> khung cũng nằm trong <var>n</var> + 1 khung vì cả hai lấy các trang dùng gần nhất từ cùng một thứ tự. Số lỗi LRU vì thế không tăng khi thêm khung. Với FIFO, thêm khung làm đổi thứ tự nạp và có thể tăng số lỗi. Hiện tượng đó gọi là <dfn>nghịch lý Belady</dfn> (<span class="en" lang="en">Belady’s anomaly</span>).</p>
+        <div class="box predict"><div class="box-h">Đoán trước</div><p>Trực giác nói thêm khung thì ít lỗi trang hơn. Với FIFO, chuỗi trong mô phỏng ở 3 khung và 4 khung, bạn đoán bên nào nhiều lỗi hơn? Ghi lại dự đoán rồi chạy song song.</p></div>
         <div id="mo-phong-thay-trang" data-memory-lab="replacement">
           <noscript><p>Bật JavaScript để chạy hai số khung song song. Với chuỗi B, C, E, D, A, F, E, D, E, C, E, D, B, A, B, C, FIFO có 11 lỗi ở 3 khung và 12 lỗi ở 4 khung.</p></noscript>
         </div>
-        <p>Có thể xấp xỉ LRU bằng cách lấy mẫu bit tham chiếu định kỳ và dồn kết quả vào một dãy bit lịch sử, với mẫu mới ở đầu có trọng số cao. Clock mở rộng còn xét bit sửa đổi <var>M</var> và ưu tiên nhóm (0, 0), tức ít dấu hiệu được dùng gần đây và có thể bỏ mà ít tốn I/O. Đếm số lần dùng cũng cho các biến thể giữ trang thường xuyên hoặc ưu tiên trang mới, nhưng số đếm cũ có thể mất ý nghĩa khi ứng dụng chuyển việc. Một cơ chế khác giữ danh sách khung đệm và có thể ghi trang bẩn sớm. Nếu trang vừa bị lấy ra vẫn còn nguyên trong một khung chưa cấp lại, hệ thống có thể nhận lại nó mà không cần đọc thiết bị.</p>
+        <p>Có thể xấp xỉ LRU bằng cách lấy mẫu bit tham chiếu định kỳ và dồn kết quả vào một dãy bit lịch sử, với mẫu mới ở đầu có trọng số cao. Clock mở rộng còn xét bit sửa đổi <var>M</var> và ưu tiên nhóm (0, 0), tức ít dấu hiệu được dùng gần đây và có thể bỏ mà ít tốn I/O. Đếm số lần dùng cũng cho các biến thể giữ trang thường xuyên hoặc ưu tiên trang mới, nhưng số đếm cũ có thể mất ý nghĩa khi ứng dụng chuyển việc. Một cơ chế khác giữ danh sách khung đệm và có thể ghi trang bẩn sớm. Nếu trang vừa bị lấy ra vẫn còn nguyên trong một khung chưa cấp lại, hệ thống có thể nhận lại nó mà không cần đọc thiết bị. Ngược lại, có ứng dụng hiểu dữ liệu của mình hơn OS. Cơ sở dữ liệu thường tự quản lý vùng đệm, nên một số hệ cho phép nó dùng phân vùng ổ ở dạng <dfn>raw disk</dfn>, bỏ qua bộ đệm và chính sách thay trang của hệ thống tệp.</p>
 
-        <h3 id="cap-khung">10.5–10.6 · Bao nhiêu khung đủ để tiến trình tiến triển?</h3>
+        <h3 id="cap-khung">10.5 · Allocation of Frames <span class="vi">Cấp phát khung</span></h3>
         <p><dfn>Cấp khung</dfn> (<span class="en" lang="en">frame allocation</span>) quyết định mỗi tiến trình được giữ bao nhiêu RAM. Một lệnh có thể cần cả trang chứa lệnh và nhiều trang chứa toán hạng. Kiến trúc và cách khởi động lại lệnh đặt ra số khung tối thiểu để lệnh có thể hoàn tất. Khi chia tài nguyên còn lại, có thể chia đều, chia theo tỷ lệ kích thước tiến trình hoặc tính thêm ưu tiên. Chia theo kích thước chỉ ước lượng nhu cầu vì tiến trình lớn có thể đang dùng ít trang.</p>
         <p>Với <dfn>thay trang cục bộ</dfn> (<span class="en" lang="en">local replacement</span>), ứng dụng xem ảnh chỉ thu hồi khung trong tập của chính nó. Với <dfn>thay trang toàn cục</dfn> (<span class="en" lang="en">global replacement</span>), nó có thể lấy khung của ứng dụng khác. Toàn cục dịch chuyển dung lượng đến nơi đang cần, nhưng một ứng dụng quét nhiều dữ liệu có thể làm ứng dụng nghe nhạc mất trang thường dùng. Hệ thống có thể duy trì một lượng khung rảnh bằng cách thu hồi ở chế độ nền khi xuống dưới một ngưỡng. Trên máy có <dfn>truy cập bộ nhớ không đồng nhất</dfn> (<span class="en" lang="en">non-uniform memory access</span>, NUMA), RAM ở nút gần CPU thường truy cập nhanh hơn. Vị trí khung vì vậy cũng quan trọng khi cấp phát và khi dời tiến trình.</p>
-        <p>Giả sử ứng dụng xem ảnh liên tục đọc A, B, C nhưng chỉ có hai khung. Với LRU, A bị thay khi nạp C, B bị thay khi A quay lại, rồi C bị thay khi B quay lại. Sau khi khởi động, nếu có đủ ba khung thì cả nhóm có thể giữ nguyên. Khi nhiều tiến trình dành phần lớn thời gian nạp và đẩy trang thay vì xử lý dữ liệu, hệ thống bị <dfn>quá tải do đảo trang</dfn> (<span class="en" lang="en">thrashing</span>). Nếu thấy CPU rảnh vì các tiến trình đang chờ I/O mà lại đưa thêm việc vào, mỗi việc có thể mất thêm khung khiến vòng lặp trầm trọng hơn.</p>
+        <h3 id="thrashing">10.6 · Thrashing <span class="vi">Trì trệ do đảo trang liên tục</span></h3>
+        <p>Giả sử ứng dụng xem ảnh liên tục đọc A, B, C nhưng chỉ có hai khung. Với LRU, A bị thay khi nạp C, B bị thay khi A quay lại, rồi C bị thay khi B quay lại. Sau khi khởi động, nếu có đủ ba khung thì cả nhóm có thể giữ nguyên. Khi nhiều tiến trình dành phần lớn thời gian nạp và đẩy trang thay vì xử lý dữ liệu, hệ thống bị <dfn>quá tải do đảo trang</dfn> (<span class="en" lang="en">thrashing</span>).</p>
+        <p>Điều trớ trêu là chính bộ lập lịch có thể đẩy hệ thống vào thrashing. Các tiến trình liên tục lỗi trang nên phần lớn thời gian nằm ở hàng chờ thiết bị, CPU rảnh. Thấy mức dùng CPU thấp, một hệ thống ngây thơ sẽ cho thêm tiến trình vào để “tận dụng CPU”. Tiến trình mới lấy khung của tiến trình cũ, nên lỗi trang càng nhiều, CPU càng rảnh, và vòng xoáy tiếp tục.</p>
+        <figure class="fig">
+          <svg class="teaching-svg" viewBox="0 0 420 230" role="img" aria-labelledby="thrash-title">
+            <title id="thrash-title">Mức dùng CPU tăng theo số tiến trình rồi sụp đổ khi thrashing</title>
+            <path class="axis-line" d="M48 18V190H404"/>
+            <text class="annotation" x="40" y="24" text-anchor="end">100%</text>
+            <text class="annotation" x="226" y="222" text-anchor="middle">mức độ đa chương trình (số tiến trình)</text>
+            <text class="annotation" transform="translate(18 110) rotate(-90)" text-anchor="middle">mức dùng CPU</text>
+            <rect class="z-min" x="262" y="18" width="142" height="172"/>
+            <path class="thrash-curve" d="M48 186C90 120 140 62 210 44C240 37 252 42 262 54C290 100 318 160 400 180"/>
+            <circle class="f-ok" cx="226" cy="41" r="5"/>
+            <text class="annotation" x="226" y="30" text-anchor="middle">điểm tốt nhất</text>
+            <text class="t-min" x="334" y="78" text-anchor="middle">thrashing</text>
+            <text class="annotation" x="334" y="98" text-anchor="middle">thêm tiến trình</text>
+            <text class="annotation" x="334" y="114" text-anchor="middle">chỉ thêm lỗi trang</text>
+          </svg>
+          <figcaption><b>Đường cong thrashing.</b> Ban đầu, thêm tiến trình giúp CPU luôn có việc khi một tiến trình chờ I/O. Qua một ngưỡng, tổng nhu cầu khung vượt RAM, lỗi trang tăng vọt và mức dùng CPU sụp xuống. Cách thoát ra là <em>giảm</em> số tiến trình đang hoạt động, ngược với phản xạ ban đầu.</figcaption>
+        </figure>
         <p>An xem kỹ vùng ảnh đầu, rồi cuộn sang vùng khác. Những trang vừa được đọc có thể sớm được đọc lại, và những địa chỉ gần đó có thể sớm được dùng. Đó là <dfn>tính cục bộ</dfn> (<span class="en" lang="en">locality</span>) theo thời gian và theo địa chỉ. Để ước lượng số khung cần cho vùng đang xem, lấy <var>Δ</var> lượt truy cập gần nhất, kể cả lượt hiện tại, rồi đếm các trang khác nhau. Tập trang thu được gọi là <dfn>tập làm việc</dfn> (<span class="en" lang="en">working set</span>).</p>
         <figure class="fig">
           <table class="working-set">
@@ -240,40 +336,138 @@
           <figcaption>Khung tô màu trượt theo lượt đọc. Sau lượt 5, tham chiếu đầu đã ra ngoài cửa sổ, nhưng A vẫn xuất hiện ở lượt 3. Sau lượt 8, bốn lần đọc chỉ chạm hai trang D và E.</figcaption>
         </figure>
         <p>Nếu tổng kích thước tập làm việc vượt số khung có thể cấp, kernel có thể tạm giảm số tiến trình hoạt động để các tiến trình còn lại có đủ RAM. Chọn <var>Δ</var> quá nhỏ có thể bỏ sót trang cùng pha, còn quá lớn sẽ gộp nhiều pha. Một cách điều chỉnh khác đo <dfn>tần suất lỗi trang</dfn> (<span class="en" lang="en">page-fault frequency</span>, PFF). Vượt ngưỡng cao thì thử cấp thêm khung. Dưới ngưỡng thấp thì có thể thu bớt. Lúc hết khung và nhiều tiến trình vượt ngưỡng, giảm tải giúp cắt vòng chờ I/O.</p>
+        <p>Trong thực tế, giáo trình nhận xét rằng cách tốt nhất vẫn là có đủ RAM để giữ mọi tập làm việc cùng lúc. Thrashing và hoán đổi kéo theo nó gây hại tới mức các hệ thống hiện đại, từ điện thoại tới trung tâm dữ liệu, được cấu hình để gần như không bao giờ rơi vào tình trạng đó.</p>
 
-        <h3 id="bo-nho-kernel">10.7–10.8 · Nén trang và cấp phát cho kernel</h3>
-        <p><dfn>Nén bộ nhớ</dfn> (<span class="en" lang="en">memory compression</span>) giữ dạng nén của trang ít dùng ngay trong RAM. Giả sử bốn trang đều nén còn một phần tư và có thể đóng gói vừa một khung. Hệ thống thu lại khoảng ba khung trước khi tính phần dữ liệu quản lý. Khi một trang được dùng lại, kernel giải nén để khôi phục dữ liệu. Cách này đổi thời gian CPU lấy dung lượng RAM và có thể tránh I/O. Mức tiết kiệm phụ thuộc vào khả năng nén của dữ liệu.</p>
-        <p>Kernel vừa cần nhiều đối tượng nhỏ như mô tả tiến trình, vừa có thể cần dải khung vật lý kề nhau cho một số công việc. <dfn>Hệ bạn cặp</dfn> (<span class="en" lang="en">buddy system</span>) quản lý các khối có kích thước lũy thừa của 2. Để cấp 24 KiB từ một khối 128 KiB, tách thành hai khối 64 KiB, rồi tách một nửa thành hai khối 32 KiB. Cấp một khối 32 KiB, dư 8 KiB bên trong. Khi trả, chỉ gộp với khối bạn cùng kích thước sinh ra từ cùng lần tách nếu nó đang rảnh. Sau khi gộp, tiếp tục xét ở kích thước lớn hơn.</p>
-        <p>Với <dfn>cấp phát slab</dfn> (<span class="en" lang="en">slab allocation</span>), kernel giữ một bộ đệm đối tượng (<span lang="en">object cache</span>) theo loại dữ liệu. Một slab lấy bộ nhớ từ một hoặc nhiều trang và chia thành nhiều ô cùng cỡ. Nếu cần một mô tả tiến trình, kernel có thể lấy ngay một ô rảnh trong slab đang dùng dở. Khi trả, đánh dấu ô rảnh để tái sử dụng. Kernel theo dõi slab đầy, dùng dở và trống để tìm ô nhanh và có thể trả slab trống cho bộ cấp trang. Các bộ cấp này có thể phối hợp, chẳng hạn bộ bạn cặp cấp khung cho slab.</p>
+        <h3 id="nen-bo-nho">10.7 · Memory Compression <span class="vi">Nén bộ nhớ</span></h3>
+        <p><dfn>Nén bộ nhớ</dfn> (<span class="en" lang="en">memory compression</span>) giữ dạng nén của trang ít dùng ngay trong RAM. Giả sử bốn trang đều nén còn một phần tư và có thể đóng gói vừa một khung. Hệ thống thu lại khoảng ba khung trước khi tính phần dữ liệu quản lý. Khi một trang được dùng lại, kernel giải nén để khôi phục dữ liệu. Cách này đổi thời gian CPU lấy dung lượng RAM và có thể tránh I/O. Mức tiết kiệm phụ thuộc vào khả năng nén của dữ liệu. Nén bộ nhớ là cách chính để giảm áp lực RAM trên Android và iOS, vốn không dùng hoán đổi. Windows 10 và macOS cũng dùng nó.</p>
+        <h3 id="bo-nho-kernel">10.8 · Allocating Kernel Memory <span class="vi">Cấp phát bộ nhớ cho kernel</span></h3>
+        <p>Bộ nhớ của kernel được quản lý khác với bộ nhớ của tiến trình người dùng, vì hai lý do. Kernel cấp rất nhiều cấu trúc với kích thước khác nhau, thường nhỏ hơn một trang, nên lãng phí do phân mảnh phải thật thấp. Và một số thiết bị phần cứng làm việc trực tiếp với bộ nhớ vật lý, nên cần khung trang <em>liền nhau</em>. Kernel vừa cần nhiều đối tượng nhỏ như mô tả tiến trình, vừa có thể cần dải khung vật lý kề nhau cho một số công việc. <dfn>Hệ bạn cặp</dfn> (<span class="en" lang="en">buddy system</span>) quản lý các khối có kích thước lũy thừa của 2. Để cấp 24 KiB từ một khối 128 KiB, tách thành hai khối 64 KiB, rồi tách một nửa thành hai khối 32 KiB. Cấp một khối 32 KiB, dư 8 KiB bên trong. Khi trả, chỉ gộp với khối bạn cùng kích thước sinh ra từ cùng lần tách nếu nó đang rảnh. Sau khi gộp, tiếp tục xét ở kích thước lớn hơn.</p>
+        <figure class="fig">
+          <svg class="teaching-svg wide" viewBox="0 0 640 212" role="img" aria-labelledby="buddy-title">
+            <title id="buddy-title">Hệ bạn cặp tách khối 128 KiB để cấp 24 KiB</title>
+            <g class="route"><path d="M320 50L160 84M320 50L480 84M160 120L100 154M160 120L290 154"/></g>
+            <rect class="nd-soft" x="200" y="14" width="240" height="36" rx="7"/><text x="320" y="37" text-anchor="middle">128 KiB · đã tách</text>
+            <rect class="nd-soft" x="40" y="84" width="240" height="36" rx="7"/><text x="160" y="107" text-anchor="middle">A<tspan class="sub">L</tspan> · 64 KiB · đã tách</text>
+            <rect class="nd-ok" x="360" y="84" width="240" height="36" rx="7"/><text x="480" y="107" text-anchor="middle">A<tspan class="sub">R</tspan> · 64 KiB · rảnh</text>
+            <rect class="nd-acc" x="10" y="154" width="180" height="48" rx="7"/><text x="100" y="174" text-anchor="middle">B<tspan class="sub">L</tspan> · 32 KiB</text><text class="annotation" x="100" y="193" text-anchor="middle">cấp cho yêu cầu 24 KiB</text>
+            <rect class="nd-ok" x="200" y="154" width="180" height="48" rx="7"/><text x="290" y="174" text-anchor="middle">B<tspan class="sub">R</tspan> · 32 KiB</text><text class="annotation" x="290" y="193" text-anchor="middle">rảnh, là “bạn” của B<tspan class="sub">L</tspan></text>
+            <text class="annotation" x="400" y="174">8 KiB thừa bên trong B<tspan class="sub">L</tspan>:</text>
+            <text class="annotation" x="400" y="193">là phân mảnh trong</text>
+          </svg>
+          <figcaption><b>Tách đôi cho tới khi vừa.</b> Yêu cầu 24 KiB được làm tròn lên lũy thừa 2 gần nhất là 32 KiB. Khối 128 KiB tách thành hai khối 64 KiB, khối bên trái lại tách thành hai khối 32 KiB. Khi B<sub>L</sub> được trả và B<sub>R</sub> vẫn rảnh, hai “bạn” gộp lại thành A<sub>L</sub>, rồi A<sub>L</sub> gộp với A<sub>R</sub>. Gộp nhanh là ưu điểm, còn phân mảnh trong là cái giá: trường hợp xấu nhất, yêu cầu 33 KiB phải nhận khối 64 KiB.</figcaption>
+        </figure>
+        <p>Với <dfn>cấp phát slab</dfn> (<span class="en" lang="en">slab allocation</span>), kernel giữ một bộ đệm đối tượng (<span lang="en">object cache</span>) theo loại dữ liệu. Một slab lấy bộ nhớ từ một hoặc nhiều trang và chia thành nhiều ô cùng cỡ. Nếu cần một mô tả tiến trình, kernel có thể lấy ngay một ô rảnh trong slab đang dùng dở. Khi trả, đánh dấu ô rảnh để tái sử dụng. Kernel theo dõi slab đầy, dùng dở và trống để tìm ô nhanh và có thể trả slab trống cho bộ cấp trang. Các bộ cấp này có thể phối hợp, chẳng hạn bộ bạn cặp cấp khung cho slab. Slab có hai lợi ích chính: không có phân mảnh do đối tượng nào cũng vừa khít một ô, và cấp hay trả đều rất nhanh vì các ô đã được tạo sẵn. Linux dùng slab từ phiên bản 2.2, và từ 2.6.24 chuyển sang biến thể <dfn>SLUB</dfn> gọn hơn. Trên hệ nhúng ít bộ nhớ, Linux có biến thể <dfn>SLOB</dfn> dùng ba danh sách cho đối tượng nhỏ, vừa và lớn.</p>
 
-        <h3 id="lua-chon-thiet-ke">10.9–10.10 · Trang lớn, nạp trước và bài học từ hệ điều hành thật</h3>
+        <h3 id="lua-chon-thiet-ke">10.9 · Other Considerations <span class="vi">Những cân nhắc khác</span></h3>
         <p><dfn>Nạp trước</dfn> (<span class="en" lang="en">prepaging</span>) thử đưa thêm các trang có khả năng sắp được dùng vào RAM. Đọc một dải vùng ảnh có thể hiệu quả nếu An sẽ cuộn tiếp. Nếu An chuyển sang ảnh khác, phần đọc thêm tốn I/O và chỗ trong RAM. Trang lớn giảm số mục bảng trang và tăng <dfn>tầm bao phủ của TLB</dfn> (<span class="en" lang="en">TLB reach</span>), bằng số mục nhân kích thước trang khi mọi mục cùng cỡ. TLB 64 mục với trang 4 KiB phủ tối đa 256 KiB. Trang lớn cũng có thể làm tăng chỗ thừa hoặc đưa vào RAM nhiều byte mà chương trình chưa dùng.</p>
-        <p>Thứ tự chương trình đọc dữ liệu có thể đổi số lỗi trang. Giả sử ma trận 3 × 3 được xếp theo hàng, mỗi hàng vừa một trang và chỉ có một khung cho dữ liệu. Duyệt theo hàng chỉ lỗi khi sang hàng mới, tổng 3 lần. Duyệt theo cột đổi trang ở mỗi phần tử, tổng 9 lần. Khi một thiết bị đang truyền trực tiếp vào một bộ đệm, kernel có thể <dfn>ghim trang</dfn> (<span class="en" lang="en">page pinning</span>) đến lúc hoàn tất để giữ ổn định khung đích. Một cách khác là thực hiện I/O qua bộ đệm do kernel quản lý rồi sao chép.</p>
+        <p>Thứ tự chương trình đọc dữ liệu có thể đổi số lỗi trang. Giả sử ma trận 3 × 3 được xếp theo hàng, mỗi hàng vừa một trang và chỉ có một khung cho dữ liệu. Duyệt theo hàng chỉ lỗi khi sang hàng mới, tổng 3 lần. Duyệt theo cột đổi trang ở mỗi phần tử, tổng 9 lần. Khi một thiết bị đang truyền trực tiếp vào một bộ đệm, kernel có thể <dfn>ghim trang</dfn> (<span class="en" lang="en">page pinning</span>, giáo trình gọi là <span class="en" lang="en">I/O interlock</span> hay <span class="en" lang="en">page locking</span>, dùng một <em>bit khóa</em> trong mỗi khung) đến lúc hoàn tất để giữ ổn định khung đích. Một cách khác là thực hiện I/O qua bộ đệm do kernel quản lý rồi sao chép.</p>
+        <h3 id="vi-du-bo-nho-ao">10.10 · Operating-System Examples <span class="vi">Bộ nhớ ảo trong Linux, Windows và Solaris</span></h3>
         <p>Trong các ví dụ ở §10.10 của ấn bản 2018, <b>Linux</b> theo dõi trang đang hoạt động và ít hoạt động để hỗ trợ thu hồi. <b>Windows 10</b> minh họa nạp theo cụm và quản lý tập làm việc của từng tiến trình. <b>Solaris</b> dùng kiểu Clock hai kim. Kim trước xóa bit tham chiếu, kim sau đến muộn hơn và xem trang có được dùng lại trong khoảng đó hay không. Như trong mô phỏng, mỗi hệ thống dựa vào dấu hiệu sử dụng trang để quyết định thời điểm thu hồi.</p>
       </section>
 
       <section aria-labelledby="ghi-nho">
-        <h2 id="ghi-nho">Từ một địa chỉ ảo đến vùng ảnh trên màn hình</h2>
+        <h2 id="ghi-nho"><span>Summary &amp; Review <span class="vi">Tổng kết và ôn tập</span></span></h2>
         <p>Khi An cuộn ảnh, CPU phát địa chỉ ảo. MMU tra bản dịch trong TLB hoặc bảng trang, kiểm tra quyền rồi ghép số khung với độ lệch. Nếu trang hợp lệ đang vắng, kernel tìm chỗ trong RAM, đọc hoặc tạo dữ liệu, rồi cho phép lệnh thử lại. Khi RAM chật, thuật toán thay trang quyết định nội dung nào rời khỏi khung. Chính sách cấp khung và tập làm việc quyết định liệu ứng dụng có giữ được những trang nó sẽ sớm dùng lại. Các bước này kết hợp cách ly giữa các tiến trình với khả năng dùng chung và tái sử dụng RAM.</p>
 
-        <h3 id="tu-kiem-tra">Câu hỏi tự kiểm tra</h3>
+        <h3 id="tu-kiem-tra">Practice Exercises <span class="vi">Câu hỏi và bài tập tự kiểm tra</span></h3>
         <p>Hãy dự đoán bước tiếp theo hoặc ghi phép tính ra giấy trước khi mở lời giải.</p>
-        <details class="quiz"><summary>1. Cơ sở là 12&nbsp;000, giới hạn là 300 byte. Đọc một byte ở địa chỉ ảo 299 và 300 cho kết quả gì?</summary><p>299 hợp lệ và dịch thành 12&nbsp;299. Địa chỉ 300 vượt biên vì độ lệch hợp lệ lớn nhất là 299. MMU báo ngoại lệ cho kernel.</p></details>
-        <details class="quiz"><summary>2. Với vùng trống 8, 5, 12 KiB và yêu cầu 4, 8, 10 KiB, best fit xử lý được bao nhiêu yêu cầu?</summary><p>Cả ba. Cấp 4 KiB ở vùng 5 KiB, cấp 8 KiB vừa đúng vùng 8 KiB, rồi cấp 10 KiB ở vùng 12 KiB. Phần trống còn lại là 1 và 2 KiB, ở hai vị trí khác nhau.</p></details>
-        <details class="quiz"><summary>3. Trang có 256 byte và trang 2 ở khung 9. Tính địa chỉ vật lý của 600. Vì sao lần đọc ngay sau địa chỉ 585 có thể trúng TLB?</summary><p>600 = 2 × 256 + 88, nên địa chỉ vật lý là 9 × 256 + 88 = 2392. Hai địa chỉ cùng thuộc trang 2. Nếu mục trang 2 được giữ trong TLB và quyền đọc phù hợp, lần sau dùng lại bản dịch với độ lệch mới.</p></details>
-        <details class="quiz"><summary>4. Với bảng hai cấp kiểu 10–10–12, địa chỉ 0 và 4 MiB có dùng chung bảng con không?</summary><p>Mỗi bảng con có 1024 mục × 4 KiB = 4 MiB vùng địa chỉ. Địa chỉ 0 nằm ở bảng con của mục thư mục 0. Địa chỉ 4 MiB là byte đầu vùng do mục thư mục 1 quản lý.</p></details>
-        <details class="quiz"><summary>5. Trượt TLB nhưng PTE cho biết trang có mặt và được đọc. Có cần đọc trang từ thiết bị không? Nếu trang hợp lệ lại đang vắng thì sao?</summary><p>Ở trường hợp đầu, tra bảng lấy khung, có thể cập nhật TLB rồi đọc dữ liệu. Ở trường hợp sau, kernel phải chuẩn bị nội dung và khung trước khi lệnh tiếp tục. Nếu nội dung chỉ có trên thiết bị, tiến trình đợi I/O.</p></details>
-        <details class="quiz"><summary>6. Khung cần thu hồi chứa trang riêng đã sửa. Kernel phải làm gì trước khi ghi dữ liệu trang mới đè lên khung?</summary><p>Ngăn việc dùng ánh xạ cũ, gồm vô hiệu hóa mục TLB liên quan, và giữ được nội dung đã sửa, chẳng hạn ghi ra vùng hoán đổi. Sau khi có bản có thể đọc lại, khung mới dùng cho trang khác.</p></details>
-        <details class="quiz"><summary>7. Cha và con cùng đọc trang C sau <code>fork()</code>. Sau đó cha ghi vào C. Con thấy gì và bản sao được tạo khi nào?</summary><p>Lúc cả hai đọc, họ dùng chung khung. Lần ghi của cha gây ngoại lệ COW. Kernel tạo bản riêng cho cha khi khung còn được con dùng, rồi thử lại lệnh ghi. Con tiếp tục đọc nội dung ban đầu.</p></details>
-        <details class="quiz"><summary>8. Có ba khung và chuỗi A, B, C, A, D, B. Tính số lỗi FIFO và LRU.</summary><p>A, B, C gây ba lỗi rồi lượt A thứ hai trúng. D gây lỗi thứ tư. FIFO bỏ A nên lượt B cuối trúng, tổng 4 lỗi. LRU bỏ B vì A vừa được dùng, nên lượt B cuối gây lỗi thứ năm và thay C.</p></details>
-        <details class="quiz"><summary>9. Clock có ba khung chứa A, B, C, với các bit 1, 0, 1. Kim ở A và cần nạp D. Sau đó các khung và bit ra sao?</summary><p>Kim xóa bit của A rồi tiến. Bit của B đã là 0 nên D thay B. Các khung chứa A, D, C với bit 0, 1, 1. Kim đứng ở khung C cho lần tìm nạn nhân tới.</p></details>
-        <details class="quiz"><summary>10. Một tiến trình có tập làm việc {A, B, C, D}, tiến trình kia có {E, F, G}. Chỉ có 6 khung. Điều gì có thể xảy ra khi giữ cả hai cùng chạy?</summary><p>Tổng nhu cầu ước lượng là 7 khung. Ít nhất một tập không thể nằm trọn trong RAM nếu hai tập rời nhau. Nếu trang bị đẩy ra liên tục cần lại ngay, tỷ lệ lỗi tăng. Có thể cấp thêm RAM hoặc tạm giảm số tiến trình hoạt động để ưu tiên cho tiến trình còn chạy có đủ khung.</p></details>
-        <details class="quiz"><summary>11. Một khối 32 KiB vừa được trả. Có một khối 32 KiB rảnh sát nó, nhưng khối bạn cặp do lần chia ban đầu tạo ra vẫn bận. Có gộp được không?</summary><p>Không gộp trong hệ bạn cặp. Hai nửa phải thuộc cùng khối cha và cùng rảnh. Sự kề nhau chỉ xác định vị trí, chưa bảo đảm chúng là hai nửa của cùng một lần chia.</p></details>
-
-        <h3 id="giao-trinh">Giáo trình</h3>
-        <p class="src">Biên soạn theo Abraham Silberschatz, Peter Baer Galvin và Greg Gagne, <cite>Operating System Concepts</cite>, ấn bản 10, Wiley, 2018. Chương 9 <span lang="en">Main Memory</span> (§9.1–9.8, từ tr. 349) và Chương 10 <span lang="en">Virtual Memory</span> (§10.1–10.11, từ tr. 389). Tình huống xem ảnh, số liệu minh họa, sơ đồ, mô phỏng và bài tập được soạn cho PADOS.</p>
+        <details class="quiz"><summary><span class="q">1. Cơ sở là 12&nbsp;000, giới hạn là 300 byte. Đọc một byte ở địa chỉ ảo 299 và 300 cho kết quả gì?</span></summary><div class="ans"><p>299 hợp lệ và dịch thành 12&nbsp;299. Địa chỉ 300 vượt biên vì độ lệch hợp lệ lớn nhất là 299. MMU báo ngoại lệ cho kernel.</p></div></details>
+        <details class="quiz"><summary><span class="q">2. Với vùng trống 8, 5, 12 KiB và yêu cầu 4, 8, 10 KiB, best fit xử lý được bao nhiêu yêu cầu?</span></summary><div class="ans"><p>Cả ba. Cấp 4 KiB ở vùng 5 KiB, cấp 8 KiB vừa đúng vùng 8 KiB, rồi cấp 10 KiB ở vùng 12 KiB. Phần trống còn lại là 1 và 2 KiB, ở hai vị trí khác nhau.</p></div></details>
+        <details class="quiz"><summary><span class="q">3. Trang có 256 byte và trang 2 ở khung 9. Tính địa chỉ vật lý của 600. Vì sao lần đọc ngay sau địa chỉ 585 có thể trúng TLB?</span></summary><div class="ans"><p>600 = 2 × 256 + 88, nên địa chỉ vật lý là 9 × 256 + 88 = 2392. Hai địa chỉ cùng thuộc trang 2. Nếu mục trang 2 được giữ trong TLB và quyền đọc phù hợp, lần sau dùng lại bản dịch với độ lệch mới.</p></div></details>
+        <details class="quiz"><summary><span class="q">4. Với bảng hai cấp kiểu 10–10–12, địa chỉ 0 và 4 MiB có dùng chung bảng con không?</span></summary><div class="ans"><p>Mỗi bảng con có 1024 mục × 4 KiB = 4 MiB vùng địa chỉ. Địa chỉ 0 nằm ở bảng con của mục thư mục 0. Địa chỉ 4 MiB là byte đầu vùng do mục thư mục 1 quản lý.</p></div></details>
+        <details class="quiz"><summary><span class="q">5. Trượt TLB nhưng PTE cho biết trang có mặt và được đọc. Có cần đọc trang từ thiết bị không? Nếu trang hợp lệ lại đang vắng thì sao?</span></summary><div class="ans"><p>Ở trường hợp đầu, tra bảng lấy khung, có thể cập nhật TLB rồi đọc dữ liệu. Ở trường hợp sau, kernel phải chuẩn bị nội dung và khung trước khi lệnh tiếp tục. Nếu nội dung chỉ có trên thiết bị, tiến trình đợi I/O.</p></div></details>
+        <details class="quiz"><summary><span class="q">6. Khung cần thu hồi chứa trang riêng đã sửa. Kernel phải làm gì trước khi ghi dữ liệu trang mới đè lên khung?</span></summary><div class="ans"><p>Ngăn việc dùng ánh xạ cũ, gồm vô hiệu hóa mục TLB liên quan, và giữ được nội dung đã sửa, chẳng hạn ghi ra vùng hoán đổi. Sau khi có bản có thể đọc lại, khung mới dùng cho trang khác.</p></div></details>
+        <details class="quiz"><summary><span class="q">7. Cha và con cùng đọc trang C sau <code>fork()</code>. Sau đó cha ghi vào C. Con thấy gì và bản sao được tạo khi nào?</span></summary><div class="ans"><p>Lúc cả hai đọc, họ dùng chung khung. Lần ghi của cha gây ngoại lệ COW. Kernel tạo bản riêng cho cha khi khung còn được con dùng, rồi thử lại lệnh ghi. Con tiếp tục đọc nội dung ban đầu.</p></div></details>
+        <details class="quiz"><summary><span class="q">8. Có ba khung và chuỗi A, B, C, A, D, B. Tính số lỗi FIFO và LRU.</span></summary><div class="ans"><p>A, B, C gây ba lỗi rồi lượt A thứ hai trúng. D gây lỗi thứ tư. FIFO bỏ A nên lượt B cuối trúng, tổng 4 lỗi. LRU bỏ B vì A vừa được dùng, nên lượt B cuối gây lỗi thứ năm và thay C.</p></div></details>
+        <details class="quiz"><summary><span class="q">9. Clock có ba khung chứa A, B, C, với các bit 1, 0, 1. Kim ở A và cần nạp D. Sau đó các khung và bit ra sao?</span></summary><div class="ans"><p>Kim xóa bit của A rồi tiến. Bit của B đã là 0 nên D thay B. Các khung chứa A, D, C với bit 0, 1, 1. Kim đứng ở khung C cho lần tìm nạn nhân tới.</p></div></details>
+        <details class="quiz"><summary><span class="q">10. Một tiến trình có tập làm việc {A, B, C, D}, tiến trình kia có {E, F, G}. Chỉ có 6 khung. Điều gì có thể xảy ra khi giữ cả hai cùng chạy?</span></summary><div class="ans"><p>Tổng nhu cầu ước lượng là 7 khung. Ít nhất một tập không thể nằm trọn trong RAM nếu hai tập rời nhau. Nếu trang bị đẩy ra liên tục cần lại ngay, tỷ lệ lỗi tăng. Có thể cấp thêm RAM hoặc tạm giảm số tiến trình hoạt động để ưu tiên cho tiến trình còn chạy có đủ khung.</p></div></details>
+        <details class="quiz"><summary><span class="q">11. Một khối 32 KiB vừa được trả. Có một khối 32 KiB rảnh sát nó, nhưng khối bạn cặp do lần chia ban đầu tạo ra vẫn bận. Có gộp được không?</span></summary><div class="ans"><p>Không gộp trong hệ bạn cặp. Hai nửa phải thuộc cùng khối cha và cùng rảnh. Sự kề nhau chỉ xác định vị trí, chưa bảo đảm chúng là hai nửa của cùng một lần chia.</p></div></details>
+        <details class="quiz"><summary><span class="q">12. Theo quy tắc 50 phần trăm, với first fit đã cấp 1.000 khối, khoảng bao nhiêu khối bị mất vì phân mảnh ngoài? Tỉ lệ bộ nhớ không dùng được là bao nhiêu?</span></summary><div class="ans"><p>Khoảng 0,5 × 1.000 = 500 khối. Trong 1.500 khối, 500 khối bị lãng phí, tức gần một phần ba bộ nhớ.</p></div></details>
+        <details class="quiz"><summary><span class="q">13. x86-64 với địa chỉ 48 bit, trang 4 KiB và bốn cấp bảng trang. Mỗi cấp dùng bao nhiêu bit, và mỗi bảng có bao nhiêu mục? Vì sao vừa khít một trang?</span></summary><div class="ans"><p>12 bit cho độ lệch, còn 36 bit chia đều cho bốn cấp, mỗi cấp 9 bit, nên mỗi bảng có 2<sup>9</sup> = 512 mục. Mỗi mục 8 byte, nên một bảng chiếm 512 × 8 = 4.096 byte, đúng bằng một trang.</p></div></details>
+        <details class="quiz"><summary><span class="q">14. Hệ thống thấy mức dùng CPU thấp nên liên tục cho thêm tiến trình, nhưng mức dùng CPU càng giảm. Chuyện gì đang xảy ra, và nên làm gì?</span></summary><div class="ans"><p>Hệ thống đang thrashing. Tổng tập làm việc vượt số khung, các tiến trình liên tục lỗi trang và chờ I/O, nên CPU rỗi. Thêm tiến trình chỉ lấy thêm khung của tiến trình cũ. Cần làm ngược lại: giảm mức độ đa chương trình, tạm treo một số tiến trình cho tới khi tập làm việc của những tiến trình còn lại vừa với RAM.</p></div></details>
+        <details class="quiz"><summary><span class="q">15. Hệ bạn cặp có một khối 128 KiB rảnh. Yêu cầu 33 KiB nhận được khối bao nhiêu, và thừa bao nhiêu?</span></summary><div class="ans"><p>33 KiB làm tròn lên lũy thừa 2 gần nhất là 64 KiB. Khối 128 KiB tách đôi, một nửa 64 KiB được cấp, nên thừa 31 KiB bên trong khối. Đây là trường hợp xấu của phân mảnh trong ở hệ bạn cặp.</p></div></details>
+        <details class="quiz"><summary><span class="q">16. TLB có 64 mục. Tính tầm bao phủ của TLB khi dùng trang 4 KiB và khi dùng trang 2 MiB.</span></summary><div class="ans"><p>Với trang 4 KiB: 64 × 4 KiB = 256 KiB. Với trang 2 MiB: 64 × 2 MiB = 128 MiB, lớn gấp 512 lần. Đó là lý do ứng dụng dùng nhiều bộ nhớ, như cơ sở dữ liệu, được lợi khi dùng trang lớn.</p></div></details>
+        <h3 id="thuat-ngu">Glossary <span class="vi">Bảng thuật ngữ Anh–Việt</span></h3>
+        <p>Các thuật ngữ được định nghĩa trong buổi học, sắp theo tên tiếng Anh. Cột cuối dẫn về mục nơi thuật ngữ xuất hiện lần đầu.</p>
+        <details class="quiz glossary"><summary><span class="q">Mở bảng 68 thuật ngữ</span></summary><div class="ans">
+          <div class="tbl-wrap"><table class="tbl glossary-table">
+            <thead><tr><th scope="col">Thuật ngữ</th><th scope="col">Tiếng Việt</th><th scope="col">Mục</th></tr></thead>
+            <tbody>
+              <tr><th scope="row" lang="en">50-percent rule</th><td>quy tắc 50 phần trăm</td><td><a href="#cap-phat-lien-tuc">9.2</a></td></tr>
+              <tr><th scope="row" lang="en">address binding</th><td>gắn địa chỉ</td><td><a href="#gan-dia-chi">9.1.2</a></td></tr>
+              <tr><th scope="row" lang="en">address-space identifier (ASID)</th><td>mã không gian địa chỉ</td><td><a href="#tlb">9.3.2</a></td></tr>
+              <tr><th scope="row" lang="en">backing store</th><td>vùng lưu trữ hỗ trợ</td><td><a href="#hoan-doi">9.5</a></td></tr>
+              <tr><th scope="row" lang="en">base register</th><td>thanh ghi cơ sở</td><td><a href="#dia-chi-logic">9.1.3</a></td></tr>
+              <tr><th scope="row" lang="en">Belady’s anomaly</th><td>nghịch lý Belady</td><td><a href="#thay-trang">10.4</a></td></tr>
+              <tr><th scope="row" lang="en">buddy system</th><td>hệ bạn cặp</td><td><a href="#bo-nho-kernel">10.8</a></td></tr>
+              <tr><th scope="row" lang="en">clean page</th><td>trang sạch</td><td><a href="#phan-trang-theo-yeu-cau">10.2</a></td></tr>
+              <tr><th scope="row" lang="en">compaction</th><td>dồn bộ nhớ</td><td><a href="#cap-phat-lien-tuc">9.2</a></td></tr>
+              <tr><th scope="row" lang="en">contiguous allocation</th><td>cấp phát liên tục</td><td><a href="#cap-phat-lien-tuc">9.2</a></td></tr>
+              <tr><th scope="row" lang="en">copy-on-write</th><td>sao chép khi ghi</td><td><a href="#sao-chep-khi-ghi">10.3</a></td></tr>
+              <tr><th scope="row" lang="en">demand paging</th><td>phân trang theo yêu cầu</td><td><a href="#phan-trang-theo-yeu-cau">10.2</a></td></tr>
+              <tr><th scope="row" lang="en">dirty page</th><td>trang bẩn</td><td><a href="#phan-trang-theo-yeu-cau">10.2</a></td></tr>
+              <tr><th scope="row" lang="en">dynamic linking</th><td>liên kết động</td><td><a href="#nap-dong">9.1.4–9.1.5</a></td></tr>
+              <tr><th scope="row" lang="en">dynamic loading</th><td>nạp động</td><td><a href="#nap-dong">9.1.4–9.1.5</a></td></tr>
+              <tr><th scope="row" lang="en">effective access time</th><td>thời gian truy cập hiệu dụng</td><td><a href="#tlb">9.3.2</a></td></tr>
+              <tr><th scope="row" lang="en">external fragmentation</th><td>phân mảnh ngoài</td><td><a href="#cap-phat-lien-tuc">9.2</a></td></tr>
+              <tr><th scope="row" lang="en">FIFO page replacement</th><td>thay trang vào trước ra trước</td><td><a href="#thay-trang">10.4</a></td></tr>
+              <tr><th scope="row" lang="en">first fit / best fit / worst fit</th><td>vừa đầu tiên / vừa nhất / lấy vùng lớn nhất</td><td><a href="#cap-phat-lien-tuc">9.2</a></td></tr>
+              <tr><th scope="row" lang="en">frame</th><td>khung trang</td><td><a href="#phuong-phap-co-ban">9.3.1</a></td></tr>
+              <tr><th scope="row" lang="en">frame allocation</th><td>cấp khung</td><td><a href="#cap-khung">10.5</a></td></tr>
+              <tr><th scope="row" lang="en">global replacement</th><td>thay trang toàn cục</td><td><a href="#cap-khung">10.5</a></td></tr>
+              <tr><th scope="row" lang="en">hashed page table</th><td>bảng trang băm</td><td><a href="#bang-trang">9.4</a></td></tr>
+              <tr><th scope="row" lang="en">hierarchical page table</th><td>bảng trang nhiều cấp</td><td><a href="#bang-trang">9.4</a></td></tr>
+              <tr><th scope="row" lang="en">hole</th><td>vùng trống</td><td><a href="#cap-phat-lien-tuc">9.2</a></td></tr>
+              <tr><th scope="row" lang="en">internal fragmentation</th><td>phân mảnh trong</td><td><a href="#cap-phat-lien-tuc">9.2</a></td></tr>
+              <tr><th scope="row" lang="en">inverted page table</th><td>bảng trang đảo</td><td><a href="#bang-trang">9.4</a></td></tr>
+              <tr><th scope="row" lang="en">least recently used (LRU)</th><td>lâu nhất chưa dùng</td><td><a href="#thay-trang">10.4</a></td></tr>
+              <tr><th scope="row" lang="en">limit register</th><td>thanh ghi giới hạn</td><td><a href="#dia-chi-logic">9.1.3</a></td></tr>
+              <tr><th scope="row" lang="en">local replacement</th><td>thay trang cục bộ</td><td><a href="#cap-khung">10.5</a></td></tr>
+              <tr><th scope="row" lang="en">locality</th><td>tính cục bộ</td><td><a href="#thrashing">10.6</a></td></tr>
+              <tr><th scope="row" lang="en">logical address</th><td>địa chỉ logic (còn gọi là địa chỉ ảo)</td><td><a href="#dia-chi-logic">9.1.3</a></td></tr>
+              <tr><th scope="row" lang="en">major page fault</th><td>lỗi trang lớn</td><td><a href="#phan-trang-theo-yeu-cau">10.2</a></td></tr>
+              <tr><th scope="row" lang="en">memory compression</th><td>nén bộ nhớ</td><td><a href="#nen-bo-nho">10.7</a></td></tr>
+              <tr><th scope="row" lang="en">memory-management unit</th><td>đơn vị quản lý bộ nhớ</td><td><a href="#dia-chi-logic">9.1.3</a></td></tr>
+              <tr><th scope="row" lang="en">memory-mapped file</th><td>tệp ánh xạ vào bộ nhớ</td><td><a href="#nap-theo-yeu-cau">10.1</a></td></tr>
+              <tr><th scope="row" lang="en">minor page fault</th><td>lỗi trang nhỏ</td><td><a href="#phan-trang-theo-yeu-cau">10.2</a></td></tr>
+              <tr><th scope="row" lang="en">non-uniform memory access</th><td>truy cập bộ nhớ không đồng nhất</td><td><a href="#cap-khung">10.5</a></td></tr>
+              <tr><th scope="row" lang="en">optimal page replacement (OPT)</th><td>thay trang tối ưu</td><td><a href="#thay-trang">10.4</a></td></tr>
+              <tr><th scope="row" lang="en">page</th><td>trang</td><td><a href="#phuong-phap-co-ban">9.3.1</a></td></tr>
+              <tr><th scope="row" lang="en">page fault</th><td>lỗi trang</td><td><a href="#phan-trang-theo-yeu-cau">10.2</a></td></tr>
+              <tr><th scope="row" lang="en">page in</th><td>đưa trang vào</td><td><a href="#hoan-doi">9.5</a></td></tr>
+              <tr><th scope="row" lang="en">page out</th><td>đẩy trang ra</td><td><a href="#hoan-doi">9.5</a></td></tr>
+              <tr><th scope="row" lang="en">page pinning</th><td>ghim trang</td><td><a href="#lua-chon-thiet-ke">10.9</a></td></tr>
+              <tr><th scope="row" lang="en">page replacement</th><td>thay trang</td><td><a href="#thay-trang">10.4</a></td></tr>
+              <tr><th scope="row" lang="en">page table</th><td>bảng trang</td><td><a href="#phuong-phap-co-ban">9.3.1</a></td></tr>
+              <tr><th scope="row" lang="en">page-fault frequency</th><td>tần suất lỗi trang</td><td><a href="#thrashing">10.6</a></td></tr>
+              <tr><th scope="row" lang="en">page-table entry</th><td>mục bảng trang</td><td><a href="#phuong-phap-co-ban">9.3.1</a></td></tr>
+              <tr><th scope="row" lang="en">paging</th><td>phân trang</td><td><a href="#phuong-phap-co-ban">9.3.1</a></td></tr>
+              <tr><th scope="row" lang="en">physical address</th><td>địa chỉ vật lý</td><td><a href="#dia-chi-logic">9.1.3</a></td></tr>
+              <tr><th scope="row" lang="en">prepaging</th><td>nạp trước</td><td><a href="#lua-chon-thiet-ke">10.9</a></td></tr>
+              <tr><th scope="row" lang="en">reentrant code</th><td>mã tái nhập</td><td><a href="#bao-ve-trang">9.3.3–9.3.4</a></td></tr>
+              <tr><th scope="row" lang="en">reference string</th><td>chuỗi tham chiếu</td><td><a href="#thay-trang">10.4</a></td></tr>
+              <tr><th scope="row" lang="en">relocation register</th><td>thanh ghi dời địa chỉ</td><td><a href="#dia-chi-logic">9.1.3</a></td></tr>
+              <tr><th scope="row" lang="en">second-chance algorithm (Clock)</th><td>thuật toán cơ hội thứ hai</td><td><a href="#thay-trang">10.4</a></td></tr>
+              <tr><th scope="row" lang="en">shared libraries</th><td>thư viện dùng chung</td><td><a href="#nap-dong">9.1.4–9.1.5</a></td></tr>
+              <tr><th scope="row" lang="en">slab allocation</th><td>cấp phát slab</td><td><a href="#bo-nho-kernel">10.8</a></td></tr>
+              <tr><th scope="row" lang="en">stack property</th><td>tính chất tập con</td><td><a href="#thay-trang">10.4</a></td></tr>
+              <tr><th scope="row" lang="en">standard swapping</th><td>hoán đổi chuẩn</td><td><a href="#hoan-doi">9.5</a></td></tr>
+              <tr><th scope="row" lang="en">thrashing</th><td>quá tải do đảo trang</td><td><a href="#thrashing">10.6</a></td></tr>
+              <tr><th scope="row" lang="en">TLB hit / TLB miss</th><td>trúng / trượt TLB</td><td><a href="#tlb">9.3.2</a></td></tr>
+              <tr><th scope="row" lang="en">TLB reach</th><td>tầm bao phủ của TLB</td><td><a href="#lua-chon-thiet-ke">10.9</a></td></tr>
+              <tr><th scope="row" lang="en">translation granule</th><td>hạt dịch</td><td><a href="#armv8">9.7</a></td></tr>
+              <tr><th scope="row" lang="en">translation lookaside buffer</th><td>bộ đệm dịch địa chỉ</td><td><a href="#tlb">9.3.2</a></td></tr>
+              <tr><th scope="row" lang="en">valid–invalid bit</th><td>bit hợp lệ</td><td><a href="#bao-ve-trang">9.3.3–9.3.4</a></td></tr>
+              <tr><th scope="row" lang="en">virtual memory</th><td>bộ nhớ ảo</td><td><a href="#nap-theo-yeu-cau">10.1</a></td></tr>
+              <tr><th scope="row" lang="en">working set</th><td>tập làm việc</td><td><a href="#thrashing">10.6</a></td></tr>
+              <tr><th scope="row" lang="en">zero-fill-on-demand</th><td>cấp trang toàn số 0 khi cần</td><td><a href="#phan-trang-theo-yeu-cau">10.2</a></td></tr>
+            </tbody>
+          </table></div>
+        </div></details>
+        <h3 id="giao-trinh">Textbook Reference <span class="vi">Giáo trình tham chiếu</span></h3>
+        <p class="src">Biên soạn theo Abraham Silberschatz, Peter Baer Galvin và Greg Gagne, <cite>Operating System Concepts</cite>, ấn bản 10, Wiley, 2018: Chapter 9 <span lang="en">Main Memory</span> (từ tr. 349); Chapter 10 <span lang="en">Virtual Memory</span> (từ tr. 389). Tên chương và tên mục trong bài giữ đúng như giáo trình để bạn tra cứu song song. Tình huống, số liệu minh họa, sơ đồ, mô phỏng và bài tập được soạn riêng cho PADOS.</p>
         <nav class="pager" aria-label="Điều hướng khóa học">
-          <a href="buoi-3.html"><small>← Buổi trước</small>Đồng bộ và bế tắc</a>
+          <a href="buoi-3.html"><small>← Buổi trước</small>Synchronization Tools, Synchronization Examples, Deadlocks</a>
           <a class="next" href="index.html"><small>Khóa học →</small>Trang chủ PADOS</a>
         </nav>
       </section>

@@ -93,8 +93,8 @@
         ['Có quyền đọc', [
           ['Gọi API', 'Trình soạn thảo truyền tên tệp và chế độ chỉ đọc cho hàm open.', ['User', 'open(baihoc.txt, O_RDONLY)', 'Đang gọi'], 0],
           ['Vào kernel', 'Thư viện chuẩn bị tham số theo quy ước của hệ thống. CPU bắt đầu chạy trình xử lý trong kernel.', ['Kernel', 'Chọn trình xử lý mở tệp', 'Đang xử lý'], 1],
-          ['Xét quyền', 'Kernel tra tệp và kiểm tra quyền với danh tính của tiến trình. Yêu cầu được chấp nhận.', ['Kernel', 'Tạo mục mô tả tệp', 'Ô số 4 được cấp'], 1],
-          ['Trở về ứng dụng', 'Hàm open trả về 4. Tiến trình có thể dùng read với số này để lấy dữ liệu.', ['User', 'open hoàn tất', 'fd = 4'], 2],
+          ['Xét quyền', 'Kernel tra tệp và kiểm tra quyền với danh tính của tiến trình. Yêu cầu được chấp nhận.', ['Kernel', 'Tạo mục mô tả tệp', 'Ô số 3 được cấp'], 1],
+          ['Trở về ứng dụng', 'Hàm open trả về 3, ô trống nhỏ nhất sau 0, 1, 2 vốn dành cho stdin, stdout và stderr. Tiến trình dùng số này khi gọi read.', ['User', 'open hoàn tất', 'fd = 3'], 2],
         ]],
         ['Thiếu quyền đọc', [
           ['Gọi API', 'Tiến trình truyền cùng tên tệp và cùng yêu cầu chỉ đọc.', ['User', 'open(baihoc.txt, O_RDONLY)', 'Đang gọi'], 0],
@@ -193,12 +193,20 @@
   }
 
   function cpuDiagram(steps, position) {
-    const slots = steps.map((step, index) => {
-      const actor = index <= position ? step[3] : '';
-      const current = index === position ? 'is-active' : '';
-      return `<li data-actor="${actor}" class="${current}"><small>${index + 1}</small><strong>${actor || '·'}</strong></li>`;
-    });
-    return `<div class="lab-caption">Hoạt động trên một lõi qua từng mốc</div><ol class="lab-timeline">${slots.join('')}</ol>`;
+    const lanes = [['A', 'A · soạn thảo'], ['Kernel', 'Kernel'], ['B', 'B · phát nhạc']];
+    const cells = (actor) => steps.map((step, index) => {
+      const filled = index <= position && step[3] === actor;
+      const current = index === position ? ' is-now' : '';
+      return `<span class="cpu-cell${filled ? ' on' : ''}${current}" data-actor="${actor}"></span>`;
+    }).join('');
+    const mode = steps[position]?.[2][0];
+    const bit = mode === 'Kernel' ? '0 · kernel mode' : mode === 'User' ? '1 · user mode' : '—';
+    return `
+      <div class="lab-caption cpu-lane-caption"><span>Ai đang giữ lõi CPU ở mỗi mốc?</span><span class="mode-bit${mode === 'Kernel' ? ' is-kernel' : ''}">Bit chế độ: <b>${bit}</b></span></div>
+      <div class="cpu-lanes" style="--n:${steps.length}">
+        ${lanes.map(([actor, label]) => `<span class="cpu-lane-label">${label}</span>${cells(actor)}`).join('')}
+        <span></span>${steps.map((_, index) => `<small class="cpu-tick${index === position ? ' is-now' : ''}">${index + 1}</small>`).join('')}
+      </div>`;
   }
 
   function cacheDiagram(steps, position, { capacity }) {
@@ -228,7 +236,7 @@
     const phases = [
       ['open(…)', 'Gửi yêu cầu'],
       ['Tra tệp và xét quyền', 'Trình xử lý trong kernel'],
-      [failed ? '−1 · EACCES' : 'fd = 4', 'Ứng dụng nhận kết quả'],
+      [failed ? '−1 · EACCES' : 'fd = 3', 'Ứng dụng nhận kết quả'],
     ];
     const current = steps[position]?.[3];
     return `<div class="mode-lanes">

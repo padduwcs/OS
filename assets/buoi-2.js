@@ -264,7 +264,12 @@
   function scheduleFrame(frame, policy, totalTime, baseline) {
     const { jobs, segments, queues, clock, current, slice, lastRun, ...text } = frame;
     const timeline = segments.map(({ id, start, end }) => `<li data-task="${id}" style="--span:${end - start}" title="${start}–${end}" aria-label="${start} đến ${end}: ${id === dash ? 'rỗi' : id}">${id}</li>`).join('');
-    const axis = `<div class="schedule-axis"><span>0</span><span>${totalTime} đơn vị</span></div>`;
+    const arrivalsAt = new Map();
+    jobs.forEach(({ id, arrival }) => arrivalsAt.set(arrival, [...(arrivalsAt.get(arrival) ?? []), id]));
+    const arrivalRow = [...arrivalsAt].map(([time, ids]) => `<span style="grid-column:${time + 1}" title="Đến tại ${time}">${ids.join(',')}↓</span>`).join('');
+    const ticks = Array.from({ length: totalTime }, (_, index) => `<span${index === clock ? ' class="is-now"' : ''}>${index}</span>`).join('');
+    const axis = `<div class="schedule-ticks" style="--ticks:${totalTime}" aria-hidden="true">${ticks}<span class="schedule-end${clock === totalTime ? ' is-now' : ''}">${totalTime}</span></div>`;
+    const arrivalsLine = `<div class="schedule-arrivals" style="--ticks:${totalTime}" aria-label="Mốc đến của các việc">${arrivalRow}</div>`;
     const timelineLabels = segments.length ? segments.map(({ id, start, end }) => `<span>${id === dash ? 'Rỗi' : id} ${start}–${end}</span>`).join('') : dash;
     const ready = queues.map((ids, index) => node(policy.levels?.[index] ?? 'Hàng sẵn sàng', join(ids), ids.length > 0));
     const workRows = jobs.map(({ id, arrival, burst, priority, remaining, arrived }) => `<tr><th scope="row">${id}</th><td>${arrival}</td><td>${burst}</td><td>${priority}</td><td>${arrived ? remaining : dash}</td></tr>`).join('');
@@ -274,7 +279,7 @@
       ...text,
       visual: `<div class="schedule-board">
         <div class="schedule-rule">${policy.rule}</div>
-        <ol class="schedule-timeline" aria-label="Trục thời gian CPU" style="--ticks:${totalTime}">${timeline}</ol>${axis}
+        ${arrivalsLine}<ol class="schedule-timeline" aria-label="Trục thời gian CPU" style="--ticks:${totalTime}">${timeline}</ol>${axis}
         <div class="schedule-segments" aria-label="Các đoạn đã chạy">${timelineLabels}</div>
         <div class="schedule-queues">${ready.join('')}</div>
         ${workTable}${jobs.every((job) => job.finish !== null) ? results(jobs, totalTime, policy, baseline) : ''}
