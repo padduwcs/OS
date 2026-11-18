@@ -279,6 +279,35 @@
     return frames;
   }
 
+  function lockGraph(owner, waiting, cycle) {
+    const positions = { A: [66, 33], T: [334, 33], B: [334, 97], K: [66, 97] };
+    const edge = (from, to, kind) => {
+      const [x1, y1] = positions[from];
+      const [x2, y2] = positions[to];
+      const dx = Math.sign(x2 - x1) * 23;
+      const dy = Math.sign(y2 - y1) * 23;
+      return `<path class="lock-${kind}" marker-end="url(#lock-arrow-${kind})" d="M${x1 + dx} ${y1 + dy}L${x2 - dx} ${y2 - dy}"/>`;
+    };
+    const held = Object.entries(owner).filter(([, id]) => id);
+    const pending = Object.entries(waiting).filter(([, lock]) => lock && owner[lock]);
+    const description = [
+      ...held.map(([lock, id]) => `${id} giữ ${lock}.`),
+      ...pending.map(([id, lock]) => `${id} chờ ${lock}.`),
+    ].join(' ') || 'Hai khóa chưa được cấp.';
+    return `<div class="lock-graph${cycle ? ' has-cycle' : ''}">
+      <svg class="teaching-svg" viewBox="0 0 400 130" role="img" aria-label="${description}">
+        <defs>${['held', 'pending'].map((kind) => `<marker id="lock-arrow-${kind}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path class="lock-tip lock-${kind}" d="M0 0 6 3 0 6z"/></marker>`).join('')}</defs>
+        ${held.map(([lock, id]) => edge(lock, id, 'held')).join('')}
+        ${pending.map(([id, lock]) => edge(id, lock, 'pending')).join('')}
+        ${Object.entries(positions).map(([id, [x, y]]) => `
+          ${id in owner ? `<rect class="waiting-node" x="${x - 22}" y="${y - 17}" width="44" height="34" rx="4"/>`
+            : `<circle class="ready-node" cx="${x}" cy="${y}" r="20"/>`}
+          <text x="${x}" y="${y + 1}" text-anchor="middle" dominant-baseline="middle">${id}</text>`).join('')}
+      </svg>
+      <div class="lock-legend"><span>→ Đang xin</span><span>→ Đã cấp</span>${cycle ? '<strong>Có vòng chờ</strong>' : ''}</div>
+    </div>`;
+  }
+
   function lockTrace(mode) {
     const frames = [];
     const owner = { K: '', T: '' };
@@ -306,7 +335,7 @@
       const progress = mode === 'retry' ? `${finished.length} bài xong · ${retries} vòng thử` : `${finished.length} bài xong`;
       frames.push({
         title, note,
-        visual: row('Tài nguyên', locks) + row('Luồng chấm', actors)
+        visual: lockGraph(owner, waiting, edges.length === 2) + row('Tài nguyên', locks) + row('Luồng chấm', actors)
           + summary('Cung chờ', edges.join(' · ') || 'Chưa có')
           + summary('Tiến độ', result || progress, result ? 'is-error' : ''),
       });
@@ -626,44 +655,27 @@
         <div class="ttl" id="${titleId}">${title}</div>
         <div class="sim-ctl">
           <label>Tình huống <select>${options.map(([id, label]) => `<option value="${id}">${label}</option>`).join('')}</select></label>
-          <button type="button" data-prev>Bước trước</button>
-          <button type="button" class="primary" data-next>Bước tiếp</button>
-          <button type="button" data-reset>Làm lại</button>
-          <span class="sim-step" aria-hidden="true"></span>
         </div>
       </div>
+      <div class="sim-ctl lab-steps"></div>
       <p class="sim-note" role="status" aria-atomic="true"></p>
       <div class="sim-illustration"></div>
     `;
     const select = lab.querySelector('select');
-    const prev = lab.querySelector('[data-prev]');
-    const next = lab.querySelector('[data-next]');
-    const reset = lab.querySelector('[data-reset]');
-    const step = lab.querySelector('.sim-step');
     const visual = lab.querySelector('.sim-illustration');
     const note = lab.querySelector('.sim-note');
     let frames;
-    let index;
-
-    function show() {
+    const reset = window.mountLabSteps(lab, (index) => {
       const frame = frames[index];
-      const position = `Bước ${index + 1}/${frames.length}`;
-      step.textContent = position;
       visual.innerHTML = frame.visual;
-      note.innerHTML = `<span class="lab-sr-only">${position}. </span><b>${frame.title}.</b> ${frame.note}`;
-      prev.disabled = index === 0;
-      next.disabled = index === frames.length - 1;
-    }
+      note.innerHTML = `<b>${frame.title}.</b> ${frame.note}`;
+    }, { play: ['counter', 'condition', 'locks'].includes(lab.dataset.syncLab) });
 
     function restart() {
       frames = trace(select.value);
-      index = 0;
-      show();
+      reset(frames.length);
     }
 
-    prev.addEventListener('click', () => { index -= 1; show(); });
-    next.addEventListener('click', () => { index += 1; show(); });
-    reset.addEventListener('click', restart);
     select.addEventListener('change', restart);
     restart();
   }

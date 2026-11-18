@@ -1,6 +1,6 @@
 # PADOS · Hệ điều hành
 
-Bài giảng tiếng Việt cho người mới bắt đầu, theo lộ trình 9 buổi dựa trên *Operating System Concepts*, ấn bản 10. Buổi 1 bao quát Chương 1–2 và có phần giải thích, mô phỏng, câu hỏi cùng lời giải ngay trên web.
+Bài giảng tiếng Việt cho người mới bắt đầu, theo lộ trình 9 buổi dựa trên *Operating System Concepts*, ấn bản 10. Bốn buổi hiện có bao quát Chương 1–10. Sinh viên có thể đổi tình huống và chạy từng bước trong mô phỏng, rồi làm bài tự kiểm tra có lời giải.
 
 - [Website PADOS](https://padduwcs.github.io/OS/)
 - [Buổi 1 · Nhập môn và cấu trúc hệ điều hành](https://padduwcs.github.io/OS/buoi-1.html)

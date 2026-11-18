@@ -14,44 +14,27 @@
         <div class="sim-ctl">
           <div class="mem-selects">${lab.selects.map(([name, label, items]) =>
             `<label>${label}<select name="${name}">${options(items)}</select></label>`).join('')}</div>
-          <button type="button" data-control="prev">Bước trước</button>
-          <button type="button" data-control="reset">Làm lại</button>
-          <button type="button" class="primary" data-control="next">Bước tiếp</button>
-          <span class="sim-step"></span>
         </div>
       </header>
+      <div class="sim-ctl lab-steps"></div>
       <p class="sim-note" aria-live="polite" aria-atomic="true"></p>
       <div class="sim-illustration"></div>`;
 
     const controls = [...root.querySelectorAll('select')];
-    const previous = root.querySelector('[data-control="prev"]');
-    const reset = root.querySelector('[data-control="reset"]');
-    const next = root.querySelector('[data-control="next"]');
-    const progress = root.querySelector('.sim-step');
     const note = root.querySelector('.sim-note');
     const visual = root.querySelector('.sim-illustration');
     let states;
-    let cursor = 0;
-
-    function show() {
+    const reset = window.mountLabSteps(root, (cursor) => {
       const state = states[cursor];
-      progress.textContent = `Bước ${cursor}/${states.length - 1}`;
-      previous.disabled = cursor === 0;
-      reset.disabled = cursor === 0;
-      next.disabled = cursor === states.length - 1;
       note.textContent = state.note;
       visual.innerHTML = lab.render(state);
-    }
+    }, { play: ['fault', 'replacement'].includes(root.dataset.memoryLab) });
 
     function restart() {
       states = lab.steps(Object.fromEntries(controls.map(({ name, value }) => [name, value])));
-      cursor = 0;
-      show();
+      reset(states.length);
     }
 
-    previous.addEventListener('click', () => { cursor -= 1; show(); });
-    next.addEventListener('click', () => { cursor += 1; show(); });
-    reset.addEventListener('click', () => { cursor = 0; show(); });
     controls.forEach((control) => control.addEventListener('change', restart));
     restart();
   }
@@ -211,11 +194,20 @@
     },
     render({ requests, index, page, offset, stage, lookup, cache, entry, outcome }) {
       const styleFor = (target) => stage === target ? 'mem-active' : '';
+      const addressLine = (label, kind, number) => `<div class="offset-line">
+        <strong>${label}</strong><div><span>${number === undefined ? 'Chưa có kết quả' : `${kind} ${number}`}</span>
+          <div class="offset-track" aria-hidden="true">${number === undefined ? ''
+            : `<i style="--offset:${offset * 100 / pageSize}%"></i>`}</div>
+          ${number === undefined ? '' : `<small>Độ lệch ${offset} byte</small>`}
+        </div></div>`;
       return `
         <ol class="sim-path mem-events" aria-label="Các yêu cầu bộ nhớ">${requests.map(({ address, write }, i) =>
           `<li${i === index ? ' aria-current="step"' : ''} class="${i < index ? 'done' : ''}">${accessName(write)} ${address}</li>`).join('')}</ol>
+        <div class="offset-pair">
+          ${addressLine('Địa chỉ ảo', 'Trang', page)}
+          ${addressLine('Địa chỉ vật lý', 'Khung', stage === 'ram' ? entry.frame : undefined)}
+        </div>
         <div class="mem-cards mem-translate">
-          ${card('Tách địa chỉ', index < 0 ? 'Chưa tách' : `p = ${page} · d = ${offset}`, styleFor('split'))}
           ${card('Tra TLB', lookup || 'Chưa tra', styleFor('tlb'))}
           ${card('Ánh xạ và quyền', entry ? `${entry.frame === null ? 'Vắng' : `f = ${entry.frame}`} · ${permissions(entry)}` : 'Chưa có', styleFor('table'))}
           ${card('Kết quả', outcome ?? 'Đang chờ', stage === 'stop' ? 'mem-error' : styleFor('ram'))}
@@ -317,6 +309,16 @@
             : ['read', 'write'].includes(stage) ? 'mem-waiting' : 'mem-active')}
           ${card('Khung RAM F2', frame, frameStage ? 'mem-active' : '')}
           ${card('I/O đã yêu cầu', `${reads} đọc · ${writes} ghi`, ['read', 'write'].includes(stage) ? 'mem-active' : '')}
+        </div>
+        <div class="fault-route" aria-label="Giai đoạn xử lý lỗi trang">
+          ${[
+            ['Báo lỗi', ['trap']],
+            ['Xét quyền', ['check', 'reject']],
+            ['Chuẩn bị khung', ['select', 'write', 'reserve']],
+            ['Đưa dữ liệu vào RAM', ['read', 'zero']],
+            ['Cập nhật bảng trang', ['map']],
+            ['Thử lại lệnh', ['retry']],
+          ].map(([label, stages]) => `<span${stages.includes(stage) ? ' aria-current="step"' : ''}>${label}</span>`).join('')}
         </div>
         <div class="tbl-wrap mem-table">
           <table class="tbl mem-lab-table">
@@ -436,13 +438,24 @@
             note += ' Thêm một khung làm tăng số lỗi, đúng như nghịch lý Belady.';
           }
         }
-        return { rule, trace, index, panels: [first, second], note };
+        const history = runs.map((run) => run.slice(1, cursor + 1)
+          .map(({ faultCount }, i) => faultCount > run[i].faultCount));
+        return { rule, trace, index, panels: [first, second], history, note };
       });
     },
-    render({ rule, trace, index, panels }) {
+    render({ rule, trace, index, panels, history }) {
       return `
-        <ol class="sim-path mem-trace" aria-label="Chuỗi trang theo thứ tự tham chiếu">${trace.map((page, i) =>
-          `<li${i === index ? ' aria-current="step"' : ''} class="${i < index ? 'done' : ''}" aria-label="Lượt ${i + 1}, trang ${page}">${page}</li>`).join('')}</ol>
+        <table class="mem-fault-history">
+          <caption>Cùng chuỗi tham chiếu · × lỗi trang · ✓ trúng</caption>
+          <thead><tr><th scope="col">Trang</th>${trace.map((page, i) =>
+            `<th scope="col"${i === index ? ' aria-current="step"' : ''} aria-label="Lượt ${i + 1}, trang ${page}">${page}</th>`).join('')}</tr></thead>
+          <tbody>${history.map((run, count) => `<tr><th scope="row">${count + 3} khung</th>
+            ${trace.map((_, i) => {
+              if (i >= run.length) return '<td></td>';
+              const fault = run[i];
+              return `<td class="${fault ? 'fault-cell' : 'hit-cell'}" aria-label="${fault ? 'Lỗi trang' : 'Trúng'}">${fault ? '×' : '✓'}</td>`;
+            }).join('')}</tr>`).join('')}</tbody>
+        </table>
         ${panels.map(({ frames, faultCount, hand, slot, message }) => `
           <div class="mem-panel" data-capacity="${frames.length}">
             <div class="mem-panel-heading"><h5>${frames.length} khung</h5><p>Lỗi trang <b class="mem-fault-count">${faultCount}</b></p></div>

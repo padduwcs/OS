@@ -32,9 +32,14 @@
   ];
 
   function processFrame([title, note, cpu, ready, waiting, context]) {
+    const actors = (items) => items.map((id) => `<span class="process-token" data-task="${id}">${id}</span>`).join('') || dash;
     return {
       title, note,
-      visual: `<div class="process-board">${node('Sẵn sàng', join(ready), ready.length > 0)}${node('CPU đang cấp cho', cpu, true)}${node('Chờ thiết bị', join(waiting), waiting.length > 0)}</div>${stats([['Ngữ cảnh và vòng đời', context]])}`,
+      visual: `<div class="process-board">
+        <div class="process-lane"><strong>Sẵn sàng</strong><span class="process-slots">${actors(ready)}</span></div>
+        <div class="process-lane process-core"><strong><span class="lesson-icon chip-icon" aria-hidden="true"></span>CPU</strong><span class="process-slots">${actors([cpu])}</span></div>
+        <div class="process-lane process-io"><strong>Chờ thiết bị</strong><span class="process-slots">${actors(waiting)}</span></div>
+      </div>${stats([['Ngữ cảnh và vòng đời', context]])}`,
     };
   }
 
@@ -253,10 +258,10 @@
       const label = id === dash ? 'CPU rỗi' : id;
       record(done ? 'Tất cả công việc đã hoàn tất' : `${label} · ${span}`, events.join(' '), `${label} · ${span}`);
     }
-    return frames.map((frame) => scheduleFrame(frame, policy, clock));
+    return frames;
   }
 
-  function scheduleFrame(frame, policy, totalTime) {
+  function scheduleFrame(frame, policy, totalTime, baseline) {
     const { jobs, segments, queues, clock, current, slice, lastRun, ...text } = frame;
     const timeline = segments.map(({ id, start, end }) => `<li data-task="${id}" style="--span:${end - start}" title="${start}–${end}" aria-label="${start} đến ${end}: ${id === dash ? 'rỗi' : id}">${id}</li>`).join('');
     const axis = `<div class="schedule-axis"><span>0</span><span>${totalTime} đơn vị</span></div>`;
@@ -272,23 +277,48 @@
         <ol class="schedule-timeline" aria-label="Trục thời gian CPU" style="--ticks:${totalTime}">${timeline}</ol>${axis}
         <div class="schedule-segments" aria-label="Các đoạn đã chạy">${timelineLabels}</div>
         <div class="schedule-queues">${ready.join('')}</div>
-        ${workTable}${jobs.every((job) => job.finish !== null) ? results(jobs, totalTime) : ''}
+        ${workTable}${jobs.every((job) => job.finish !== null) ? results(jobs, totalTime, policy, baseline) : ''}
       </div>${stats([['Đồng hồ', clock], ['Lượt vừa quan sát', lastRun || dash], ['Vẫn giữ CPU tại mốc này', running]])}`,
     };
   }
 
-  function results(jobs, totalTime) {
-    const metrics = jobs.map(({ id, arrival, burst, first, finish }) => ({
+  function jobMetrics(jobs) {
+    return jobs.map(({ id, arrival, burst, first, finish }) => ({
       id, first, finish, turnaround: finish - arrival, waiting: finish - arrival - burst, response: first - arrival,
     }));
-    const avg = (key) => number.format(metrics.reduce((sum, job) => sum + job[key], 0) / jobs.length);
+  }
+
+  const average = (metrics, key) => metrics.reduce((sum, job) => sum + job[key], 0) / metrics.length;
+
+  function compareWithFcfs(metrics, baseline, label) {
+    const response = (jobs) => jobs.find(({ id }) => id === 'M').response;
+    const measures = [
+      ['Đáp ứng của M', response(baseline), response(metrics)],
+      ['Chờ trung bình', average(baseline, 'waiting'), average(metrics, 'waiting')],
+    ];
+    return `<div class="schedule-compare"><strong>Cùng tập việc, đối chiếu với FCFS</strong>
+      ${measures.map(([name, reference, selected]) => {
+        const scale = Math.max(reference, selected, 1);
+        return `<div class="schedule-measure"><b>${name}</b>
+          ${[['FCFS', reference], [label, selected]].map(([policy, value]) => `
+            <div><span>${policy}</span><span class="schedule-meter" aria-hidden="true">
+              <i style="width:${100 * value / scale}%"></i></span><strong>${number.format(value)}</strong></div>`).join('')}
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  function results(jobs, totalTime, policy, baseline) {
+    const metrics = jobMetrics(jobs);
+    const avg = (key) => number.format(average(metrics, key));
     const utilization = jobs.reduce((sum, job) => sum + job.burst, 0) * 100 / totalTime;
     const rows = metrics.map(({ id, first, finish, turnaround, waiting, response }) => `<tr><th scope="row">${id}</th><td>${first}</td><td>${finish}</td><td>${turnaround}</td><td>${waiting}</td><td>${response}</td></tr>`).join('');
     return `<table class="schedule-table schedule-results">
       <caption>Kết quả tính từ lịch chạy</caption>
       <thead><tr><th scope="col">Việc</th><th scope="col">Chạy đầu</th><th scope="col">Kết thúc</th><th scope="col">Hoàn tất</th><th scope="col">Chờ</th><th scope="col">Đáp ứng</th></tr></thead>
       <tbody>${rows}</tbody><tfoot><tr><th scope="row" colspan="3">Trung bình</th><td>${avg('turnaround')}</td><td>${avg('waiting')}</td><td>${avg('response')}</td></tr></tfoot>
-    </table><div class="schedule-totals">CPU bận ${number.format(utilization)}% · Thông lượng ${number.format(jobs.length / totalTime)} việc mỗi đơn vị</div>`;
+    </table><div class="schedule-totals">CPU bận ${number.format(utilization)}% · Thông lượng ${number.format(jobs.length / totalTime)} việc mỗi đơn vị</div>
+    ${baseline ? compareWithFcfs(metrics, baseline, policy.label) : ''}`;
   }
 
   const quantumControl = { name: 'Lượng tử RR', options: ['2', '4'] };
@@ -319,7 +349,13 @@
         { name: 'Thuật toán', options: Object.values(policies).map(({ label }) => label) },
         quantumControl,
       ],
-      trace: (workload, algorithm, quantum) => scheduleTrace(workloads[workload], Object.values(policies)[algorithm], [2, 4][quantum]),
+      trace: (workload, algorithm, quantum) => {
+        const input = workloads[workload];
+        const policy = Object.values(policies)[algorithm];
+        const frames = scheduleTrace(input, policy, [2, 4][quantum]);
+        const baseline = policy === policies.fcfs ? null : jobMetrics(scheduleTrace(input, policies.fcfs).at(-1).jobs);
+        return frames.map((frame) => scheduleFrame(frame, policy, frames.at(-1).clock, baseline));
+      },
       convention: 'Việc đến đúng mốc hết lượt vào hàng trước việc hết lượt. Nếu bằng hạng thì theo thứ tự vào hàng và giữ nguyên việc đang chạy. Các việc đến cùng lúc vào hàng theo thứ tự bảng.',
     },
   };
@@ -333,12 +369,7 @@
         <div class="sim-ctl lab-options">${controls}</div>
       </div>
       ${lab.convention ? `<p class="lab-convention">${lab.convention}</p>` : ''}
-      <div class="sim-ctl lab-navigation">
-        <button type="button" data-prev>Bước trước</button>
-        <button type="button" class="primary" data-next>Bước tiếp</button>
-        <button type="button" data-reset>Làm lại</button>
-        <span class="sim-step"></span>
-      </div>
+      <div class="sim-ctl lab-steps"></div>
       <p class="sim-note" aria-live="polite" aria-atomic="true"></p>
       <div class="lab-view"></div>
     </section>`;
@@ -346,20 +377,13 @@
     const selects = [...host.querySelectorAll('select')];
     const view = host.querySelector('.lab-view');
     const status = host.querySelector('.sim-note');
-    const counter = host.querySelector('.sim-step');
-    const previous = host.querySelector('[data-prev]');
-    const next = host.querySelector('[data-next]');
     let frames;
-    let index = 0;
 
-    function render() {
+    const reset = window.mountLabSteps(host, (index) => {
       const { title, note, visual } = frames[index];
       view.innerHTML = visual;
       status.innerHTML = `<b>${title}.</b> ${note}`;
-      counter.textContent = `${index + 1} / ${frames.length}`;
-      previous.disabled = index === 0;
-      next.disabled = index === frames.length - 1;
-    }
+    }, { play: host.dataset.lab !== 'ipc' });
 
     function load() {
       const settings = selects.map(({ selectedIndex }) => selectedIndex);
@@ -370,14 +394,10 @@
         quantum.closest('label').hidden = quantum.disabled;
       }
       frames = lab.trace(...settings);
-      index = 0;
-      render();
+      reset(frames.length);
     }
 
     selects.forEach((select) => select.addEventListener('change', load));
-    previous.addEventListener('click', () => { index -= 1; render(); });
-    next.addEventListener('click', () => { index += 1; render(); });
-    host.querySelector('[data-reset]').addEventListener('click', () => { index = 0; render(); });
     load();
   }
 

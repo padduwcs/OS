@@ -1,7 +1,3 @@
-.lesson-two-map .visual-flow li:last-child::before { content: '←'; }
-.lesson-two-map .visual-flow li:nth-child(2)::before { content: '→'; }
-.music-icon { font: 600 2rem/1.2 var(--sans); }
-
 .process-layout, .fork-map, .ipc-routes {
   display: grid;
   gap: .75rem;
@@ -9,7 +5,7 @@
 }
 .process-layout, .fork-map { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .process-layout > div { min-width: 0; }
-.memory-zones, .state-routes, .parallel-example ol, .deadline-chart ol, .schedule-timeline {
+.memory-zones, .parallel-example ol, .deadline-chart ol, .schedule-timeline {
   list-style: none;
   padding: 0;
 }
@@ -22,22 +18,7 @@
   border-radius: 5px;
 }
 .process-layout > div:last-child .memory-zones li { background: var(--accent-soft); }
-.state-routes { display: grid; gap: .3rem; margin: 0; font: .83rem/1.35 var(--sans); }
-.state-routes li {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 1fr);
-  align-items: center;
-  gap: .3rem;
-  margin: 0;
-  text-align: center;
-}
-.state-routes span {
-  padding: .4rem .18rem;
-  background: var(--surface-2);
-  border: 1px solid var(--line);
-  border-radius: 5px;
-}
-.state-routes small, .fork-arrow { color: var(--accent-ink); }
+.fork-arrow { color: var(--accent-ink); }
 .fork-parent { grid-column: 1 / -1; justify-self: center; width: min(100%, 16rem); }
 .fork-branch { display: grid; gap: .24rem; grid-template-rows: auto 1fr; text-align: center; }
 .ipc-routes .visual-flow { margin-top: .3rem; }
@@ -74,7 +55,6 @@
 
 .lesson-two-lab .sim-note { min-height: 0; border-bottom: 1px solid var(--line); }
 .lesson-two-lab .sim-ctl button, .lesson-two-lab .sim-ctl select { min-height: 38px; }
-.lab-navigation { padding: .55rem 1rem; }
 .lab-options { gap: .3rem .45rem; }
 .lab-options label[hidden] { display: none; }
 .lesson-two-lab .sim-h .ttl { flex-basis: 100%; }
@@ -129,6 +109,22 @@ li[data-task='D'], li[data-task='M'] { color: var(--teal); background: var(--tea
   .process-board, .mailbox-board, .schedule-queues { font-size: .77rem; }
   .schedule-table { font-size: .76rem; }
   .schedule-table td, .schedule-table th { padding-inline: .16rem; }
-  .lab-navigation { padding-inline: .65rem; }
   .lesson-two-lab .sim-ctl button, .lesson-two-lab .sim-ctl select { min-height: 44px; }
 }
+.process-lane{display:grid;grid-template-rows:auto 1fr;gap:.35rem;min-width:0;padding:.45rem .3rem;
+  border-bottom:3px solid var(--accent);background:var(--accent-soft);text-align:center}
+.process-lane strong{display:flex;align-items:center;justify-content:center;gap:.25rem;line-height:1.3}
+.process-lane .lesson-icon{--icon-unit:.45rem;margin:0;flex:none}
+.process-core{border-color:var(--ok);background:var(--ok-soft)}
+.process-io{border-color:var(--chance);background:var(--chance-soft)}
+.process-slots{display:flex;justify-content:center;align-items:center;gap:.22rem;min-height:2.2rem;color:var(--muted)}
+.process-token{display:grid;place-items:center;width:1.75rem;height:1.75rem;border:1px solid var(--accent);
+  border-radius:50%;background:var(--surface);color:var(--accent-ink);font:650 .9rem var(--mono)}
+.process-token[data-task="B"]{border-color:var(--ok);color:var(--ok)}
+.schedule-compare{margin-top:1rem;padding-top:.7rem;border-top:1px solid var(--line);color:var(--ink)}
+.schedule-measure{margin:.5rem 0;color:var(--ink-2)}
+.schedule-measure>div{display:grid;grid-template-columns:minmax(5rem,9rem) minmax(2rem,1fr) 2.3rem;align-items:center;gap:.45rem;margin:.15rem 0}
+.schedule-measure>div strong{text-align:right;font-variant-numeric:tabular-nums}
+.schedule-meter{height:.55rem;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.schedule-meter i{display:block;height:100%;border-radius:4px;background:var(--muted)}
+.schedule-measure>div:last-child i{background:var(--accent)}

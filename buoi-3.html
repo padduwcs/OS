@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/buoi-3.css">
   <script defer src="assets/site.js"></script>
+  <script defer src="assets/lab.js"></script>
   <script defer src="assets/buoi-3.js"></script>
 </head>
 <body>
@@ -19,7 +20,7 @@
     <button class="icon-btn side-btn" type="button" aria-controls="sidebar" aria-expanded="false" title="Mục lục" aria-label="Ẩn hoặc hiện mục lục" hidden>
       <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M9.5 4.5v15"/></svg>
     </button>
-    <a class="brand" href="./">PADOS</a>
+    <a class="brand" href="index.html">PADOS</a>
     <span class="crumb">Buổi 3 · Đồng bộ và bế tắc</span>
     <span class="spacer"></span>
     <button class="icon-btn print-btn" type="button" title="In bài" aria-label="In bài" hidden>
@@ -72,42 +73,27 @@
       <header class="hero">
         <div class="eyebrow">Buổi 3 · Chương 6–8</div>
         <h1>Đồng bộ và bế tắc</h1>
-        <p class="lead">Ngay trước hạn nộp, An và Bình bấm gửi gần như cùng lúc. Máy chủ nhận cả hai bài, nhưng bộ đếm chỉ tăng từ 40 lên 41. Khi hàng đợi chấm đầy, máy chủ còn phải quyết định yêu cầu nào chờ và ai có thể giải phóng chỗ. Nếu hai luồng đều giữ thứ bên kia cần, chuyện gì sẽ xảy ra?</p>
-        <figure class="fig opening-map">
-          <ol class="visual-flow submission-flow">
-            <li><span class="course-symbol" aria-hidden="true">A · B</span><strong>Luồng nhận bài</strong><small>Cùng cập nhật bộ đếm</small></li>
-            <li><span class="course-symbol" aria-hidden="true">X │ Y</span><strong>Hàng đợi chấm</strong><small>Còn ô trống mới ghi thêm</small></li>
-            <li><span class="course-symbol" aria-hidden="true">K │ T</span><strong>Luồng chấm</strong><small>Lấy bài và xin tài nguyên</small></li>
-          </ol>
-          <figcaption><b>Đường đi của một bài nộp.</b> Đọc từ trái sang phải. Hai luồng cùng sửa bộ đếm ở đầu vào, bài nằm trong hàng đợi ở giữa, rồi luồng chấm cần tài nguyên như khe chạy K và vùng tạm T. Ví dụ dùng một máy chủ chấm giả định.</figcaption>
-        </figure>
-        <div class="meta">
-          <div><h4>Bạn sẽ làm được</h4><p>Chọn cách bảo vệ dữ liệu, lần theo điều kiện làm luồng chờ, và tính bằng tay khi nào có thể cấp thêm tài nguyên.</p></div>
-          <div><h4>Kiến thức nối tiếp</h4><p>Ôn <a href="buoi-2.html#trang-thai">trạng thái tiến trình và chuyển ngữ cảnh</a>. Trong các mô phỏng, hãy dự đoán trạng thái tiếp theo trước khi bấm <b>Bước tiếp</b>.</p></div>
-        </div>
+        <p class="lead">An và Bình bấm nộp gần như cùng lúc. Máy chủ đã nhận hai bài, nhưng bộ đếm chỉ tăng từ 40 lên 41. Mỗi luồng đều làm đúng phép cộng của mình. Muốn tìm lần tăng bị mất, ta phải đặt thao tác của hai luồng lên cùng một trục thời gian.</p>
       </header>
 
       <section aria-labelledby="chuong-6">
         <h2 id="chuong-6"><span class="sec">6</span>Làm sao để hai luồng phối hợp đúng?</h2>
         <h3 id="vung-toi-han">6.1–6.2 · Tranh chấp và vùng tới hạn</h3>
-        <p>Hai luồng nhận bài A và B chia sẻ biến <code>count</code>. Mỗi lần nhận thành công, một luồng thực hiện <code>count = count + 1</code>. Ở mức thao tác, luồng đọc số vào giá trị riêng, cộng 1 rồi ghi lại. Trên một lõi, bộ lập lịch có thể đổi luồng giữa hai thao tác. Trên nhiều lõi, hai luồng còn có thể đọc cùng lúc.</p>
+        <p>Hai luồng nhận bài A và B cùng sửa biến <code>count</code>. Hãy tách dòng <code>count = count + 1</code> thành ba thao tác trong mô hình này. Luồng đọc bộ đếm, cộng 1 vào giá trị vừa đọc rồi ghi kết quả về. <a href="buoi-2.html#tieu-chi">Bộ lập lịch ở buổi trước</a> có thể đổi luồng ngay sau thao tác đọc. Vậy B sẽ đọc được số nào nếu A đã đọc 40 mà chưa ghi?</p>
         <figure class="fig">
-          <div class="tbl-wrap course-data">
-            <table class="tbl course-timeline">
-              <thead><tr><th scope="col">Mốc</th><th scope="col">Luồng A</th><th scope="col">Luồng B</th><th scope="col"><code>count</code></th></tr></thead>
+          <div class="tbl-wrap race-figure">
+            <table class="race-lanes">
+              <thead><tr><th scope="col">Bước</th><th scope="col">1</th><th scope="col">2</th><th scope="col">3</th><th scope="col">4</th><th scope="col">5</th><th scope="col">6</th></tr></thead>
               <tbody>
-                <tr><th scope="row">1</th><td>Đọc 40</td><td></td><td>40</td></tr>
-                <tr><th scope="row">2</th><td></td><td>Đọc 40</td><td>40</td></tr>
-                <tr><th scope="row">3</th><td>Cộng ra 41</td><td></td><td>40</td></tr>
-                <tr><th scope="row">4</th><td></td><td>Cộng ra 41</td><td>40</td></tr>
-                <tr><th scope="row">5</th><td>Ghi 41</td><td></td><td>41</td></tr>
-                <tr><th scope="row">6</th><td></td><td>Ghi 41</td><td>41</td></tr>
+                <tr><th scope="row">Luồng A</th><td><span>Đọc <b>40</b></span></td><td></td><td><span>Cộng <b>41</b></span></td><td></td><td><span>Ghi <b>41</b></span></td><td></td></tr>
+                <tr><th scope="row">Luồng B</th><td></td><td><span>Đọc <b>40</b></span></td><td></td><td><span>Cộng <b>41</b></span></td><td></td><td><span>Ghi <b>41</b></span></td></tr>
+                <tr><th scope="row"><code>count</code></th><td>40</td><td>40</td><td>40</td><td>40</td><td class="count-change">41</td><td class="count-lost">41</td></tr>
               </tbody>
             </table>
           </div>
-          <figcaption><b>Một lượt tăng bị mất.</b> Đọc từ mốc 1 đến mốc 6. Ở mốc 6, B vẫn ghi kết quả đã tính từ mốc 2. Kết quả đúng sau hai lượt tăng là 42.</figcaption>
+          <figcaption>Đọc từ trái sang phải. Ở bước 6, B ghi đè 41 bằng 41 vì đã lấy số 40 ở bước 2. Hàng dưới cho thấy lần ghi thứ hai diễn ra mà bộ đếm vẫn đứng yên.</figcaption>
         </figure>
-        <p>Đây là <dfn>điều kiện tranh chấp</dfn> (<span class="en" lang="en">race condition</span>). Kết quả phụ thuộc vào thứ tự xen kẽ các thao tác. Đoạn từ lúc đọc đến lúc ghi bộ đếm là một <dfn>vùng tới hạn</dfn> (<span class="en" lang="en">critical section</span>). Luồng chạy thủ tục vào để xin quyền, thực hiện vùng tới hạn, chạy thủ tục ra để trả quyền, rồi làm việc riêng.</p>
+        <p>Nếu A ghi xong rồi B mới đọc, bộ đếm lên 42. Sự phụ thuộc của kết quả vào thứ tự xen kẽ gọi là <dfn>điều kiện tranh chấp</dfn> (<span class="en" lang="en">race condition</span>). Để bảo vệ phép tăng bằng khóa, vùng cần giữ cả quyền đọc lẫn ghi, từ lúc lấy số cũ đến lúc công bố số mới. Đó là <dfn>vùng tới hạn</dfn> (<span class="en" lang="en">critical section</span>). Luồng xin quyền trước khi vào và trả quyền khi rời vùng.</p>
         <div class="tbl-wrap">
           <table class="tbl">
             <thead><tr><th scope="col">Yêu cầu của lời giải</th><th scope="col">Ý nghĩa với hai luồng nhận bài</th></tr></thead>
@@ -121,7 +107,7 @@
         <p>Trong kernel có khả năng bị thu hồi CPU, đoạn đang sửa dữ liệu chung có thể bị xen vào. Ngay cả khi tắt ngắt trên lõi hiện tại, lõi khác vẫn có thể truy cập cùng dữ liệu. Các công cụ sau thiết lập quy tắc phối hợp cho mọi luồng cùng truy cập.</p>
 
         <h3 id="peterson">6.3–6.4 · Peterson, thứ tự bộ nhớ và thao tác nguyên tử</h3>
-        <p>Giải pháp <dfn>Peterson</dfn> cho đúng hai luồng dùng hai cờ <code>muon[A]</code>, <code>muon[B]</code> và một biến <code>luot</code>. Cả hai cờ khởi tạo là sai. Mỗi luồng công bố mình muốn vào rồi nhường lượt khi cả hai cùng xin. Mã giả dưới đây chạy cho A, còn B hoán đổi A với B.</p>
+        <p>Thử cho mỗi luồng dựng một cờ khi muốn vào. Cờ cho biết bên kia có quan tâm, nhưng nếu cả hai cùng nhìn thấy cờ và đều nhường thì chẳng ai tiến. Giải pháp <dfn>Peterson</dfn> cho hai luồng thêm biến <code>luot</code> để phân xử khi cả hai cùng xin. Các cờ <code>muon[A]</code> và <code>muon[B]</code> khởi tạo là sai. Mã dưới đây chạy cho A. Đổi vai A và B để có mã của luồng còn lại.</p>
         <div class="algo">
           <div class="algo-h">Luồng A xin vào rồi trả quyền</div>
           <pre><code>muon[A] ← đúng
@@ -138,6 +124,7 @@ muon[A] ← sai</code></pre>
         <p><dfn>Khóa loại trừ tương hỗ</dfn> (<span class="en" lang="en">mutex lock</span>) có người sở hữu. Luồng gọi <code>acquire()</code> trước khi chạm vào dữ liệu và gọi <code>release()</code> khi xong. Khi A giữ mutex, B chưa thể đọc bộ đếm trong vùng tới hạn. B vào sau khi A ghi 41, nên nó đọc 41 và ghi 42. Việc kiểm tra rồi giành khóa cần diễn ra nguyên tử. Nếu hai luồng đều thấy khóa rảnh trước khi đánh dấu bận, chính khóa cũng có điều kiện tranh chấp.</p>
         <p>Với <dfn>khóa quay</dfn> (<span class="en" lang="en">spinlock</span>), luồng thử lại trong vòng lặp và vẫn dùng CPU. Cách này hữu ích nếu thời gian giữ khóa rất ngắn và chủ khóa có thể tiếp tục chạy trên lõi khác. Khi có thể phải đợi lâu, khóa chặn đưa luồng vào hàng chờ để nhường CPU. Giải phóng khóa có thể đưa luồng chờ về trạng thái sẵn sàng. Bộ lập lịch vẫn quyết định lúc luồng đó chạy.</p>
         <div id="mo-phong-bo-dem" data-sync-lab="counter"></div>
+        <p>Trong mô phỏng, mỗi bước đọc, cộng và ghi là phép trừu tượng hóa để khảo sát thứ tự. Trong C hoặc C++, hai luồng cùng truy cập một biến thường mà ít nhất một bên ghi, thiếu đồng bộ phù hợp, có thể tạo tranh chấp dữ liệu (<span lang="en">data race</span>) và dẫn đến hành vi không xác định.</p>
         <p><dfn>Semaphore</dfn> quản lý các lượt được phép tiếp tục. <code>wait(S)</code> lấy một lượt nếu có, hoặc chờ lượt. <code>signal(S)</code> cấp một lượt, đánh thức một luồng nếu đang có người chờ. Hai thao tác phải nguyên tử đối với cùng semaphore. Semaphore đếm (<span class="en" lang="en">counting semaphore</span>) quản lý nhiều lượt. Semaphore nhị phân (<span class="en" lang="en">binary semaphore</span>) có một lượt trong cách dùng làm cổng. Khởi tạo <code>ready = 0</code> để luồng chấm gọi <code>wait(ready)</code> và chỉ qua sau khi bên tải tệp gọi <code>signal(ready)</code>. Nếu bên tải phát tín hiệu trước, lượt cấp vẫn còn cho lần chờ sau.</p>
         <p>Một cài đặt semaphore chặn có thể trừ biến đếm ngay khi <code>wait</code> và đưa luồng vào hàng nếu số trở thành âm. Khi <code>signal</code>, nó tăng biến đếm và đánh thức một người nếu giá trị mới vẫn không dương. Trong cách cài đặt đó, độ lớn của số âm là số luồng chờ. Bài mô phỏng dùng số lượt rảnh không âm và hiển thị hàng chờ riêng. Thứ tự đánh thức tùy cài đặt. Hàng FIFO lấy người đợi lâu nhất trước.</p>
 
@@ -173,10 +160,10 @@ trả về bài</code></pre>
       <section aria-labelledby="chuong-7">
         <h2 id="chuong-7"><span class="sec">7</span>Áp dụng đồng bộ vào hàng đợi và dữ liệu chung</h2>
         <h3 id="bo-dem">7.1.1 · Bộ đệm hữu hạn</h3>
-        <p>Giả sử nơi lưu bài chờ chấm chỉ có <var>N</var> ô. Luồng nhận là <dfn>bên sản xuất</dfn> (<span class="en" lang="en">producer</span>), luồng chấm là <dfn>bên tiêu thụ</dfn> (<span class="en" lang="en">consumer</span>). Trong bài toán <dfn>bộ đệm hữu hạn</dfn> (<span class="en" lang="en">bounded-buffer problem</span>), bên nhận phải đợi ô trống, bên chấm phải đợi ô có bài, và mọi sửa đổi đầu hoặc cuối hàng cần cùng một khóa.</p>
+        <p>Bộ đếm đã đúng, nhưng chỗ chứa bài chờ chấm chỉ có <var>N</var> ô. Nếu ô cuối vừa đầy, khóa có thể giữ hàng an toàn nhưng chưa tạo được chỗ cho bài mới. Bài toán <dfn>bộ đệm hữu hạn</dfn> (<span class="en" lang="en">bounded-buffer problem</span>) cần cả hai loại bảo đảm. Luồng nhận, tức <dfn>bên sản xuất</dfn> (<span class="en" lang="en">producer</span>), chờ một ô trống. Luồng chấm, tức <dfn>bên tiêu thụ</dfn> (<span class="en" lang="en">consumer</span>), chờ một bài. Sau khi đã có lượt, mỗi bên lấy cùng một khóa để sửa hàng.</p>
         <div class="algo">
           <div class="algo-h">Khởi tạo <span><code>empty = N</code>, <code>full = 0</code>, <code>m</code> đang rảnh</span></div>
-          <pre><code>Bên nhận                       Bên chấm
+          <pre tabindex="0" aria-label="Mã giả bên nhận và bên chấm"><code>Bên nhận                       Bên chấm
 wait(empty)                    wait(full)
 khóa(m)                        khóa(m)
 thêm bài vào cuối hàng         lấy bài đầu hàng
@@ -207,21 +194,34 @@ signal(full)                   signal(empty)</code></pre>
         <h3 id="triet-gia">7.1.3 · Bữa ăn của các triết gia</h3>
         <p><dfn>Bài toán bữa ăn của các triết gia</dfn> (<span class="en" lang="en">dining-philosophers problem</span>) đặt năm người quanh bàn, với một chiếc đũa giữa mỗi cặp hàng xóm. Mỗi người cần cả hai chiếc kề mình để ăn. Nếu cả năm đều cầm chiếc bên trái rồi chờ chiếc bên phải, cả năm giữ một chiếc và chờ thành vòng. Hai luồng chấm lấy khóa K và T theo hai thứ tự ngược nhau trong <a href="#do-thi">ví dụ hai khóa</a> sẽ gặp tình huống tương tự.</p>
         <figure class="fig">
-          <ol class="graph-chain">
-            <li><span class="graph-thread">A</span><span>chờ →</span></li>
-            <li><span class="graph-thread">B</span><span>chờ →</span></li>
-            <li><span class="graph-thread">C</span><span>chờ →</span></li>
-            <li><span class="graph-thread">D</span><span>chờ →</span></li>
-            <li><span class="graph-thread">E</span><span>chờ →</span></li>
-            <li><span class="graph-thread">A</span></li>
-          </ol>
-          <figcaption><b>Năm người cùng giữ chiếc đũa đầu tiên.</b> Mỗi mũi tên chỉ đến hàng xóm đang cầm chiếc đũa mà người trước cần. Lần theo từ A đến E rồi quay lại A để thấy vì sao cả nhóm phải chờ.</figcaption>
+          <svg class="teaching-svg dining-table" viewBox="0 0 360 241" role="img" aria-labelledby="dining-title dining-desc">
+            <title id="dining-title">Vòng chờ quanh bàn của năm triết gia</title>
+            <desc id="dining-desc">A cần chiếc đũa B đang giữ. B đợi C, C đợi D, D đợi E và E đợi A. Các mũi tên tạo thành một vòng kín.</desc>
+            <defs><marker id="dining-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path class="arrowhead" d="M0 0 6 3 0 6z"/></marker></defs>
+            <circle class="muted-node" cx="180" cy="126" r="76"/>
+            <g class="route" marker-end="url(#dining-arrow)">
+              <path d="M199 33Q256 25 277 76"/><path d="M293 110Q313 168 263 204"/>
+              <path d="M220 216Q180 235 140 216"/><path d="M97 204Q47 168 67 110"/>
+              <path d="M83 76Q104 25 161 33"/>
+            </g>
+            <path class="dining-chopsticks" d="M142 66l-15 18m92-18l15 18m15 60l-22-6m-106 6l-15 10m64 29h20"/>
+            <g class="ready-node">
+              <circle cx="180" cy="28" r="18"/><circle cx="290" cy="91" r="18"/><circle cx="243" cy="209" r="18"/>
+              <circle cx="117" cy="209" r="18"/><circle cx="70" cy="91" r="18"/>
+            </g>
+            <g text-anchor="middle" dominant-baseline="middle">
+              <text x="180" y="29">A</text><text x="290" y="92">B</text><text x="243" y="210">C</text>
+              <text x="117" y="210">D</text><text x="70" y="92">E</text>
+              <text class="annotation" x="180" y="126">Mỗi người giữ một đũa</text>
+            </g>
+          </svg>
+          <figcaption>Mũi tên chỉ vào hàng xóm đang giữ chiếc đũa còn thiếu. Đi từ A theo chiều mũi tên sẽ quay lại A. Chỉ cần một người nhả đũa đang giữ, người đang chờ chiếc đó mới có cơ hội tiến.</figcaption>
         </figure>
         <p>Một monitor có thể lưu trạng thái <em>đang nghĩ</em>, <em>đang đói</em> hoặc <em>đang ăn</em> và một biến điều kiện cho mỗi người. Khi một người báo đói, monitor chỉ chuyển người đó sang đang ăn nếu hai hàng xóm đều chưa ăn. Nếu chưa được, người này chờ với hai tay rảnh. Khi ăn xong, họ đổi trạng thái rồi kiểm tra lại hai hàng xóm đang đói và báo cho người vừa đủ điều kiện. Điều này phá chuỗi giữ một chiếc trong khi đợi chiếc kia. Thứ tự được phục vụ vẫn cần quy tắc riêng để tránh bỏ qua một người mãi.</p>
 
         <h3 id="kernel-api">7.2–7.4 · Từ cơ chế đến kernel, POSIX và Java</h3>
         <p>Kernel phải phối hợp cả luồng và trình xử lý ngắt. Trong các ví dụ của giáo trình, Windows dùng khóa quay cho vùng rất ngắn trên nhiều lõi và dùng đối tượng điều phối (<span class="en" lang="en">dispatcher object</span>) như mutex, semaphore, sự kiện hoặc bộ định giờ để chặn và đánh thức luồng. Khi đối tượng chuyển sang trạng thái có tín hiệu, kernel có thể chuyển luồng chờ sang sẵn sàng. Linux minh họa biến nguyên tử cho cập nhật đơn, khóa quay cho vùng cần tránh ngủ, và các cơ chế chặn khi việc chờ là hợp lệ. Khi ngắt cũng truy cập cùng dữ liệu của một lõi, kernel còn phải tính đến việc ngắt xen vào lúc lõi đang giữ khóa.</p>
-        <div class="tbl-wrap">
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="Đối chiếu các cơ chế đồng bộ trong POSIX và Java">
           <table class="tbl">
             <thead><tr><th scope="col">Cơ chế</th><th scope="col">POSIX</th><th scope="col">Java</th></tr></thead>
             <tbody>
@@ -273,7 +273,8 @@ signal(full)                   signal(empty)</code></pre>
         <div id="mo-phong-thu-tu-khoa" data-sync-lab="locks"></div>
 
         <h3 id="tranh-be-tac">8.6 · Trạng thái an toàn và thuật toán chủ ngân hàng</h3>
-        <p>Một yêu cầu có thể xin đúng số đơn vị đang rảnh mà cấp ngay vẫn gây rủi ro. Trong <dfn>trạng thái an toàn</dfn> (<span class="en" lang="en">safe state</span>), tồn tại một thứ tự sao cho từng luồng có thể lấy đủ phần còn thiếu theo mức tối đa đã khai, hoàn tất, rồi trả tài nguyên cho người tiếp theo. Một <dfn>trạng thái không an toàn</dfn> (<span class="en" lang="en">unsafe state</span>) thiếu thứ tự bảo đảm đó. Các luồng vẫn có thể chạy xong nếu thực tế xin ít hơn mức tối đa hoặc trả sớm.</p>
+        <p>Giả sử ta có nhiều khe chạy K. Một luồng xin nốt khe đang rảnh. Hoàn toàn có thể cấp ngay, nhưng hãy nhìn một bước xa hơn. Sau khi cấp, còn luồng nào có thể lấy đủ phần thiếu và chạy đến lúc trả những gì nó đang giữ? Nếu có thể lặp việc đó cho đến khi mọi luồng xong, ta có một chuỗi hoàn tất chứng minh <dfn>trạng thái an toàn</dfn> (<span class="en" lang="en">safe state</span>), dựa trên mức tối đa đã khai.</p>
+        <p>Một <dfn>trạng thái không an toàn</dfn> (<span class="en" lang="en">unsafe state</span>) thiếu chuỗi bảo đảm theo những mức tối đa đó. Tiến trình thực tế vẫn có thể xong nếu xin ít hơn hoặc trả sớm. Đến phần phát hiện, ta sẽ dùng những yêu cầu đang chờ thực tế để xác định luồng nào đã bế tắc.</p>
         <p>Với một đơn vị mỗi loại, ta có thể thêm cung dự kiến (<span class="en" lang="en">claim edge</span>) dạng nét đứt vào đồ thị. Nó chỉ tài nguyên luồng có thể xin sau này. Khi có yêu cầu và tài nguyên rảnh, thử đổi cung xin thành cung cấp phát. Nếu đồ thị kể cả các cung dự kiến có chu trình sau phép thử, hãy hoãn yêu cầu. Khi luồng trả tài nguyên, cung cấp phát trở lại thành cung dự kiến.</p>
         <p><dfn>Thuật toán chủ ngân hàng</dfn> (<span class="en" lang="en">banker’s algorithm</span>) xử lý cả trường hợp có nhiều đơn vị. Ví dụ hàng chấm có tổng 6 khe chạy K và 4 vùng tạm T, với <code>Available = (2, 1)</code>. Số thứ nhất của mỗi cặp là K. Số thứ hai là T. Với hai cặp <var>X</var> và <var>Y</var>, <code>X ≤ Y</code> nghĩa là từng thành phần của X đều không vượt thành phần tương ứng của Y.</p>
         <div class="tbl-wrap">
@@ -289,7 +290,7 @@ signal(full)                   signal(empty)</code></pre>
         </div>
         <div class="algo">
           <div class="algo-h">Kiểm tra an toàn trên một ảnh chụp cấp phát</div>
-          <pre><code>Need ← Max − Allocation
+          <pre tabindex="0" aria-label="Mã giả kiểm tra trạng thái an toàn"><code>Need ← Max − Allocation
 Work ← bản sao Available
 đánh dấu mọi luồng là chưa xét xong
 khi tìm được i chưa xét xong và Need[i] ≤ Work
@@ -299,6 +300,7 @@ an toàn nếu mọi luồng được đánh dấu xong</code></pre>
         </div>
         <p>Ở trạng thái đầu, A cần (2, 1) vừa đủ với <code>Work = (2, 1)</code>. Giả sử đưa A phần còn thiếu rồi A hoàn tất, phần đưa thêm sẽ quay lại ngay. Phần tăng ròng của <code>Work</code> là số A vốn giữ, (1, 1). Vì vậy <code>Work</code> thành (3, 2), đủ cho B. Sau B nó thành (5, 3), đủ cho C. Chuỗi A → B → C chứng minh trạng thái đầu an toàn. Đây là thứ tự giả lập để chứng minh có thể hoàn tất, còn lịch chạy thật do hệ thống quyết định.</p>
         <p>Khi luồng <var>i</var> xin <code>Request[i]</code>, trước hết so yêu cầu với <code>Need[i]</code> để bắt lỗi vượt mức đã khai, rồi so với <code>Available</code> để biết có sẵn đủ hay phải chờ. Nếu cả hai kiểm tra đạt, cấp thử trên bản sao bằng cách trừ yêu cầu khỏi <code>Available</code>, cộng vào <code>Allocation[i]</code> và trừ khỏi <code>Need[i]</code>. Chạy kiểm tra an toàn. Chỉ xác nhận nếu tìm được chuỗi. Nếu xét hết luồng còn lại mà vẫn không tìm được ai có thể xong, bỏ bản cấp thử và hoãn yêu cầu.</p>
+        <p>Thử “B xin (1, 0)”. Hãy dừng ngay sau khi cấp thử và tìm một hàng có <code>Need ≤ Work</code> theo cả hai cột K, T. Nếu chưa có hàng nào như vậy, lượt cấp lấy tài nguyên rảnh ở hiện tại nhưng làm mất đường bảo đảm hoàn tất.</p>
         <div id="mo-phong-ngan-hang" data-sync-lab="banker"></div>
         <p>Cách làm này cần biết trước nhu cầu tối đa và số đơn vị hữu hiệu. Một lượt kiểm tra có thể quét tới <var>n</var> luồng cho mỗi lần chọn trong tối đa <var>n</var> lượt, mỗi phép so dùng <var>m</var> loại tài nguyên, nên chi phí xấu nhất là O(<var>n</var>²<var>m</var>). Các ràng buộc về khai báo và chi phí giúp giải thích vì sao nhiều chương trình chọn quy tắc thứ tự khóa đơn giản hơn.</p>
 
@@ -330,7 +332,7 @@ an toàn nếu mọi luồng được đánh dấu xong</code></pre>
         <p class="src">Biên soạn theo Abraham Silberschatz, Peter Baer Galvin và Greg Gagne, <cite>Operating System Concepts</cite>, ấn bản 10, Wiley, 2018. Chương 6 <span lang="en">Synchronization Tools</span> (tr. 257–288), Chương 7 <span lang="en">Synchronization Examples</span> (tr. 289–316) và Chương 8 <span lang="en">Deadlocks</span> (tr. 317–346). Tình huống máy chấm, số liệu, sơ đồ và bài tập được soạn cho PADOS.</p>
         <nav class="pager" aria-label="Điều hướng khóa học">
           <a href="buoi-2.html"><small>← Buổi trước</small>Tiến trình, luồng và lập lịch CPU</a>
-          <a class="next" href="./"><small>Khóa học →</small>Trang chủ PADOS</a>
+          <a class="next" href="buoi-4.html"><small>Buổi tiếp →</small>Bộ nhớ chính và bộ nhớ ảo</a>
         </nav>
       </section>
     </article></main>

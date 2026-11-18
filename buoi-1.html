@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
   <script defer src="assets/site.js"></script>
+  <script defer src="assets/lab.js"></script>
   <script defer src="assets/sim.js"></script>
 </head>
 <body>
@@ -18,7 +19,7 @@
     <button class="icon-btn side-btn" type="button" aria-controls="sidebar" aria-expanded="false" title="Mục lục" aria-label="Ẩn hoặc hiện mục lục" hidden>
       <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M9.5 4.5v15"/></svg>
     </button>
-    <a class="brand" href="./">PADOS</a>
+    <a class="brand" href="index.html">PADOS</a>
     <span class="crumb">Buổi 1 · Nhập môn và cấu trúc hệ điều hành</span>
     <span class="spacer"></span>
     <button class="icon-btn print-btn" type="button" title="In bài" aria-label="In bài" hidden>
@@ -65,19 +66,7 @@
       <header class="hero">
         <div class="eyebrow">Buổi 1 · Chương 1–2</div>
         <h1>Nhập môn và cấu trúc hệ điều hành</h1>
-        <p class="lead">Bạn mở <code>baihoc.txt</code> trong lúc máy đang phát nhạc. Trình soạn thảo hiện nội dung, còn nhạc vẫn chạy. Ai tìm dữ liệu? CPU làm gì trong lúc chờ ổ lưu trữ? Từ thao tác này, ta sẽ lần theo công việc của hệ điều hành ở cả hai phía, ứng dụng và phần cứng.</p>
-        <figure class="fig opening-map">
-          <ol class="visual-flow">
-            <li><span class="lesson-icon file-icon" aria-hidden="true"></span><strong>Ứng dụng</strong><small>Yêu cầu mở và đọc tệp</small></li>
-            <li><span class="lesson-icon chip-icon" aria-hidden="true"></span><strong>Kernel</strong><small>Kiểm tra và điều phối</small></li>
-            <li><span class="lesson-icon drive-icon" aria-hidden="true"></span><strong>Ổ lưu trữ</strong><small>Cấp dữ liệu khi cần</small></li>
-          </ol>
-          <figcaption><b>Đường đi của yêu cầu.</b> Mũi tên hai chiều biểu thị yêu cầu và kết quả. Kernel có thể trả dữ liệu ngay nếu bản sao còn trong bộ nhớ. Ta sẽ giải thích từng chặng khi đến đó.</figcaption>
-        </figure>
-        <div class="meta">
-          <div><h4>Bạn sẽ hiểu</h4><p>Cách hệ điều hành chia tài nguyên, vì sao CPU đổi chế độ khi ứng dụng xin dịch vụ và cấu trúc kernel ảnh hưởng thế nào đến việc xử lý yêu cầu.</p></div>
-          <div><h4>Cần biết trước</h4><p>Bạn có thể bắt đầu từ đây. Với mỗi mô phỏng, thử đoán bước sau rồi bấm <b>Bước tiếp</b> để kiểm tra.</p></div>
-        </div>
+        <p class="lead">Bạn mở <code>baihoc.txt</code> trong lúc máy đang phát nhạc. Ổ lưu trữ có thể mất một lúc mới gửi dữ liệu về. Trong khoảng đó, chiếc máy vẫn phát được đoạn nhạc tiếp theo, thậm chí trên một lõi CPU. Lần theo thao tác mở tệp, ta sẽ thấy hệ điều hành chia thời gian của lõi ra sao và vì sao ứng dụng cần xin quyền trước khi đọc dữ liệu.</p>
       </header>
 
       <section aria-labelledby="chuong-1">
@@ -85,17 +74,18 @@
 
         <h3 id="vai-tro">Vì sao máy tính cần hệ điều hành?</h3>
         <h4 id="muc-1-1">1.1 · Tài nguyên dùng chung và quyền sử dụng</h4>
-        <p>Bộ xử lý trung tâm (<span class="en">CPU</span>) thực thi lệnh. Bộ nhớ chính (<span class="en">RAM</span>) giữ mã và dữ liệu máy đang dùng. Các thiết bị vào/ra (<span class="en">input/output, I/O</span>) như bàn phím, ổ lưu trữ và loa giúp máy nhận, giữ và đưa dữ liệu ra ngoài. Cả trình phát nhạc lẫn trình soạn thảo đều cần những tài nguyên hữu hạn này.</p>
-        <p>Nếu mỗi ứng dụng tự điều khiển thiết bị, cả hai có thể tranh quyền ghi vào cùng một vùng hoặc gửi lệnh mâu thuẫn cho thiết bị. <dfn>Hệ điều hành</dfn> (<span class="en">operating system, OS</span>) cung cấp cách dùng tài nguyên chung có trật tự. Với tư cách <em>bộ cấp phát</em> (<span class="en">resource allocator</span>), nó quyết định khi nào ứng dụng được dùng CPU, bộ nhớ hay thiết bị. Với tư cách <em>chương trình điều khiển</em> (<span class="en">control program</span>), nó đặt và thi hành các giới hạn sử dụng. Ví dụ, hai ứng dụng có thể dùng chung ổ đĩa, còn quyền đọc được xét theo từng tệp và từng tiến trình.</p>
+        <p>Trình soạn thảo cần chỗ để chứa văn bản. Trình phát nhạc cũng cần chỗ để giữ đoạn âm thanh sắp phát. Cả hai dùng bộ nhớ chính (<span class="en">RAM</span>) và cần bộ xử lý trung tâm (<span class="en">CPU</span>) để chạy lệnh. Bàn phím, ổ lưu trữ và loa đảm nhiệm việc nhận, giữ hoặc đưa dữ liệu ra ngoài. Ta gọi chúng là thiết bị vào/ra (<span class="en">input/output, I/O</span>).</p>
+        <p>Nếu cả hai ứng dụng có thể tùy ý ghi vào RAM, văn bản đang sửa có thể đè lên dữ liệu âm thanh. <dfn>Hệ điều hành</dfn> (<span class="en">operating system, OS</span>) cấp vùng nhớ cho mỗi bên và cùng phần cứng giới hạn nơi từng ứng dụng được phép truy cập. Hai việc đó minh họa hai vai trò của OS. Với tư cách <em>bộ cấp phát</em> (<span class="en">resource allocator</span>), nó phân chia tài nguyên. Với tư cách <em>chương trình điều khiển</em> (<span class="en">control program</span>), nó thi hành giới hạn đã đặt ra.</p>
         <p>Với người dùng máy cá nhân, OS cần khiến thao tác dễ và phản hồi nhanh. Trên máy dùng chung, còn phải phân chia tài nguyên giữa nhiều người. Hệ điều khiển thiết bị lại có thể ưu tiên hoàn tất đúng hạn. Cùng một nhiệm vụ quản lý tài nguyên dẫn đến các lựa chọn khác nhau tùy nơi sử dụng.</p>
         <div class="box def"><div class="box-h">Kernel và phần mềm đi kèm</div><p><dfn>Kernel</dfn> (nhân) là phần lõi thực hiện các chức năng nền như lập lịch và quản lý bộ nhớ. Một hệ điều hành hoàn chỉnh thường còn đi kèm trình dòng lệnh, công cụ quản lý tệp và dịch vụ nền. Các nền tảng di động cũng cung cấp <span class="en">middleware</span>, chẳng hạn framework đa phương tiện cho ứng dụng.</p></div>
 
         <h3 id="to-chuc">CPU, bộ nhớ và thiết bị phối hợp ra sao?</h3>
         <h4 id="muc-1-2">1.2 · Điều khiển thiết bị, chuyển dữ liệu và phát ngắt</h4>
-        <p>Giả sử dữ liệu của <code>baihoc.txt</code> cần được lấy từ ổ lưu trữ. <dfn>Driver</dfn> (trình điều khiển) là phần mềm biết cách đặt lệnh cho thiết bị. <dfn>Controller</dfn> (bộ điều khiển) là phần cứng tiếp nhận lệnh, làm việc với thiết bị và cung cấp trạng thái qua các thanh ghi điều khiển. CPU chạy mã driver. Controller thực hiện phần việc phía thiết bị. Các thành phần trao đổi dữ liệu qua những kết nối phần cứng như bus.</p>
+        <p>Giả sử <code>baihoc.txt</code> chưa có bản sao trong RAM. Mã biết cách ra lệnh cho ổ gọi là <dfn>driver</dfn> (trình điều khiển). CPU chạy mã này để giao việc cho <dfn>controller</dfn> (bộ điều khiển), phần cứng làm việc với ổ lưu trữ. Driver có thể ghi lệnh và đọc trạng thái qua các thanh ghi của controller. Lệnh, trạng thái và dữ liệu đi qua những kết nối phần cứng như bus.</p>
         <p>CPU có thể <dfn>thăm dò</dfn> (<span class="en">polling</span>) bằng cách đọc trạng thái thiết bị lặp đi lặp lại. Với một lượt chờ dài, một cách khác là cho CPU làm việc khác và để controller phát <dfn>ngắt</dfn> (<span class="en">interrupt</span>) khi có kết quả. CPU dừng dòng lệnh hiện tại ở điểm thích hợp, lưu thông tin để có thể quay lại và tra <span class="en">interrupt vector</span> để đến trình xử lý tương ứng. Kernel ghi nhận sự kiện và có thể đánh thức công việc đang chờ. Sau đó CPU có thể tiếp tục việc bị ngắt hoặc chuyển sang việc khác theo quyết định lập lịch.</p>
         <p>Ngắt từ thiết bị có thể đến lúc CPU đang thực thi mã không liên quan, nên là sự kiện bất đồng bộ. Một <dfn>ngoại lệ</dfn> (<span class="en">exception</span>) như lỗi chia cho 0 phát sinh trong lúc thực thi chính lệnh gây lỗi. Từ <span class="en">trap</span> thường dùng cho một số sự kiện do phần mềm gây ra, trong đó có đường vào OS có chủ đích trong mô hình của giáo trình. Tên gọi cụ thể tùy kiến trúc. Khi nhiều ngắt cùng đến, hệ thống có thể dùng mức ưu tiên. Một số ngắt có thể bị chặn tạm thời (<span class="en">maskable</span>), còn ngắt không che được (<span class="en">nonmaskable</span>) dùng cho sự kiện đặc biệt.</p>
-        <p>Hãy tách <strong>việc chuyển nội dung khối dữ liệu</strong> khỏi <strong>việc báo một sự kiện</strong>. Khi dùng <dfn>truy cập bộ nhớ trực tiếp</dfn> (<span class="en">direct memory access, DMA</span>), driver thiết lập vùng đệm, rồi phần cứng chuyển dữ liệu vào RAM. Ngắt báo hoàn tất có thể đến sau. Với phương án CPU trực tiếp chuyển dữ liệu (<span class="en">programmed I/O</span>), CPU lấy dữ liệu qua giao diện controller và tự ghi vào RAM. Hãy theo dõi hướng mũi tên ở bước chuyển khối.</p>
+        <p>Biết thiết bị đã có dữ liệu mới giải quyết được một nửa công việc. Dữ liệu còn phải vào một vùng RAM để chương trình dùng. Khi dùng <dfn>truy cập bộ nhớ trực tiếp</dfn> (<span class="en">direct memory access, DMA</span>), driver chuẩn bị địa chỉ vùng đệm, sau đó phần cứng chuyển khối vào RAM và có thể phát ngắt báo hoàn tất. Với <span class="en">programmed I/O</span>, CPU chạy lệnh lấy dữ liệu qua giao diện controller rồi tự ghi vào RAM.</p>
+        <p>Chạy cả hai tình huống và dừng ở bước có ngắt. Ô vùng đệm trong RAM cho biết liệu kernel có thể dùng ngay khối vừa đọc hay còn phải chép nó.</p>
         <div id="mo-phong-io" data-sim="io"></div>
         <p>Dữ liệu đi qua nhiều tầng vì một thiết bị khó vừa nhanh, vừa rẻ, vừa chứa được nhiều. Thanh ghi nằm sát nơi CPU thực thi lệnh. Cache giữ bản sao để truy cập nhanh. RAM giữ trạng thái làm việc và thường mất nội dung khi mất điện (<span class="en">volatile</span>). SSD và HDD giữ dữ liệu qua lần tắt máy (<span class="en">nonvolatile</span>). Các lớp lưu trữ chậm hơn, như băng từ, phù hợp hơn với lưu trữ dài hạn.</p>
         <figure class="fig storage-figure">
@@ -125,7 +115,7 @@
 
         <h3 id="van-hanh">Làm sao CPU có thể phục vụ nhiều chương trình?</h3>
         <h4 id="muc-1-4">1.4 · Đa chương trình, chuyển ngữ cảnh và bộ định thời</h4>
-        <p>Tệp chương trình chứa mã và dữ liệu. Khi mã đó được chạy, OS theo dõi một <dfn>tiến trình</dfn> (<span class="en">process</span>), gồm trạng thái thực thi và các tài nguyên như vùng nhớ, tệp đang mở. Trong ví dụ, tiến trình A là trình soạn thảo và B là trình phát nhạc. B <strong>sẵn sàng</strong> khi có thể chạy ngay nếu được cấp CPU. A <strong>đang chờ</strong> khi nó cần dữ liệu mà ổ lưu trữ chưa trả.</p>
+        <p>Trong mô phỏng vừa rồi, ổ đang đọc tệp thì CPU chuyển sang phát nhạc. Để làm được vậy, hệ điều hành phải nhớ trình soạn thảo đang dừng ở đâu và đang đợi gì. Mỗi lần thực thi với trạng thái và tài nguyên riêng gọi là một <dfn>tiến trình</dfn> (<span class="en">process</span>). Gọi trình soạn thảo là A và trình phát nhạc là B. Khi ổ chưa trả dữ liệu, A <strong>đang chờ</strong>. Nếu B có đủ dữ liệu để chạy và chỉ thiếu lượt CPU, B <strong>sẵn sàng</strong>.</p>
         <p><dfn>Đa chương trình</dfn> (<span class="en">multiprogramming</span>) giữ nhiều công việc trong hệ thống để CPU có thể chuyển sang việc khác khi công việc hiện tại phải chờ. <dfn>Đa nhiệm chia thời gian</dfn> (<span class="en">multitasking, time sharing</span>) dùng các lượt chạy đủ ngắn để chương trình tương tác được phục vụ kịp thời. Khi chuyển từ A sang B, kernel lưu trạng thái cần để chạy tiếp A và khôi phục trạng thái của B. Đó là <dfn>chuyển ngữ cảnh</dfn> (<span class="en">context switch</span>). Xen kẽ trên cùng một lõi là một cách có <span class="en">concurrency</span> (thực thi đồng thời theo nghĩa nhiều việc cùng tiến triển). <span class="en">Parallelism</span> là có nhiều việc thực sự thực thi cùng lúc, chẳng hạn trên hai lõi.</p>
         <div class="box problem"><div class="box-h">Nếu A chạy mãi thì sao?</div><p>Chờ A tự dừng sẽ khiến B có thể đợi mãi. Kernel cần một cách để CPU quay về chạy mã của mình sau một khoảng thời gian, kể cả khi A đang ở giữa vòng lặp.</p></div>
         <p>Kernel lập trình <dfn>bộ định thời</dfn> (<span class="en">timer</span>) để phát ngắt khi đến hạn. Phần cứng giới hạn việc chỉnh timer và cấu hình bảo vệ bộ nhớ bằng <dfn>chế độ thực thi</dfn>. Ở <span class="en">user mode</span>, ứng dụng thực thi các lệnh thông thường. Ở <span class="en">kernel mode</span>, mã của hệ điều hành có thể thực thi lệnh đặc quyền. Mô hình đơn giản trong sách dùng bit 1 cho user và bit 0 cho kernel. Một kiến trúc thực tế có thể có thêm mức quyền, chẳng hạn cho việc ảo hóa.</p>
@@ -207,7 +197,8 @@
 
         <h3 id="dich-vu">Từ thao tác của người dùng đến dịch vụ của OS</h3>
         <h4 id="muc-2-1">2.1 · Dịch vụ hệ điều hành</h4>
-        <p>Khi bạn mở <code>baihoc.txt</code>, bấm đúp chỉ là phần thấy được. Đằng sau đó, hệ điều hành có thể <strong>nạp chương trình</strong>, tiếp nhận sự kiện từ thiết bị, <strong>tra và đọc tệp</strong>, rồi giúp ứng dụng gửi dữ liệu ra màn hình. Các tiến trình cũng có thể <strong>giao tiếp</strong> bằng vùng nhớ chung (<span class="en">shared memory</span>) hoặc trao thông điệp (<span class="en">message passing</span>). Khi thiết bị trả lỗi hoặc chương trình dùng địa chỉ sai, OS phát hiện và xử lý tùy phạm vi sự cố.</p>
+        <p>Ta đã theo lần đọc từ driver xuống ổ. Giờ hãy quay lại cú bấm đúp. Hệ điều hành chuyển sự kiện chuột cho chương trình quản lý tệp. Chương trình có thể yêu cầu chạy trình soạn thảo và chuyển tên tệp cho nó. Mỗi bên chỉ cần biết cách yêu cầu công việc tiếp theo. Việc tra tên tệp và điều khiển ổ được thực hiện ở các lớp bên dưới.</p>
+        <p>Các chương trình cũng cần trao đổi dữ liệu. OS có thể cho chúng dùng một vùng nhớ chung (<span class="en">shared memory</span>) hoặc cung cấp cách trao thông điệp (<span class="en">message passing</span>). Khi thiết bị trả lỗi hoặc chương trình dùng địa chỉ sai, OS phát hiện và xử lý tùy phạm vi sự cố.</p>
         <p>Một nhóm dịch vụ khác phục vụ cả hệ thống. Cấp phát tài nguyên giúp nhiều chương trình cùng hoạt động. Thống kê sử dụng (<span class="en">accounting</span>) giúp quản trị và theo dõi tải. Bảo vệ và an ninh đặt giới hạn cho từng tiến trình. Nút bấm, cửa sổ và dòng lệnh là các giao diện để con người dùng những dịch vụ đó.</p>
 
         <h4 id="muc-2-2">2.2 · Dòng lệnh, cửa sổ và cảm ứng</h4>
@@ -216,14 +207,15 @@
 
         <h3 id="loi-goi">Từ API vào kernel</h3>
         <h4 id="muc-2-3">2.3 · Lời gọi hệ thống và cách trả kết quả</h4>
-        <p><dfn>API</dfn> (<span class="en">application programming interface</span>) quy định hàm nào có thể gọi, cần tham số nào và kết quả có nghĩa gì. Chẳng hạn, qua giao diện POSIX, <code>open("baihoc.txt", O_RDONLY)</code> yêu cầu mở tệp chỉ để đọc. Windows cung cấp những giao diện riêng như Win32. Một hàm API có thể làm việc ngay trong bộ nhớ của ứng dụng, như hàm <code>strlen()</code> đếm số byte của chuỗi C. Khi cần một dịch vụ thuộc quyền của kernel, thư viện đi qua <dfn>lời gọi hệ thống</dfn> (<span class="en">system call</span>).</p>
+        <p>Trình soạn thảo biết tên tệp. Nó còn cần một cách đề nghị kernel xác định tệp đó và kiểm tra quyền đọc. Qua giao diện POSIX, chương trình gọi <code>open("baihoc.txt", O_RDONLY)</code>. Tên hàm, tham số và ý nghĩa kết quả thuộc <dfn>API</dfn> (<span class="en">application programming interface</span>). Windows cung cấp các giao diện khác, chẳng hạn Win32.</p>
+        <p>Hàm <code>strlen()</code> cũng thuộc một API. Nó đếm độ dài chuỗi C ngay trong bộ nhớ mà ứng dụng được phép đọc. Với <code>open()</code>, thư viện cần vào kernel qua một <dfn>lời gọi hệ thống</dfn> (<span class="en">system call</span>) để thực hiện công việc yêu cầu quyền của hệ điều hành.</p>
         <figure class="fig">
           <ol class="visual-flow mode-flow">
             <li><small>User mode</small><strong>Gọi <code>open()</code></strong><span>Thư viện chuẩn bị số hiệu và tham số</span></li>
             <li class="kernel-zone"><small>Kernel mode</small><strong>Kiểm tra và mở tệp</strong><span>Kernel chọn trình xử lý, tra tệp và kiểm tra quyền</span></li>
             <li><small>User mode</small><strong>Nhận kết quả</strong><span>Ứng dụng nhận số mô tả tệp hoặc lỗi</span></li>
           </ol>
-          <figcaption><b>Đường vào có kiểm soát.</b> CPU chạy lệnh vào kernel ở điểm vào đã thiết lập. Kernel dùng số hiệu để chọn trình xử lý. Sau khi xử lý, ứng dụng tiếp tục ở user mode.</figcaption>
+          <figcaption><b>Một lượt đi qua ranh giới quyền.</b> Điểm vào kernel do hệ thống thiết lập. Chương trình gọi tiếp tục ở user mode khi có kết quả. Việc vào kernel có thể xảy ra trong cùng ngữ cảnh tiến trình.</figcaption>
         </figure>
         <p>Quy ước truyền tham số có thể dùng thanh ghi, địa chỉ trỏ tới một vùng tham số hoặc ngăn xếp (<span class="en">stack</span>). Nếu tham số là địa chỉ của ứng dụng, kernel cần kiểm tra nó trước khi truy cập. Khi <code>open</code> thành công, kernel thiết lập mục trong bảng mô tả tệp của tiến trình, rồi ứng dụng nhận một số <dfn>file descriptor</dfn> (mô tả tệp) để dùng cho các lời gọi sau. Hãy xem cùng lời gọi thay đổi kết quả ra sao khi quyền đọc thay đổi.</p>
         <div id="mo-phong-syscall" data-sim="syscall"></div>
@@ -308,7 +300,7 @@
         <div id="mo-phong-boot" data-sim="boot"></div>
 
         <h4 id="muc-2-10">2.10 · Gỡ lỗi, đo hiệu năng và theo dấu sự kiện</h4>
-        <p>Khi ứng dụng thoát bất ngờ, nhật ký có thể cho biết sự kiện ngay trước đó. <span class="en">Core dump</span> lưu trạng thái tiến trình nếu hệ thống có cấu hình để tạo. Trình gỡ lỗi có thể dùng nó để xem tiến trình dừng ở đâu. Khi sự cố xảy ra ở kernel, <span class="en">crash dump</span> có thể ghi được phần trạng thái hệ thống cần cho chẩn đoán.</p>
+        <p>Giả sử máy đã khởi động bình thường nhưng trình soạn thảo đột ngột biến mất lúc mở tệp. Nhật ký cho biết sự kiện ngay trước khi thoát. Nếu hệ thống tạo <span class="en">core dump</span>, trình gỡ lỗi còn có thể đọc trạng thái tiến trình để tìm vị trí dừng. Với sự cố ở kernel, <span class="en">crash dump</span> có thể lưu phần trạng thái hệ thống cần để chẩn đoán.</p>
         <p>Với máy chậm, trước hết cần biết tài nguyên nào đang bận. Công cụ như <code>top</code>, <code>vmstat</code> và <code>iostat</code> đưa ra thống kê tổng hợp. <dfn>Tracing</dfn> ghi lại chuỗi sự kiện cụ thể. Ví dụ, <code>strace</code> cho biết các lời gọi hệ thống của một tiến trình. Lấy mẫu với <code>perf</code> giúp tìm nơi CPU dành thời gian. BCC (<span class="en">BPF Compiler Collection</span>) hỗ trợ dùng eBPF để thu thập sự kiện như độ trễ I/O ở những điểm quan sát trong kernel. Kernel kiểm tra chương trình eBPF trước khi cho phép chạy.</p>
         <figure class="fig">
           <div class="trace-chart">
@@ -386,6 +378,10 @@
         </details>
       </section>
       <p class="src">Biên soạn theo <cite>Operating System Concepts</cite>, ấn bản 10 (2018), Chương 1–2, của Abraham Silberschatz, Peter Baer Galvin và Greg Gagne. Các ví dụ, dấu vết minh họa và bài tập được soạn cho PADOS.</p>
+      <nav class="pager" aria-label="Điều hướng khóa học">
+        <a href="index.html"><small>← Khóa học</small>Trang chủ PADOS</a>
+        <a class="next" href="buoi-2.html"><small>Buổi tiếp →</small>Tiến trình, luồng và lập lịch CPU</a>
+      </nav>
     </article></main>
   </div>
 </body>

@@ -31,6 +31,7 @@
     io: {
       title: 'Đường dữ liệu và đường báo ngắt',
       subtitle: 'Đọc một khối của baihoc.txt. Theo dõi hướng mũi tên ở mỗi bước.',
+      start: 'Vùng đệm trong RAM chưa có khối cần đọc. Chạy một lượt với DMA rồi đổi cách chuyển dữ liệu để tìm xem lúc nào khối thực sự vào RAM.',
       fields: ['CPU', 'Controller', 'Trình soạn thảo'],
       scenarios: [
         ['Dùng DMA', [
@@ -52,6 +53,7 @@
     cpu: {
       title: 'Một lõi CPU đổi lượt thế nào?',
       subtitle: 'A là trình soạn thảo. B là trình phát nhạc.',
+      start: 'Theo dõi tên trên trục CPU và trạng thái của A, B. Ô Kernel có thể xuất hiện giữa hai lượt chạy của cùng một tiến trình.',
       fields: ['Chế độ CPU', 'Trạng thái A', 'Trạng thái B'],
       scenarios: [
         ['A chờ thiết bị', [
@@ -74,6 +76,7 @@
     cache: {
       title: 'Cache nào còn giữ được Y?',
       subtitle: 'Cùng chuỗi X, Y, X, Z, Y. Cache bắt đầu rỗng và thay khối theo LRU.',
+      start: 'Hãy dừng ngay trước lần đọc Z. Khối ở đầu hàng đã lâu nhất chưa được dùng. Nếu cache đầy, đó là khối sẽ nhường chỗ.',
       fields: ['Từ cũ đến mới', 'Lần đọc này', 'Hit / số lần đọc'],
       scenarios: [2, 3].map((capacity) => [
         capacity + ' ô cache',
@@ -84,6 +87,7 @@
     syscall: {
       title: 'Cùng một yêu cầu, hai kết quả',
       subtitle: 'Tiến trình yêu cầu mở baihoc.txt chỉ để đọc.',
+      start: 'Tên tệp và yêu cầu đọc giống nhau trong cả hai lượt. Đổi quyền để xem kết quả bắt đầu khác nhau ở bước nào.',
       fields: ['Chế độ CPU', 'Xử lý', 'Kết quả'],
       scenarios: [
         ['Có quyền đọc', [
@@ -103,6 +107,7 @@
     loader: {
       title: 'Lỗi ở linker hay lúc chạy?',
       subtitle: 'main gọi dem_dong, một hàm được viết trong tệp khác.',
+      start: 'Thử từng trường hợp thiếu thành phần và theo dõi xem đã có tệp thực thi chưa tại thời điểm lỗi.',
       fields: ['Giai đoạn', 'Đầu ra hoặc lỗi'],
       scenarios: [
         ['Đủ thành phần', [
@@ -125,6 +130,7 @@
     structure: {
       title: 'Cùng lần đọc, dịch vụ chạy ở đâu?',
       subtitle: 'Khối dữ liệu chưa có trong RAM.',
+      start: 'Chạy cùng yêu cầu đọc trên hai kiến trúc. Khi hệ thống tệp gọi driver, hãy để ý liệu hai bên có nằm trong cùng miền bảo vệ.',
       fields: ['Thành phần xử lý', 'Nơi chạy', 'Cách chuyển yêu cầu'],
       scenarios: [
         ['Kernel nguyên khối', [
@@ -138,12 +144,13 @@
           ['Tìm khối trên thiết bị', 'Tiến trình hệ thống tệp tìm khối và gửi một thông điệp khác tới tiến trình driver.', ['Hệ thống tệp → driver', 'User → kernel → user', 'IPC qua vi nhân']],
           ['Xử lý kết quả thiết bị', 'Driver dùng quyền điều khiển thiết bị đã cấp. Vi nhân nhận ngắt và báo cho driver. Driver báo lại cho hệ thống tệp.', ['Driver và thiết bị', 'User cho driver, kernel cho ngắt', 'Thông báo ngắt và IPC']],
           ['Trở về ứng dụng', 'Tiến trình dịch vụ phản hồi với dữ liệu và số byte đã đọc qua cơ chế trao đổi đã thiết kế.', ['Hệ thống tệp → ứng dụng', 'User → kernel → user', 'Phản hồi IPC qua vi nhân']],
-        ]],
+        ], { micro: true }],
       ],
     },
     boot: {
       title: 'Ai trao quyền cho ai khi bật máy?',
       subtitle: 'Một máy Linux dùng UEFI, GRUB và systemd.',
+      start: 'So sánh hai lượt khởi động và xác định thành phần cuối cùng còn làm xong phần việc của mình khi thiếu driver.',
       fields: ['Đang thực hiện', 'Hệ thống tệp gốc'],
       scenarios: [
         ['Khởi động bình thường', [
@@ -164,6 +171,9 @@
 
   function ioDiagram(steps, position) {
     const stage = steps[position]?.[3] ?? 'initial';
+    const stages = steps.slice(0, position + 1).map((step) => step[3]);
+    const buffered = stages.includes('dma') || stages.includes('pio');
+    const usesDma = steps.some((step) => step[3] === 'dma');
     const signal = {
       command: ['→', 'Lệnh đọc'],
       interrupt: ['←', 'Ngắt'],
@@ -172,12 +182,13 @@
     const cpuReadsRam = stage === 'resume';
     return `
       <div class="io-circuit" data-stage="${stage}">
-        <div class="lab-node io-cpu"><strong>CPU</strong><small>Chạy mã driver</small></div>
+        <div class="lab-node io-cpu"><span class="lesson-icon chip-icon"></span><strong>CPU</strong><small>${steps[position]?.[2][0] ?? 'Có thể chạy mã driver'}</small></div>
         <div class="lab-edge io-signal"><b>${signal[0]}</b><small>${signal[1]}</small></div>
-        <div class="lab-node io-controller"><strong>Controller</strong><small>Cùng ổ lưu trữ</small></div>
+        <div class="lab-node io-controller"><span class="lesson-icon drive-icon"></span><strong>Controller</strong><small>Cùng ổ lưu trữ</small></div>
         <div class="lab-edge io-write"><b>${cpuReadsRam ? '↑' : '↓'}</b><small>${cpuReadsRam ? 'Đọc vùng đệm' : 'CPU ghi'}</small></div>
-        <div class="lab-edge io-dma"><b>↓</b><small>DMA ghi</small></div>
-        <div class="lab-node io-ram"><strong>RAM</strong><small>Vùng đệm dữ liệu</small></div>
+        ${usesDma ? '<div class="lab-edge io-dma"><b>↓</b><small>DMA ghi</small></div>' : ''}
+        <div class="io-ram"><span><strong>RAM</strong><small>Vùng đệm</small></span>
+          <span class="io-bytes${buffered ? ' has-data' : ''}">${buffered ? 'Khối đã vào RAM' : 'Chưa có khối'}</span></div>
       </div>`;
   }
 
@@ -213,15 +224,44 @@
     }).join('')}</ol>`;
   }
 
+  function protectionDiagram(steps, position, { failed }) {
+    const phases = [
+      ['open(…)', 'Gửi yêu cầu'],
+      ['Tra tệp và xét quyền', 'Trình xử lý trong kernel'],
+      [failed ? '−1 · EACCES' : 'fd = 4', 'Ứng dụng nhận kết quả'],
+    ];
+    const current = steps[position]?.[3];
+    return `<div class="mode-lanes">
+      <div class="mode-lane-label">User mode</div><div class="mode-lane-label">Kernel mode</div>
+      <svg viewBox="0 0 300 100" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M85 22 138 67 M162 67 215 22" vector-effect="non-scaling-stroke"/>
+      </svg>
+      <ol class="mode-lane-path">${phases.map(([label, description], index) => `
+        <li class="mode-lane-step${current === index ? ' is-active' : ''}">
+          <strong>${index === 2 && position < steps.length - 1 ? 'Kết quả' : label}</strong><small>${description}</small>
+        </li>`).join('')}</ol>
+    </div>`;
+  }
+
+  function structureDiagram(_steps, position, { micro }) {
+    const active = [['app', 'files'], ['files', 'driver'], ['driver', 'files'], ['app', 'files']][position] ?? [];
+    if (position >= 0) active.push('micro');
+    const service = (id, label, icon) => `<span class="architecture-service${active.includes(id) ? ' is-active' : ''}">
+      <i class="lesson-icon ${icon}"></i>${label}</span>`;
+    const services = service('files', 'Hệ thống tệp', 'file-icon') + service('driver', 'Driver', 'drive-icon');
+    return `<div class="lab-architecture">
+      <div><small>User mode</small><div class="architecture-services">${service('app', 'Ứng dụng', 'file-icon')}${micro ? services : ''}</div></div>
+      <div><small>Kernel mode</small><div class="architecture-services">${micro
+        ? service('micro', 'Vi nhân chuyển IPC', 'chip-icon') : services}</div></div>
+    </div>`;
+  }
+
   const graphics = {
     io: ioDiagram,
     cpu: cpuDiagram,
     cache: cacheDiagram,
-    syscall: (steps, position, settings) => phaseDiagram([
-      ['User mode', 'Gửi lời gọi'],
-      ['Kernel mode', 'Tra tệp và xét quyền'],
-      ['User mode', 'Nhận kết quả'],
-    ], steps, position, settings),
+    syscall: protectionDiagram,
+    structure: structureDiagram,
     loader: (steps, position, settings) => phaseDiagram([
       ['Compiler', 'Tệp đối tượng'],
       ['Linker', 'Tệp thực thi'],
@@ -248,14 +288,12 @@
         <div class="ttl" id="sim-${id}-title">${lesson.title}<small>${lesson.subtitle}</small></div>
         <div class="sim-ctl">
           <label>Tình huống <select>${lesson.scenarios.map(([label]) => `<option>${label}</option>`).join('')}</select></label>
-          <button type="button" data-action="reset">Làm lại</button>
-          <button type="button" data-action="back">Bước trước</button>
-          <button type="button" class="primary" data-action="next">Bước tiếp ▶</button>
         </div>
       </div>
+      <div class="sim-ctl lab-steps"></div>
+      <p class="sim-note" role="status"></p>
       ${graphic ? '<div class="sim-illustration" aria-hidden="true"></div>' : ''}
       <ol class="sim-path" aria-label="Các bước mô phỏng"></ol>
-      <p class="sim-note" role="status"></p>
       <dl class="sim-state"></dl>`;
 
     const select = mount.querySelector('select');
@@ -263,12 +301,8 @@
     const path = mount.querySelector('.sim-path');
     const state = mount.querySelector('.sim-state');
     const note = mount.querySelector('.sim-note');
-    const reset = mount.querySelector('[data-action="reset"]');
-    const back = mount.querySelector('[data-action="back"]');
-    const next = mount.querySelector('[data-action="next"]');
-    let position = -1;
-
-    function render() {
+    function render(index) {
+      const position = index - 1;
       const [, steps, settings = {}] = lesson.scenarios[select.selectedIndex];
       if (graphic) illustration.innerHTML = graphic(steps, position, settings);
       path.innerHTML = steps.map(([title], index) => {
@@ -281,25 +315,13 @@
         `<div><dt>${field}</dt><dd>${values?.[index] ?? '—'}</dd></div>`
       )).join('');
       note.textContent = position < 0
-        ? 'Bạn dự đoán điều gì xảy ra ở bước đầu? Bấm Bước tiếp để xem.'
-        : `Bước ${position + 1}/${steps.length} · ${steps[position][1]}`;
-      back.disabled = position < 0;
-      reset.disabled = position < 0;
-      next.disabled = position === steps.length - 1;
+        ? lesson.start
+        : `${steps[position][0]}. ${steps[position][1]}`;
     }
 
-    select.addEventListener('change', () => { position = -1; render(); });
-    reset.addEventListener('click', () => { position = -1; render(); next.focus(); });
-    back.addEventListener('click', () => {
-      position -= 1;
-      render();
-      if (back.disabled) next.focus();
-    });
-    next.addEventListener('click', () => {
-      position += 1;
-      render();
-      if (next.disabled) back.focus();
-    });
-    render();
+    const reset = window.mountLabSteps(mount, render, { play: ['io', 'cpu', 'boot'].includes(id) });
+    const load = () => reset(lesson.scenarios[select.selectedIndex][1].length + 1);
+    select.addEventListener('change', load);
+    load();
   }
 })();

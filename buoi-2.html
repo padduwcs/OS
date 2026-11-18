@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/buoi-2.css">
   <script defer src="assets/site.js"></script>
+  <script defer src="assets/lab.js"></script>
   <script defer src="assets/buoi-2.js"></script>
 </head>
 <body>
@@ -19,7 +20,7 @@
     <button class="icon-btn side-btn" type="button" aria-controls="sidebar" aria-expanded="false" title="Mục lục" aria-label="Ẩn hoặc hiện mục lục" hidden>
       <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M9.5 4.5v15"/></svg>
     </button>
-    <a class="brand" href="./">PADOS</a>
+    <a class="brand" href="index.html">PADOS</a>
     <span class="crumb">Buổi 2 · Tiến trình, luồng và lập lịch CPU</span>
     <span class="spacer"></span>
     <button class="icon-btn print-btn" type="button" title="In bài" aria-label="In bài" hidden>
@@ -71,25 +72,14 @@
       <header class="hero">
         <div class="eyebrow">Buổi 2 · Chương 3–5</div>
         <h1>Tiến trình, luồng và lập lịch CPU</h1>
-        <p class="lead">Bạn mở <code>baihoc.txt</code>, rồi gõ một từ để tìm trong lúc trình soạn thảo còn đang lập chỉ mục cho tệp. Nhạc vẫn phát. Trên máy chỉ có một lõi CPU, vì sao cửa sổ vẫn phản hồi khi còn việc tính toán? Nếu thêm lõi, phần nào có thể làm cùng lúc và phần nào vẫn phải chờ?</p>
-        <figure class="fig opening-map lesson-two-map">
-          <ol class="visual-flow">
-            <li><span class="lesson-icon file-icon" aria-hidden="true"></span><strong>Tiến trình soạn thảo</strong><small>Luồng giao diện · Luồng lập chỉ mục</small></li>
-            <li><span class="lesson-icon chip-icon" aria-hidden="true"></span><strong>Bộ lập lịch CPU</strong><small>Chọn trong các luồng sẵn sàng</small></li>
-            <li><span class="lesson-icon music-icon" aria-hidden="true">♫</span><strong>Tiến trình phát nhạc</strong><small>Luồng giải mã</small></li>
-          </ol>
-          <figcaption><b>Hai ứng dụng cùng cần lượt CPU.</b> Hai ô ngoài nhóm các luồng theo tiến trình. Mũi tên hướng vào bộ lập lịch cho thấy các luồng có thể tranh cùng một lõi khi đã sẵn sàng. Luồng đang đợi dữ liệu phải chờ sự kiện đánh thức trước khi tranh lượt.</figcaption>
-        </figure>
-        <div class="meta">
-          <div><h4>Bạn sẽ làm được</h4><p>Theo dõi trạng thái tiến trình, chọn cách trao đổi dữ liệu, chia việc thành luồng và tính thời gian chờ từ một lịch CPU.</p></div>
-          <div><h4>Kiến thức nối tiếp</h4><p><a href="buoi-1.html#to-chuc">Buổi 1 đã giới thiệu ngắt và I/O</a>. Trong mỗi mô phỏng, hãy dự đoán việc tiếp theo trước khi bấm <b>Bước tiếp</b>.</p></div>
-        </div>
+        <p class="lead">Tệp <code>baihoc.txt</code> đã mở. Bạn gõ một từ để tìm trong khi trình soạn thảo vẫn đang quét tài liệu và nhạc vẫn phát. Trên máy một lõi, mỗi công việc cần một lượt CPU. Nếu bộ lập lịch chọn quét nốt cả tệp trước, phím vừa gõ và đoạn nhạc tiếp theo phải đợi. Muốn chia lượt hợp lý, trước hết cần biết công việc nào đã sẵn sàng và làm sao nó tiếp tục đúng chỗ sau khi nhường lõi.</p>
+        <p class="reading-cue">Trong <a href="buoi-1.html#mo-phong-cpu">lượt đọc tệp ở buổi trước</a>, ổ báo đã đọc xong, nhưng trình phát nhạc vẫn được giữ lượt. Ta sẽ bắt đầu từ khoảnh khắc đó.</p>
       </header>
 
       <section aria-labelledby="chuong-3">
         <h2 id="chuong-3"><span class="sec">3</span>Tiến trình giữ lại điều gì khi CPU đổi việc?</h2>
         <h3 id="trang-thai">3.1–3.2 · Từ chương trình đến tiến trình đang chạy</h3>
-        <p>Tệp thực thi của trình soạn thảo chứa lệnh và dữ liệu ban đầu. Khi chạy nó, hệ điều hành tạo một <dfn>tiến trình</dfn> (<span class="en">process</span>), tức một lần thực thi có trạng thái và tài nguyên riêng. Khởi chạy hai bản độc lập có thể tạo hai tiến trình, có hai định danh tiến trình (<span class="en">process identifier, PID</span>) và những giá trị biến khác nhau, dù chúng xuất phát từ cùng tệp thực thi.</p>
+        <p>Mở hai bản độc lập của trình soạn thảo và gõ ở một bên. Hai cửa sổ xuất phát từ cùng tệp thực thi, nhưng mỗi bên đang sửa một nội dung và có thể dừng ở một lệnh khác nhau. Hệ điều hành gọi mỗi lần thực thi có trạng thái và tài nguyên riêng như vậy là một <dfn>tiến trình</dfn> (<span class="en">process</span>). Kernel đặt một định danh (<span class="en">process identifier, PID</span>) để theo dõi từng tiến trình.</p>
         <p>Tiến trình nhìn thấy một <dfn>không gian địa chỉ</dfn> (<span class="en">address space</span>). Khi mở tệp, nó thực thi lệnh trong vùng mã, dùng biến toàn cục ở vùng dữ liệu, có thể xin vùng đệm từ vùng cấp phát động (<span class="en">heap</span>) và giữ biến cục bộ cùng địa chỉ trở về của lời gọi hàm trên ngăn xếp (<span class="en">stack</span>). Bộ đếm chương trình (<span class="en">program counter, PC</span>) và các thanh ghi CPU ghi lại dòng thực thi đang ở đâu và đang tính với giá trị nào.</p>
         <figure class="fig">
           <div class="process-layout">
@@ -99,19 +89,34 @@
           <figcaption><b>Bộ nhớ ứng dụng và hồ sơ của kernel.</b> Nhìn cột trái để biết dữ liệu của ứng dụng nằm ở đâu. Cột phải cho thấy những thông tin cho phép kernel quản lý và tiếp tục tiến trình. Cách bố trí địa chỉ thực tế tùy hệ thống.</figcaption>
         </figure>
         <p><dfn>Khối điều khiển tiến trình</dfn> (<span class="en">process control block, PCB</span>) là tên trong giáo trình cho hồ sơ kernel dùng để quản lý tiến trình. Trước hết, hình dung mỗi tiến trình có một dòng thực thi. Khi chuyển từ trình soạn thảo sang trình phát nhạc, kernel lưu ngữ cảnh của bên đang dùng CPU và khôi phục ngữ cảnh đã lưu của bên được chọn. Đó là <dfn>chuyển ngữ cảnh</dfn> (<span class="en">context switch</span>). Lúc chuyển, CPU làm công việc điều phối và các chương trình tạm thời chưa tiến thêm. Một ngắt cũng có thể được xử lý rồi trả CPU về đúng công việc cũ.</p>
+        <p>Trước khi ổ báo xong, cấp CPU cho trình soạn thảo cũng chưa giúp nó đọc tiếp. Nó <dfn>đang chờ</dfn> (<span class="en">waiting</span> hay <span class="en">blocked</span>) một sự kiện. Khi dữ liệu về, nó <dfn>sẵn sàng</dfn> (<span class="en">ready</span>) vì chỉ còn thiếu lượt CPU. Kernel ghi nó vào <dfn>hàng sẵn sàng</dfn> (<span class="en">ready queue</span>). Cấu trúc của hàng tùy chính sách chọn việc. Các tiến trình còn chờ sự kiện có thể được theo dõi ở các hàng riêng.</p>
         <figure class="fig">
-          <ol class="state-routes">
-            <li><span>Mới</span><small>→ tiếp nhận →</small><span>Sẵn sàng</span></li>
-            <li><span>Sẵn sàng</span><small>→ cấp CPU →</small><span>Đang chạy</span></li>
-            <li><span>Đang chạy</span><small>→ chờ sự kiện →</small><span>Đang chờ</span></li>
-            <li><span>Đang chờ</span><small>→ sự kiện xảy ra →</small><span>Sẵn sàng</span></li>
-            <li><span>Đang chạy</span><small>→ bị thu hồi CPU →</small><span>Sẵn sàng</span></li>
-            <li><span>Đang chạy</span><small>→ hoàn tất →</small><span>Kết thúc</span></li>
-          </ol>
-          <figcaption><b>Các đường chuyển trạng thái.</b> Hãy so hai đường về <em>Sẵn sàng</em>. I/O hoàn tất làm công việc hết lý do chờ. Hết lượt CPU đưa một công việc đang chạy về hàng để chờ được cấp CPU lần nữa.</figcaption>
+          <svg class="teaching-svg" viewBox="0 0 445 221" role="img" aria-labelledby="process-map-title process-map-desc">
+            <title id="process-map-title">Vòng đời tiến trình qua năm trạng thái</title>
+            <desc id="process-map-desc">Mới sang sẵn sàng khi tiếp nhận. Sẵn sàng sang đang chạy khi được cấp CPU. Đang chạy có thể về sẵn sàng khi bị thu hồi, đi xuống đang chờ khi cần sự kiện, hoặc kết thúc. Sự kiện đưa tiến trình từ đang chờ về sẵn sàng.</desc>
+            <defs><marker id="process-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path class="arrowhead" d="M0 0 6 3 0 6z"/></marker></defs>
+            <g class="route" marker-end="url(#process-arrow)">
+              <path d="M49 89H109"/><path d="M200 89H273"/><path d="M368 89H389"/>
+              <path d="M321 71V38Q321 28 311 28H164Q154 28 154 38V69"/>
+              <path d="M321 107V169"/><path d="M273 189H164Q154 189 154 179V109"/>
+            </g>
+            <rect class="muted-node" x="3" y="71" width="46" height="36" rx="18"/>
+            <rect class="ready-node" x="110" y="71" width="90" height="36" rx="8"/>
+            <rect class="running-node" x="274" y="71" width="94" height="36" rx="8"/>
+            <rect class="waiting-node" x="274" y="170" width="94" height="38" rx="8"/>
+            <rect class="muted-node" x="390" y="69" width="53" height="40" rx="18"/>
+            <g text-anchor="middle" dominant-baseline="middle">
+              <text x="26" y="90">Mới</text><text x="155" y="90">Sẵn sàng</text><text x="321" y="90">Đang chạy</text>
+              <text x="321" y="190">Đang chờ</text><text class="annotation" x="416" y="82">Kết</text><text class="annotation" x="416" y="97">thúc</text>
+              <text class="annotation" x="79" y="76">Nhận</text><text class="annotation" x="237" y="75">Cấp CPU</text>
+              <text class="annotation" x="238" y="15">Thu hồi CPU</text>
+              <text class="annotation" x="371" y="140">Cần I/O</text><text class="annotation" x="215" y="173">I/O xong</text>
+            </g>
+          </svg>
+          <figcaption>Khi hết lượt, tiến trình đi theo đường phía trên. Khi phải đợi thiết bị, nó đi vòng xuống dưới. Cả hai đường tới <em>Sẵn sàng</em> đều còn một bước cấp CPU. Các lý do chờ khác cũng có thể đi theo đường dưới.</figcaption>
         </figure>
-        <p>Một tiến trình <dfn>sẵn sàng</dfn> (<span class="en">ready</span>) có thể chạy ngay khi có lõi. Nó nằm trong <dfn>hàng sẵn sàng</dfn> (<span class="en">ready queue</span>), dù hệ điều hành có thể cài hàng bằng cấu trúc khác danh sách FIFO. Một tiến trình <dfn>đang chờ</dfn> (<span class="en">waiting</span> hay <span class="en">blocked</span>) cần một sự kiện, chẳng hạn dữ liệu đọc xong. Kernel có thể theo dõi các hàng chờ riêng cho từng sự kiện. Khi I/O báo xong, công việc được chuyển sang sẵn sàng và bộ lập lịch quyết định khi nào nó chạy tiếp. Khối lượng việc cũng có hai mẫu thường gặp. Việc thiên về I/O (<span class="en">I/O-bound</span>) thường chạy ngắn rồi chờ thiết bị. Việc thiên về CPU (<span class="en">CPU-bound</span>) dành nhiều thời gian hơn để tính, như một lượt lập chỉ mục lớn.</p>
         <div id="mo-phong-tien-trinh" data-lab="process"></div>
+        <p>Việc đọc tệp thường có nhiều đợt chạy ngắn xen với thời gian đợi thiết bị. Đó là việc thiên về I/O (<span class="en">I/O-bound</span>). Việc lập chỉ mục trên dữ liệu đã nằm trong RAM có thể dành phần lớn thời gian để tính, tức thiên về CPU (<span class="en">CPU-bound</span>). Sự khác biệt này sẽ ảnh hưởng đến cách ta chia lượt CPU ở Chương 5.</p>
 
         <h3 id="tao-tien-trinh">3.3 · Tạo tiến trình con để chạy công việc riêng</h3>
         <p>Giả sử trình soạn thảo gọi một tiện ích lập chỉ mục để lấy kết quả qua một kênh riêng. Trên Unix, <code>fork()</code> tạo một <dfn>tiến trình con</dfn> (<span class="en">child process</span>). Hai bên tiếp tục từ sau lời gọi. Tiến trình cha nhận PID của con, con nhận 0. Giá trị âm báo thất bại cho bên gọi. Con bắt đầu với bản sao logic của không gian địa chỉ cha. Các mô tả tệp được thừa kế có thể tham chiếu đến cùng đối tượng tệp mở, nên cần đóng các đầu kênh mà mỗi bên không dùng.</p>
@@ -182,7 +187,7 @@
         <div id="mo-phong-da-loi" data-lab="parallel"></div>
 
         <h3 id="anh-xa">4.3–4.4 · Từ luồng do thư viện tạo đến luồng kernel lập lịch</h3>
-        <p><dfn>Luồng cấp người dùng</dfn> (<span class="en">user thread</span>) có thể được một thư viện quản lý. <dfn>Luồng cấp kernel</dfn> (<span class="en">kernel thread</span> trong mô hình ánh xạ của giáo trình) là thực thể thực thi mà kernel cấp CPU. Cách ánh xạ quyết định một lời gọi chặn ảnh hưởng đến mấy luồng và có bao nhiêu luồng cùng tiến trình có thể chạy song song.</p>
+        <p>Tách giao diện và quét tệp thành hai luồng mới giải quyết cách chia việc trong chương trình. Nếu thư viện đặt cả hai lên cùng một đơn vị mà kernel cấp CPU, khi đơn vị đó bị chặn, giao diện cũng mất đường chạy. Để đọc các mô hình dưới đây, hãy theo dõi hai cấp. <dfn>Luồng cấp người dùng</dfn> (<span class="en">user thread</span>) có thể do thư viện quản lý. <dfn>Luồng cấp kernel</dfn> (<span class="en">kernel thread</span> trong mô hình của giáo trình) là thực thể mà kernel có thể lập lịch trực tiếp.</p>
         <div class="tbl-wrap"><table class="tbl">
           <caption>Đọc mỗi ánh xạ từ số luồng người dùng sang số luồng kernel.</caption>
           <thead><tr><th scope="col">Mô hình</th><th scope="col">Ai có thể chạy?</th><th scope="col">Khi một luồng chặn trong kernel</th></tr></thead>
@@ -214,7 +219,7 @@
       <section aria-labelledby="chuong-5">
         <h2 id="chuong-5"><span class="sec">5</span>Khi nhiều việc sẵn sàng, CPU chạy việc nào trước?</h2>
         <h3 id="tieu-chi">5.1–5.2 · Lúc nào cần chọn và đo kết quả bằng gì?</h3>
-        <p>Trình phát nhạc giải mã một đoạn rồi có thể đợi thiết bị. Luồng lập chỉ mục dùng CPU lâu hơn để quét dữ liệu. Một đơn vị thực thi thường xen kẽ <dfn>đợt CPU</dfn> (<span class="en">CPU burst</span>) với đợt chờ I/O. Trong lúc một việc chờ thiết bị, hệ điều hành có thể cấp CPU cho việc sẵn sàng khác. Trên hệ hiện đại kernel thường lập lịch luồng kernel. Các bài tính một lõi dưới đây gọi mỗi đơn vị được lập lịch là một công việc, có thể xem là một tiến trình đơn luồng.</p>
+        <p>Giả sử lượt giải mã tiếp theo của trình phát nhạc và một lượt quét tệp đều đang sẵn sàng. Nếu quét hết tệp trong lượt đầu, việc giải mã ngắn phải đợi sau một đợt tính dài. Nếu chen lượt nhạc vào giữa, việc quét hoàn tất muộn hơn và CPU phải đổi lượt thêm. <dfn>Đợt CPU</dfn> (<span class="en">CPU burst</span>) là lượng thời gian CPU cần cho một đoạn thực thi trước khi việc chờ I/O hoặc kết thúc. Bộ lập lịch có thể chia đợt đó qua nhiều lượt. Để dễ tính, mô phỏng dùng một lõi và mỗi công việc chỉ có một đợt CPU.</p>
         <p><dfn>Bộ lập lịch CPU</dfn> (<span class="en">CPU scheduler</span>) chọn từ các việc sẵn sàng. <dfn>Bộ chuyển giao</dfn> (<span class="en">dispatcher</span>) thực hiện quyết định, chuẩn bị ngữ cảnh và chuyển điều khiển tới đúng chỗ công việc sẽ tiếp tục. Khoảng thời gian để dừng một việc và bắt đầu việc khác gọi là <dfn>độ trễ chuyển giao</dfn> (<span class="en">dispatch latency</span>). Giáo trình xét bốn thời điểm ra quyết định.</p>
         <div class="tbl-wrap"><table class="tbl">
           <caption>Việc đang chạy có thể còn muốn dùng CPU khi xảy ra hai sự kiện giữa bảng.</caption>
@@ -255,7 +260,7 @@
           <ol class="visual-flow feedback-map"><li class="kernel-zone"><strong>Q0 · RR, 2 đơn vị</strong><small>Việc mới vào đây</small></li><li><strong>Q1 · RR, 4 đơn vị</strong><small>Việc đã hết lượt Q0</small></li><li><strong>Q2 · FCFS</strong><small>Việc đã hết lượt Q1</small></li></ol>
           <figcaption><b>Hai quyết định của MLFQ.</b> Mũi tên biểu thị hạ mức khi dùng hết lượt mà vẫn còn việc. Khi cấp CPU, bộ lập lịch luôn kiểm tra Q0 trước, đến Q1 rồi Q2. Vì vậy việc ở Q2 có thể bị ngắt khi một việc mới vào Q0.</figcaption>
         </figure>
-        <p>Hãy chạy FCFS trước, rồi thử RR trên cùng dữ liệu. Mỗi bước cho thấy việc vừa vào hàng, đoạn CPU vừa chạy, hàng đang chờ và lượng CPU còn cần. Khi có kết quả, đọc thời gian đáp ứng của M và thời gian chờ trung bình. Sau đó đổi tập công việc hoặc lượng tử để xem các so sánh thay đổi thế nào.</p>
+        <p>Với tập “Việc nền đến trước”, dừng ở lượt M vừa xuất hiện. Dự đoán còn bao lâu M mới nhận CPU theo FCFS, rồi thử RR với lượng tử 2. Khi tới cuối lịch, đối chiếu thời gian đáp ứng của M và thời gian chờ trung bình với cùng một mốc FCFS. Hai số có thể thay đổi khác nhau vì một số đo riêng M và số kia tính mọi việc.</p>
         <div id="mo-phong-lap-lich" data-lab="schedule"></div>
 
         <h3 id="lap-lich-da-loi">5.4–5.5 · Ai tranh CPU trong hệ nhiều luồng và nhiều lõi?</h3>
@@ -306,7 +311,10 @@
 
         <h3 id="giao-trinh">Giáo trình</h3>
         <p class="src">Biên soạn theo Abraham Silberschatz, Peter Baer Galvin và Greg Gagne, <cite>Operating System Concepts</cite>, ấn bản 10, Wiley, 2018. Chương 3 <span lang="en">Processes</span> (tr. 105–156), Chương 4 <span lang="en">Threads &amp; Concurrency</span> (tr. 159–198) và Chương 5 <span lang="en">CPU Scheduling</span> (tr. 199–254). Tình huống, dữ liệu mô phỏng, sơ đồ và bài tập được soạn cho PADOS.</p>
-        <p><a href="buoi-1.html">← Buổi 1 · Nhập môn và cấu trúc hệ điều hành</a> · <a href="./">Về trang chủ PADOS</a></p>
+        <nav class="pager" aria-label="Điều hướng khóa học">
+          <a href="buoi-1.html"><small>← Buổi trước</small>Nhập môn và cấu trúc hệ điều hành</a>
+          <a class="next" href="buoi-3.html"><small>Buổi tiếp →</small>Đồng bộ và bế tắc</a>
+        </nav>
       </section>
     </article></main>
   </div>

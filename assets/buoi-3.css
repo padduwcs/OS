@@ -1,19 +1,3 @@
-.course-symbol {
-  display: grid;
-  min-width: 3rem;
-  min-height: 2rem;
-  margin-bottom: .2rem;
-  padding: .15rem .35rem;
-  place-items: center;
-  color: var(--accent-ink);
-  background: var(--surface);
-  border: 1px solid var(--line-2);
-  border-radius: 6px;
-  font: 600 .8rem/1 var(--mono);
-  white-space: nowrap;
-}
-
-.opening-map .submission-flow li + li::before { content: "→"; }
 .course-data { margin: 0; }
 .course-timeline :is(th, td):not(:first-child),
 .course-matrix :is(th, td):not(:first-child) {
@@ -52,16 +36,7 @@
 .sync-lab .sim-ctl { width: 100%; }
 .sync-lab .sim-ctl label { width: 100%; margin: 0; }
 .sync-lab .sim-ctl button, .sync-lab .sim-ctl select { min-height: 36px; }
-.sync-lab .sim-step { margin-inline-start: auto; }
-.sync-lab .sim-note { min-height: 0; border-top: 0; border-bottom: 1px solid var(--line); }
-.sync-lab .lab-sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
+.sync-lab .sim-note { border-bottom: 1px solid var(--line); }
 .sync-lab .sim-illustration { display: grid; gap: .55rem; border-bottom: 0; }
 .sync-lab .lab-node { min-height: 3.2rem; line-height: 1.25; }
 .sync-lab .lab-node small { overflow-wrap: anywhere; }
@@ -103,4 +78,30 @@
   .sync-lab .sim-ctl button, .sync-lab .sim-ctl select { min-height: 44px; }
   .sync-lab :is(.sim-h, .sim-illustration, .sim-note) { padding-inline: .65rem; }
   .sync-lab .course-matrix :is(th, td) { padding: .35rem .22rem; font-size: .7rem; }
+}
+.race-figure{margin:0}
+.dining-table .dining-chopsticks{fill:none;stroke:var(--chance);stroke-width:3;stroke-linecap:round}
+.race-lanes{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:.18rem;
+  font: .78rem/1.35 var(--sans);text-align:center;font-variant-numeric:tabular-nums}
+.race-lanes th:first-child{width:5rem;text-align:left;color:var(--ink-2)}
+.race-lanes thead{color:var(--ink-2)}
+.race-lanes td{background:var(--surface-2);border-radius:4px;color:var(--ink-2)}
+.race-lanes td span{display:block;padding:.25rem .05rem;background:var(--accent-soft);color:var(--accent-ink);border-radius:4px}
+.race-lanes td span b{display:block;font-family:var(--mono)}
+.race-lanes tr:nth-child(2) span{color:var(--violet);background:var(--violet-soft)}
+.race-lanes tr:last-child td{padding:.3rem 0}
+.race-lanes td.count-change{background:var(--ok-soft);color:var(--ok);font-weight:650}
+.race-lanes td.count-lost{background:var(--min-soft);color:var(--min);outline:1px solid var(--min);font-weight:650}
+.lock-graph{margin:0 0 .85rem;padding:.25rem .5rem .45rem;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.lock-graph.has-cycle{border-color:var(--min);background:var(--min-soft)}
+.lock-graph .lock-held{color:var(--accent-ink)}
+.lock-graph .lock-pending{color:var(--min)}
+.lock-graph path:not(.lock-tip){stroke:currentColor;stroke-width:2;fill:none}
+.lock-graph .lock-tip{fill:currentColor}
+.lock-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:.3rem .9rem;font-size:.76rem}
+.lock-legend span:first-child,.lock-legend strong{color:var(--min)}
+.lock-legend span:nth-child(2){color:var(--accent-ink)}
+@media screen and (max-width:540px){
+  .race-lanes{border-spacing:.12rem;font-size:.65rem}
+  .race-lanes th:first-child{width:3.2rem}
 }
