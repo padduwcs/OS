@@ -447,6 +447,13 @@ h1,h2,h3{text-wrap:balance}
 .diagram-layers li+li::before{content:"↓";position:absolute;top:-1.02rem;left:1rem;color:var(--accent);line-height:1}
 .diagram-layers li:nth-child(3){background:var(--accent-soft);border-color:var(--accent)}
 .diagram-layers li span{color:var(--ink-2)}
+.cpu-timeline{margin:1rem 0}
+.cpu-timeline ol{display:grid;grid-template-columns:2fr 3fr 1fr;gap:3px;list-style:none;margin:0;padding:0;font: .8rem var(--sans);text-align:center;font-variant-numeric:tabular-nums}
+.cpu-timeline li{margin:0;padding:.45rem 0;background:var(--accent-soft);color:var(--accent-ink);border-radius:5px}
+.cpu-timeline li:nth-child(2){color:var(--ok);background:var(--ok-soft)}
+.cpu-timeline li:last-child{color:var(--muted);background:var(--surface-2)}
+.cpu-timeline span{display:block;margin-top:.2rem}
+.cpu-timeline figcaption{margin-top:.4rem;color:var(--muted);font: .8rem/1.5 var(--sans)}
 .sim-path,.sim-state{margin:0;padding:12px 16px;font-size:.84rem}
 .sim-path{display:flex;flex-wrap:wrap;gap:6px;list-style:none}
 .sim-path li{color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:.28rem .54rem;margin:0}

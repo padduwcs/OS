@@ -29,7 +29,7 @@
   const lessons = {
     io: {
       title: 'Ai chuyển khối dữ liệu vào RAM?',
-      subtitle: 'Hai cách tổ chức việc đọc một khối trong mô hình I/O.',
+      subtitle: 'Hai cách chuyển một khối dữ liệu trong mô hình thiết bị đơn giản.',
       fields: ['CPU', 'Controller', 'Tiến trình đọc'],
       scenarios: [
         ['Dùng DMA', [
@@ -40,7 +40,7 @@
           ['Tiếp tục', 'Khi được lập lịch, tiến trình đọc có thể nhận dữ liệu. Trong tình huống này, kernel chọn nó chạy tiếp.', ['Chạy tiến trình đọc', 'Rỗi', 'Đang chạy']],
         ]],
         ['CPU chuyển dữ liệu', [
-          ['Gửi lệnh', 'Driver yêu cầu controller lấy dữ liệu từ SSD, chưa giao việc chép khối vào RAM cho DMA.', ['Kernel đang gửi yêu cầu', 'Nhận lệnh', 'Đang chạy trong kernel']],
+          ['Gửi lệnh', 'Driver yêu cầu controller đọc thiết bị. Trong tình huống này, CPU sẽ chép khối từ controller vào RAM.', ['Kernel đang gửi yêu cầu', 'Nhận lệnh', 'Đang chạy trong kernel']],
           ['Chờ dữ liệu', 'Trong lúc thiết bị lấy khối vào bộ đệm cục bộ, CPU chuyển sang ứng dụng khác.', ['Chạy ứng dụng khác', 'Lấy khối từ SSD', 'Đang chờ']],
           ['Báo có dữ liệu', 'Controller phát ngắt để báo khối đã ở bộ đệm của thiết bị. CPU chuyển vào kernel.', ['Xử lý ngắt', 'Khối ở bộ đệm thiết bị', 'Đang chờ']],
           ['Chép vào RAM', 'Driver dùng CPU đọc dữ liệu qua giao diện controller và chép vào RAM. Khi đã chép xong, kernel đánh thức tiến trình đọc.', ['Kernel trực tiếp chép', 'Cấp dữ liệu qua giao diện I/O', 'Sẵn sàng']],
@@ -118,6 +118,25 @@
           ['Biên dịch', 'Hai tệp đối tượng đều được tạo trong môi trường xây dựng.', ['Compiler', 'main.o, tinh.o']],
           ['Liên kết', 'Môi trường xây dựng có thư viện cần dùng. Linker tạo được tệp thực thi và ghi phụ thuộc.', ['Linker', 'Tệp thực thi']],
           ['Nạp thất bại', 'Máy đích thiếu thư viện động đã khai báo. Trình liên kết động dừng trước khi main chạy.', ['Loader và trình liên kết động', 'Lỗi thiếu thư viện dùng chung']],
+        ]],
+      ],
+    },
+    structure: {
+      title: 'Một yêu cầu đọc đi qua những đâu?',
+      subtitle: 'Cùng một lần đọc tệp trong hai cách tổ chức kernel.',
+      fields: ['Thành phần xử lý', 'Chế độ CPU', 'Đường đi của yêu cầu'],
+      scenarios: [
+        ['Kernel nguyên khối', [
+          ['Gửi yêu cầu', 'Ứng dụng gọi read. CPU vào kernel ở điểm vào của system call.', ['Ứng dụng → kernel', 'User → kernel', 'System call']],
+          ['Tìm khối tệp', 'Hệ thống tệp tra vị trí của khối rồi gọi đường I/O trong kernel để chuyển yêu cầu cho driver.', ['Hệ thống tệp', 'Kernel', 'Lời gọi hàm trong kernel']],
+          ['Đọc thiết bị', 'Driver gửi lệnh cho thiết bị. Khi nhận thông báo hoàn tất, mã trong kernel chuyển kết quả về đường đọc tệp.', ['Driver và thiết bị', 'Kernel khi chạy driver', 'Yêu cầu và ngắt thiết bị']],
+          ['Trả kết quả', 'Kernel đưa dữ liệu vào vùng đệm của ứng dụng. Khi tiến trình tiếp tục, read trả số byte đã đọc.', ['Kernel → ứng dụng', 'Kernel → user', 'Trở về từ system call']],
+        ]],
+        ['Vi nhân', [
+          ['Gửi yêu cầu', 'Thư viện gửi yêu cầu qua IPC. Vi nhân kiểm tra rồi chuyển thông điệp đến dịch vụ hệ thống tệp.', ['Ứng dụng → hệ thống tệp', 'User → kernel → user', 'Thông điệp qua vi nhân']],
+          ['Tìm khối tệp', 'Dịch vụ hệ thống tệp tra vị trí của khối rồi dùng IPC để yêu cầu tiến trình driver đọc thiết bị.', ['Hệ thống tệp → driver', 'User → kernel → user', 'Thông điệp qua vi nhân']],
+          ['Đọc thiết bị', 'Driver dùng quyền thiết bị đã được cấp. Vi nhân tiếp nhận ngắt và thông báo cho driver. Driver gửi kết quả cho dịch vụ tệp.', ['Driver và thiết bị', 'User cho driver, kernel cho ngắt', 'Thông báo sự kiện và IPC']],
+          ['Trả kết quả', 'Dịch vụ hệ thống tệp phản hồi. Ứng dụng tiếp tục với dữ liệu và số byte đã đọc. Mỗi dịch vụ vẫn có không gian địa chỉ riêng.', ['Hệ thống tệp → ứng dụng', 'User → kernel → user', 'Phản hồi qua vi nhân']],
         ]],
       ],
     },
