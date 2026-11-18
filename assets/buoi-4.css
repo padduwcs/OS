@@ -1,0 +1,181 @@
+.mem-token {
+  display: inline-block;
+  justify-self: start;
+  padding: .22rem .38rem;
+  color: var(--accent-ink);
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  font: 600 .78rem/1.35 var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.mem-opening .mem-token { justify-self: center; }
+.mem-opening .visual-flow li + li::before { content: "→"; }
+.mem-calc li { align-content: start; }
+
+.mem-bits {
+  display: grid;
+  grid-template-columns: 10fr 10fr 12fr;
+  margin-bottom: .8rem;
+  border: 1px solid var(--line-2);
+  border-radius: 7px;
+  overflow: hidden;
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+  font: .76rem/1.35 var(--sans);
+  text-align: center;
+}
+
+.mem-bits span { display: grid; padding: .45rem .25rem; gap: .15rem; }
+.mem-bits span + span { border-inline-start: 1px solid var(--line-2); }
+.mem-bits span:last-child { color: var(--ink-2); background: var(--surface-2); }
+.mem-bits b { font-family: var(--mono); }
+
+.mem-timeline {
+  margin: 0;
+  padding: 0 0 0 .4rem;
+  list-style: none;
+  font: .84rem/1.5 var(--sans);
+}
+
+.mem-timeline li {
+  position: relative;
+  display: grid;
+  gap: .15rem;
+  margin: 0;
+  padding: 0 0 .8rem 1.05rem;
+  border-inline-start: 1px solid var(--line-2);
+}
+
+.mem-timeline li:last-child { padding-bottom: 0; }
+
+.mem-timeline li::before {
+  content: "";
+  position: absolute;
+  inset: .39rem auto auto -.27rem;
+  width: .48rem;
+  height: .48rem;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+.mem-timeline span { color: var(--ink-2); }
+.mem-table { margin: 0; }
+.memory-lab .sim-h { align-items: start; }
+.memory-lab .ttl { margin: 0; }
+.memory-lab .ttl small { margin-top: .18rem; }
+.memory-lab .sim-ctl { width: 100%; }
+.memory-lab .sim-ctl :is(button, select) { min-height: 36px; }
+.memory-lab .sim-step { margin-inline-start: auto; min-width: auto; }
+
+.mem-selects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .3rem .85rem;
+  width: 100%;
+  margin-bottom: .22rem;
+}
+
+.memory-lab .sim-ctl label { flex-wrap: wrap; max-width: 100%; margin: 0; }
+.memory-lab .sim-note { min-height: 0; border-top: 0; border-bottom: 1px solid var(--line); }
+.memory-lab .sim-illustration { display: grid; gap: .65rem; border-bottom: 0; }
+.memory-lab .sim-path { padding: 0; }
+.memory-lab .sim-path li { font: .78rem/1.4 var(--sans); }
+.memory-lab .mem-trace { gap: .25rem; }
+.memory-lab .mem-trace li { min-width: 1.6rem; padding: .2rem .26rem; font-family: var(--mono); text-align: center; }
+
+.mem-group-title, .mem-panel-heading h5 {
+  margin: 0;
+  color: var(--ink-2);
+  font: 600 .79rem/1.4 var(--sans);
+}
+
+.mem-strip {
+  display: flex;
+  min-height: 1.65rem;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.mem-block {
+  display: grid;
+  flex-basis: 0;
+  min-width: 0;
+  place-items: center;
+  overflow: hidden;
+  background: var(--surface-2);
+  font: 600 .73rem/1 var(--mono);
+}
+
+.mem-block + .mem-block { border-inline-start: 1px solid var(--line-2); }
+.mem-block.free, .mem-card.mem-free { background: var(--surface); }
+.mem-block.new { color: var(--ok); background: var(--ok-soft); }
+
+.mem-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(5.4rem, 100%), 1fr));
+  gap: .35rem;
+}
+
+.mem-card {
+  min-width: 0;
+  padding: .4rem .48rem;
+  background: var(--surface-2);
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+
+.mem-card span, .mem-card small { display: block; color: var(--ink-2); font-size: .72rem; }
+.mem-card strong { display: block; margin-top: .08rem; font-variant-numeric: tabular-nums; }
+.mem-card small { margin-top: .1rem; font-weight: 400; }
+.mem-translate { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.mem-frames { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.mem-panel[data-capacity="3"] .mem-frames { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.memory-lab :is(.mem-card, .mem-block).mem-active,
+.memory-lab .tbl tbody tr.mem-active > * {
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.memory-lab .mem-block.mem-active { box-shadow: inset 0 0 0 1px var(--accent); }
+.memory-lab :is(.mem-card, .sim-path li).mem-waiting { color: var(--ink); background: var(--chance-soft); border-color: var(--chance); }
+.memory-lab .mem-card.mem-error,
+.memory-lab .tbl tbody tr.mem-error > * { color: var(--ink); background: var(--min-soft); border-color: var(--min); }
+
+.mem-stats, .mem-result {
+  margin: 0;
+  color: var(--ink-2);
+  font: .79rem/1.45 var(--sans);
+}
+
+.mem-stats b, .mem-result b { color: var(--ink); }
+.mem-stats > span { margin-inline: .2rem; }
+.mem-lab-table caption { caption-side: top; }
+.memory-lab .mem-lab-table :is(th, td) { padding: .35rem .55rem; }
+
+.mem-panel {
+  display: grid;
+  gap: .38rem;
+  padding: .6rem;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+
+.mem-panel-heading { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; }
+.mem-panel-heading p { margin: 0; color: var(--ink-2); font-size: .78rem; }
+.mem-fault-count { color: var(--ink); font-family: var(--mono); }
+
+@media screen and (max-width: 540px) {
+  .mem-opening .mem-token { font-size: .7rem; }
+  .mem-calc small, .mem-calc .mem-token { font-size: .7rem; }
+  .memory-lab .sim-ctl :is(button, select) { min-height: 44px; }
+  .memory-lab :is(.sim-h, .sim-note, .sim-illustration) { padding-inline: .65rem; }
+  .memory-lab .mem-lab-table :is(th, td) { padding: .35rem .25rem; }
+  .mem-translate { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mem-frames .mem-card { padding-inline: .25rem; }
+}
