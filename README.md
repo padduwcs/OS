@@ -1,4 +1,4 @@
-# PADOS · Hệ điều hành
+# OS · Hệ điều hành
 
 Bài giảng Hệ điều hành bằng tiếng Việt cho người mới bắt đầu, bám theo *Operating System Concepts*, 10th Edition (Silberschatz, Galvin, Gagne, 2018). Lộ trình gồm 9 buổi; bốn buổi hiện có bao quát Chapter 1–10.
 
