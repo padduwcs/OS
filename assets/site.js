@@ -104,17 +104,23 @@
   let scheduled = false;
 
   function showPosition() {
+    const available = root.scrollHeight - root.clientHeight;
     let current = -1;
     headings.forEach((heading, index) => {
       if (heading.getBoundingClientRect().top <= 130) current = index;
     });
+    if (available > 0 && root.scrollTop >= available - 1) {
+      const selected = links.findIndex((link) => link.hash === location.hash);
+      if (selected > current && headings[selected].getBoundingClientRect().top < root.clientHeight) {
+        current = selected;
+      }
+    }
     const nextLink = links[current];
     if (nextLink !== activeLink) {
       activeLink?.removeAttribute('aria-current');
       nextLink?.setAttribute('aria-current', 'location');
       activeLink = nextLink;
     }
-    const available = root.scrollHeight - root.clientHeight;
     const fraction = available > 0 ? root.scrollTop / available : 0;
     progress.style.width = `${Math.min(1, Math.max(0, fraction)) * 100}%`;
     scheduled = false;
@@ -127,6 +133,7 @@
   }
   addEventListener('scroll', schedulePosition, { passive: true });
   addEventListener('resize', schedulePosition);
+  addEventListener('hashchange', schedulePosition);
   addEventListener('load', schedulePosition);
   document.querySelector('.content').addEventListener('toggle', schedulePosition, true);
   showPosition();

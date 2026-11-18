@@ -1,0 +1,106 @@
+.course-symbol {
+  display: grid;
+  min-width: 3rem;
+  min-height: 2rem;
+  margin-bottom: .2rem;
+  padding: .15rem .35rem;
+  place-items: center;
+  color: var(--accent-ink);
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  font: 600 .8rem/1 var(--mono);
+  white-space: nowrap;
+}
+
+.opening-map .submission-flow li + li::before { content: "→"; }
+.course-data { margin: 0; }
+.course-timeline :is(th, td):not(:first-child),
+.course-matrix :is(th, td):not(:first-child) {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.course-timeline td:empty { background: var(--surface-2); }
+.course-timeline td.reading { color: var(--accent-ink); background: var(--accent-soft); }
+.course-timeline td.waiting { color: var(--chance); background: var(--chance-soft); }
+.course-timeline td.writing { color: var(--ok); background: var(--ok-soft); }
+.graph-chain {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: .8rem/1.35 var(--sans);
+}
+.graph-chain li { display: flex; align-items: center; gap: .35rem; margin: 0; }
+.graph-chain li > :nth-child(2) { color: var(--ink-2); }
+.graph-thread, .graph-resource {
+  display: inline-grid;
+  min-width: 2rem;
+  min-height: 2rem;
+  place-items: center;
+  border: 1px solid var(--line-2);
+  font-weight: 650;
+}
+.graph-thread { border-radius: 50%; color: var(--accent-ink); background: var(--accent-soft); }
+.graph-resource { border-radius: 4px; background: var(--surface-2); }
+
+.sync-lab .sim-h { align-items: start; }
+.sync-lab .sim-ctl { width: 100%; }
+.sync-lab .sim-ctl label { width: 100%; margin: 0; }
+.sync-lab .sim-ctl button, .sync-lab .sim-ctl select { min-height: 36px; }
+.sync-lab .sim-step { margin-inline-start: auto; }
+.sync-lab .sim-note { min-height: 0; border-top: 0; border-bottom: 1px solid var(--line); }
+.sync-lab .lab-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.sync-lab .sim-illustration { display: grid; gap: .55rem; border-bottom: 0; }
+.sync-lab .lab-node { min-height: 3.2rem; line-height: 1.25; }
+.sync-lab .lab-node small { overflow-wrap: anywhere; }
+.sync-lab .lab-node.is-waiting { color: var(--chance); background: var(--chance-soft); }
+.sync-lab .lab-node.is-complete { border-color: var(--ok); }
+.sync-lab .lab-node.is-complete small { color: var(--ok); }
+.sync-lab .lab-node.is-error small { color: var(--min); }
+.sync-lab .lab-heading { margin: 0; color: var(--ink-2); font-size: .78rem; }
+.sync-lab .lab-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(5.4rem, 1fr));
+  gap: .35rem;
+}
+.sync-lab .lab-row + .lab-heading { margin-top: .18rem; }
+.sync-lab .lab-value { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.sync-lab .lab-summary {
+  margin: 0;
+  padding: .45rem .55rem;
+  border-radius: 6px;
+  background: var(--surface-2);
+}
+.sync-lab .lab-summary.is-complete { background: var(--ok-soft); color: var(--ok); }
+.sync-lab .lab-summary.is-error { background: var(--min-soft); color: var(--min); }
+.sync-lab .lab-summary.is-waiting { background: var(--chance-soft); color: var(--chance); }
+.sync-lab .tbl-wrap { margin: 0; }
+.sync-lab .course-matrix caption { caption-side: top; }
+.sync-lab .course-matrix :is(th, td) { padding: .38rem .45rem; }
+.sync-lab .course-matrix tbody th { border-bottom-color: var(--line); }
+.sync-lab .course-matrix tr.is-active > * { background: var(--accent-soft); }
+.sync-lab .course-matrix tr.is-complete > * { background: var(--ok-soft); }
+.sync-lab .course-matrix tr.is-error > * { background: var(--min-soft); }
+.sync-lab .course-matrix :is(th, td):last-child { text-align: start; }
+
+@media screen and (max-width: 540px) {
+  .course-timeline :is(th, td), .course-matrix :is(th, td) { padding: .45rem .28rem; font-size: .76rem; }
+  .graph-chain, .graph-chain li { gap: .22rem; }
+  .graph-chain { font-size: .71rem; }
+  .graph-thread, .graph-resource { min-width: 1.45rem; min-height: 1.45rem; }
+  .sync-lab .sim-ctl button, .sync-lab .sim-ctl select { min-height: 44px; }
+  .sync-lab :is(.sim-h, .sim-illustration, .sim-note) { padding-inline: .65rem; }
+  .sync-lab .course-matrix :is(th, td) { padding: .35rem .22rem; font-size: .7rem; }
+}
