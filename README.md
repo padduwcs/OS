@@ -1,6 +1,6 @@
 # OS · Hệ điều hành
 
-Bài giảng Hệ điều hành bằng tiếng Việt cho người mới bắt đầu, bám theo *Operating System Concepts*, 10th Edition (Silberschatz, Galvin, Gagne, 2018). Lộ trình gồm 9 buổi; bốn buổi hiện có bao quát Chapter 1–10.
+Bài giảng Hệ điều hành bằng tiếng Việt cho người mới bắt đầu, bám theo *Operating System Concepts*, 10th Edition (Silberschatz, Galvin, Gagne, 2018). Lộ trình gồm 9 buổi; năm buổi hiện có bao quát Chapter 1–12.
 
 | Buổi | Chương | Nội dung |
 | --- | --- | --- |
@@ -8,7 +8,7 @@ Bài giảng Hệ điều hành bằng tiếng Việt cho người mới bắt �
 | [2](https://padduwcs.github.io/OS/buoi-2.html) | Chapter 3–5 | Processes, Threads & Concurrency, CPU Scheduling |
 | [3](https://padduwcs.github.io/OS/buoi-3.html) | Chapter 6–8 | Synchronization Tools, Synchronization Examples, Deadlocks |
 | [4](https://padduwcs.github.io/OS/buoi-4.html) | Chapter 9–10 | Main Memory & Virtual Memory |
-| 5 | Chapter 11–12 | Mass-Storage Structure & I/O Systems |
+| [5](https://padduwcs.github.io/OS/buoi-5.html) | Chapter 11–12 | Mass-Storage Structure & I/O Systems |
 | 6 | Chapter 13–15 | File-System Interface, Implementation & Internals |
 | 7 | Chapter 16–17 | Security & Protection |
 | 8 | Chapter 18–19 | Virtual Machines, Networks & Distributed Systems |

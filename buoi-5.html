@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Buổi 5 Hệ điều hành. Theo thư viện ảnh của An từ ổ cứng, SSD và RAID tới đường đi của một lời gọi read(), với sơ đồ, mô phỏng từng bước và bài tập có lời giải.">
+  <title>Buổi 5 · Mass-Storage Structure &amp; I/O Systems · OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/buoi-5.css">
+  <script defer src="assets/site.js"></script>
+  <script defer src="assets/lab.js"></script>
+  <script defer src="assets/buoi-5.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="skip" href="#main">Đến nội dung</a>
+    <button class="icon-btn side-btn" type="button" aria-controls="sidebar" aria-expanded="false" title="Mục lục" aria-label="Ẩn hoặc hiện mục lục" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M9.5 4.5v15"/></svg>
+    </button>
+    <a class="brand" href="index.html">OS</a>
+    <span class="crumb">Buổi 5 · Mass-Storage Structure &amp; I/O Systems</span>
+    <span class="spacer"></span>
+    <button class="icon-btn print-btn" type="button" title="In bài" aria-label="In bài" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V4h10v5"/><rect x="3.5" y="9" width="17" height="8" rx="2"/><rect x="7" y="14" width="10" height="6"/></svg>
+    </button>
+    <button class="icon-btn theme-btn" type="button" title="Giao diện sáng/tối" aria-label="Đổi giao diện sáng/tối" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>
+    </button>
+    <div class="progress" aria-hidden="true"></div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <nav aria-label="Mục lục buổi học">
+        <div class="nav-chapter">
+          <a class="nav-chapter-title" href="#chuong-11">Chapter 11 · Mass-Storage Structure</a>
+          <div class="toc">
+            <a href="#tong-quan-luu-tru">11.1 · Overview of Mass-Storage Structure</a>
+            <a href="#lap-lich-hdd">11.2 · HDD Scheduling</a>
+            <a href="#lap-lich-nvm">11.3 · NVM Scheduling</a>
+            <a href="#phat-hien-loi">11.4 · Error Detection and Correction</a>
+            <a href="#quan-ly-thiet-bi">11.5 · Storage Device Management</a>
+            <a href="#vung-hoan-doi">11.6 · Swap-Space Management</a>
+            <a href="#gan-ket-luu-tru">11.7 · Storage Attachment</a>
+            <a href="#raid">11.8 · RAID Structure</a>
+          </div>
+        </div>
+        <div class="nav-chapter">
+          <a class="nav-chapter-title" href="#chuong-12">Chapter 12 · I/O Systems</a>
+          <div class="toc">
+            <a href="#tong-quan-io">12.1 · Overview</a>
+            <a href="#phan-cung-io">12.2 · I/O Hardware</a>
+            <a href="#giao-dien-ung-dung">12.3 · Application I/O Interface</a>
+            <a href="#he-con-io">12.4 · Kernel I/O Subsystem</a>
+            <a href="#vong-doi-io">12.5 · Transforming I/O Requests to Hardware Operations</a>
+            <a href="#streams">12.6 · STREAMS</a>
+            <a href="#hieu-nang">12.7 · Performance</a>
+          </div>
+        </div>
+        <div class="nav-chapter">
+          <a class="nav-chapter-title" href="#ghi-nho">Summary &amp; Review</a>
+          <div class="toc">
+            <a href="#tu-kiem-tra">Practice Exercises</a>
+            <a href="#thuat-ngu">Glossary</a>
+            <a href="#giao-trinh">Textbook Reference</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+    <main class="page" id="main" tabindex="-1"><article class="content">
+      <header class="hero">
+        <div class="eyebrow">Buổi 5 · Chapter 11–12</div>
+        <h1>Mass-Storage Structure &amp; I/O Systems</h1>
+        <p class="title-vi">Cấu trúc lưu trữ thứ cấp và hệ thống vào/ra</p>
+        <p class="lead">Buổi 4 kết thúc ở một chỗ còn bỏ ngỏ: khi RAM đầy, kernel đẩy trang ra “ổ lưu trữ” và đọc lại khi cần. Ta đã tính rằng một lỗi trang phải đọc thiết bị đắt gấp hàng chục nghìn lần một lần truy cập RAM, nhưng chưa hỏi vì sao nó đắt và hệ điều hành làm gì để bớt đắt. Buổi này trả lời hai câu hỏi. Dữ liệu được cất trên thiết bị lưu trữ như thế nào, và hệ điều hành đọc ghi chúng sao cho nhanh và an toàn? Rộng hơn, làm sao một hệ điều hành điều khiển hàng trăm loại thiết bị khác nhau mà ứng dụng vẫn chỉ cần gọi <code>read()</code> và <code>write()</code>?</p>
+        <p class="reading-cue">Hai chương đi từ thiết bị lên ứng dụng. Chapter 11 xem xét lưu trữ thứ cấp: cấu tạo của ổ đĩa cứng và bộ nhớ flash, sắp xếp hàng đợi để đầu đọc đi ít nhất, phát hiện lỗi, chuẩn bị ổ, vùng hoán đổi, các cách gắn lưu trữ, và RAID. Chapter 12 nhìn mọi thiết bị vào/ra: phần cứng giao tiếp với CPU qua thanh ghi, thăm dò, ngắt và DMA; giao diện thống nhất cho ứng dụng; các dịch vụ của kernel như đệm và cache; và đường đi trọn vẹn của một lời gọi <code>read()</code>. Ví dụ xuyên suốt tiếp nối Buổi 4: thư viện ảnh của An. Ảnh mới nằm trên SSD của laptop, kho ảnh cũ nằm trên một ổ cứng gắn ngoài, bản sao lưu nằm trong một hộp NAS bốn ổ ở nhà và trên đám mây.</p>
+        <div class="meta">
+          <div>
+            <h4>Sau buổi này, bạn giải thích được</h4>
+            <ul>
+              <li>cấu tạo của HDD và NVM, và tự tính thời gian truy cập một khối;</li>
+              <li>chạy tay FCFS, SCAN, C-SCAN cùng SSTF, LOOK, C-LOOK để tính quãng đường đầu đọc;</li>
+              <li>vì sao SSD cần FTL và thu gom rác; RAID 0, 1, 4, 5, 6 đánh đổi gì, và tính được khối chẵn lẻ, MTBF;</li>
+              <li>thăm dò, ngắt và DMA phối hợp ra sao, và một lời gọi <code>read()</code> đi qua những tầng nào.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>Cần biết trước</h4>
+            <p>Buổi 1: ngắt, DMA, phân cấp lưu trữ, system call. Buổi 2: trạng thái tiến trình, hàng đợi chờ, FCFS và hiện tượng đói. Buổi 3: bài toán sản xuất–tiêu thụ. Buổi 4: lỗi trang, vùng hoán đổi, tệp ánh xạ vào bộ nhớ, copy-on-write.</p>
+            <h4>Mẹo tính nhanh</h4>
+            <p>Một vòng quay của đĩa mất 60.000 / RPM mili giây, và độ trễ quay trung bình là nửa vòng. Phép XOR của nhiều bit bằng 1 khi số bit 1 là lẻ.</p>
+          </div>
+        </div>
+      </header>
+
+      <section aria-labelledby="chuong-11">
+        <h2 id="chuong-11"><span class="sec">11</span><span>Mass-Storage Structure <span class="vi">Cấu trúc lưu trữ thứ cấp</span></span></h2>
+        <p>Chương này đi từ dưới lên. Cấu tạo vật lý của hai loại thiết bị chính quyết định thao tác nào nhanh, thao tác nào chậm. Từ đó suy ra hệ điều hành nên sắp thứ tự yêu cầu ra sao, phát hiện lỗi thế nào, chuẩn bị và quản lý ổ ra sao, và cuối cùng ghép nhiều ổ thành RAID để vừa nhanh hơn vừa bền hơn.</p>
+
+        <h3 id="tong-quan-luu-tru">11.1 · Overview of Mass-Storage Structure <span class="vi">Tổng quan về lưu trữ thứ cấp</span></h3>
+        <p>Nhắc lại phân cấp lưu trữ ở Buổi 1: RAM nhanh nhưng mất dữ liệu khi tắt máy, nên bên dưới cần một tầng <dfn>lưu trữ thứ cấp</dfn> (<span class="en">secondary storage</span>) không khả biến. Ngày nay tầng này gần như do hai loại thiết bị đảm nhận: <dfn>ổ đĩa cứng</dfn> (<span class="en">hard disk drive, HDD</span>) và <dfn>thiết bị nhớ không khả biến</dfn> (<span class="en">nonvolatile memory device, NVM</span>) như SSD. Chậm hơn và lớn hơn nữa là <dfn>lưu trữ cấp ba</dfn> (<span class="en">tertiary storage</span>) như băng từ, đĩa quang. Khi nói chung mọi loại, giáo trình dùng chữ <dfn>lưu trữ không khả biến</dfn> (<span class="en">nonvolatile storage, NVS</span>) hoặc “ổ” (<span class="en">drive</span>). Hai loại ổ chính khác nhau tận gốc, một bên cơ học, một bên điện tử, nên ta xem lần lượt từng loại.</p>
+
+        <h4 id="hdd">11.1.1 · Hard Disk Drives <span class="vi">Ổ đĩa cứng</span></h4>
+        <p>Kho ảnh cũ của An nằm trên một ổ cứng gắn ngoài. Bên trong là một chồng <dfn>đĩa từ</dfn> (<span class="en">platter</span>) hai mặt phủ vật liệu từ; dữ liệu được ghi bằng cách từ hóa bề mặt. Trên mỗi mặt có một <dfn>đầu đọc–ghi</dfn> (<span class="en">read–write head</span>) bay sát bề mặt, và mọi đầu gắn trên một <dfn>cánh tay</dfn> (<span class="en">disk arm</span>) chung nên luôn di chuyển cùng nhau. Mỗi mặt đĩa chia thành các vòng tròn đồng tâm gọi là <dfn>rãnh</dfn> (<span class="en">track</span>), mỗi rãnh chia thành các <dfn>cung</dfn> (<span class="en">sector</span>), và tập các rãnh ở cùng một vị trí cánh tay trên mọi mặt là một <dfn>trụ</dfn> (<span class="en">cylinder</span>). Sector là đơn vị truyền nhỏ nhất, dài 512 byte cho tới khoảng năm 2010, sau đó chuyển dần sang 4 KiB. Hình dưới cho thấy các khái niệm này từ hai góc nhìn.</p>
+        <figure class="fig">
+          <div class="b5-hdd-pair">
+          <svg class="teaching-svg b5-hdd" viewBox="0 0 240 250" role="img" aria-labelledby="hdd-top-title hdd-top-desc">
+            <title id="hdd-top-title">Một mặt đĩa nhìn từ trên</title>
+            <desc id="hdd-top-desc">Mặt đĩa với ba rãnh đồng tâm, một cung được tô màu trên rãnh giữa, trục quay ở tâm, và đầu đọc gắn trên cánh tay quay quanh một trục ở góc dưới bên phải.</desc>
+            <defs><marker id="hdd-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrowhead" d="M0 0L10 5L0 10z"/></marker></defs>
+            <circle class="nd-soft" cx="120" cy="128" r="96"/>
+            <circle class="ln-thin" cx="120" cy="128" r="78"/>
+            <circle class="ln-acc" cx="120" cy="128" r="60"/>
+            <circle class="ln-thin" cx="120" cy="128" r="42"/>
+            <path class="nd-ok" d="M172.1 84.3A68 68 0 0 1 185.7 110.4L170.2 114.5A52 52 0 0 0 159.8 94.6Z"/>
+            <circle class="f-ink" cx="120" cy="128" r="6"/>
+            <path class="b5-arm" d="M230 234L171 162"/>
+            <rect class="nd-acc" x="163" y="156" width="14" height="10" rx="2" transform="rotate(50 170 161)"/>
+            <circle class="nd" cx="230" cy="234" r="6"/>
+            <path class="route" d="M22.3 163.6A104 104 0 0 0 53.2 207.7" marker-end="url(#hdd-arrow)"/>
+            <path class="ln-thin" d="M65 73L44 26M176 92L200 26M166 168L150 230"/>
+            <text class="annotation halo" x="4" y="20">rãnh (track)</text>
+            <text class="annotation halo" x="236" y="20" text-anchor="end">cung (sector)</text>
+            <text class="annotation halo" x="120" y="152" text-anchor="middle">trục quay</text>
+            <text class="annotation halo" x="150" y="246" text-anchor="end">đầu đọc–ghi</text>
+          </svg>
+          <svg class="teaching-svg b5-hdd" viewBox="0 0 230 250" role="img" aria-labelledby="hdd-side-title hdd-side-desc">
+            <title id="hdd-side-title">Hai đĩa xếp chồng nhìn từ cạnh</title>
+            <desc id="hdd-side-desc">Hai đĩa trên cùng một trục quay, có bốn mặt và bốn đầu đọc. Các đầu đọc gắn trên một khối cánh tay chung ở bên phải. Khung nét đứt quanh các đầu đọc là một trụ: các rãnh nằm ở cùng vị trí cánh tay trên mọi mặt đĩa.</desc>
+            <path class="ln" d="M70 58V204"/>
+            <rect class="nd-soft" x="8" y="86" width="134" height="9" rx="2"/>
+            <rect class="nd-soft" x="8" y="156" width="134" height="9" rx="2"/>
+            <path class="b5-arm thin" d="M202 70V182M202 81H130M202 101H130M202 151H130M202 171H130"/>
+            <rect class="nd-acc" x="118" y="77" width="14" height="8" rx="2"/><rect class="nd-acc" x="118" y="97" width="14" height="8" rx="2"/>
+            <rect class="nd-acc" x="118" y="147" width="14" height="8" rx="2"/><rect class="nd-acc" x="118" y="167" width="14" height="8" rx="2"/>
+            <rect class="b5-cylinder" x="112" y="68" width="26" height="114" rx="4"/>
+            <text class="annotation halo" x="4" y="22">trụ (cylinder): mọi rãnh</text>
+            <text class="annotation halo" x="4" y="40">ở cùng vị trí cánh tay</text>
+            <text class="annotation halo" x="4" y="222">2 đĩa, 4 mặt, 4 đầu đọc,</text>
+            <text class="annotation halo" x="4" y="240">chung một khối cánh tay</text>
+          </svg>
+          </div>
+          <figcaption><b>Ba khái niệm hình học của HDD.</b> Một <em>rãnh</em> là một vòng tròn trên một mặt đĩa, một <em>cung</em> là một đoạn của rãnh, còn một <em>trụ</em> gom mọi rãnh mà các đầu đọc đang nằm trên. Đổi trụ là phải di chuyển cánh tay, còn đổi mặt đĩa trong cùng trụ chỉ cần chọn đầu đọc khác.</figcaption>
+        </figure>
+        <p>Hình học đó quyết định hiệu năng. Đĩa quay ở tốc độ cố định, thường 5.400, 7.200, 10.000 hoặc 15.000 vòng mỗi phút (<span class="en">rotations per minute, RPM</span>). Muốn đọc một sector, ổ phải làm hai việc cơ học. Cánh tay dời đầu đọc tới đúng trụ, mất <dfn>thời gian tìm</dfn> (<span class="en">seek time</span>); rồi ổ chờ sector quay tới dưới đầu đọc, mất <dfn>độ trễ quay</dfn> (<span class="en">rotational latency</span>). Tổng hai khoảng là <dfn>thời gian định vị</dfn> (<span class="en">positioning time</span>, hay <span class="en">random-access time</span>). Sau đó dữ liệu mới chảy với <dfn>tốc độ truyền</dfn> (<span class="en">transfer rate</span>), cỡ hàng chục tới hàng trăm MB mỗi giây.</p>
+        <p>Hãy tính với ổ gắn ngoài của An, quay 7.200 RPM. Một vòng mất 60.000 / 7.200 ≈ 8,33 ms; trung bình sector cần đọc cách đầu đọc nửa vòng, nên độ trễ quay trung bình là 4,17 ms. Giả sử thời gian tìm trung bình 9 ms và tốc độ truyền 160 MB/s. Thanh dưới chia nhỏ thời gian đọc một khối 4 KiB ở vị trí ngẫu nhiên.</p>
+        <figure class="fig">
+          <div class="b5-timebar" role="img" aria-label="Thời gian đọc một khối 4 KiB: tìm 9 ms, chờ quay 4,17 ms, truyền 0,026 ms">
+            <span class="seek" style="flex-grow:900"><b>Tìm</b> 9 ms</span><span class="rot" style="flex-grow:417"><b>Chờ quay</b> 4,17 ms</span><span class="xfer" style="flex-grow:3"></span>
+          </div>
+          <div class="b5-timebar-note"><span>Truyền 4 KiB: 4.096 B / 160 MB/s ≈ <b>0,026 ms</b>, mảnh rất mỏng ở cuối thanh</span><span>Tổng ≈ <b>13,2 ms</b>, tức khoảng 76 lần đọc ngẫu nhiên mỗi giây</span></div>
+          <figcaption><b>Gần như toàn bộ thời gian là chờ cơ học.</b> Phần truyền dữ liệu chỉ chiếm khoảng 0,2%. Đọc liền một mạch 1 MiB liên tiếp chỉ phải định vị một lần: 13,2 + 6,6 ≈ 20 ms. Nếu 1 MiB đó rải rác thành 256 khối 4 KiB, tổng thời gian là 256 × 13,2 ≈ 3,4 giây, chậm hơn khoảng 170 lần.</figcaption>
+        </figure>
+        <p>Con số 170 lần là bài học chính của mục này: với HDD, <em>thứ tự</em> và <em>tính liền nhau</em> của các yêu cầu quyết định gần như tất cả, và đó là lý do mục 11.2 bỏ công sắp xếp hàng đợi. Cấu tạo cơ học còn kéo theo rủi ro: đầu đọc bay trên lớp khí dày cỡ micromet, và nếu chạm bề mặt thì gây <dfn>va đầu từ</dfn> (<span class="en">head crash</span>), thường phải thay cả ổ và mất dữ liệu nếu không có sao lưu hay RAID.</p>
+        <details class="deep"><summary><span class="q">Đọc thêm · tốc độ công bố và dung lượng HDD ngày nay</span></summary><div class="deep-body">
+          <p>Tốc độ truyền nhà sản xuất công bố luôn cao hơn tốc độ hiệu dụng, vì nó là tốc độ đầu đọc lấy bit khỏi mặt từ chứ chưa tính thời gian định vị và chi phí giao thức; bài tập 3 cuối buổi cho bạn tính khoảng cách này. Về dung lượng, tới năm 2025 các ổ HDD cho trung tâm dữ liệu đã vượt 30 TB nhờ ghi từ có hỗ trợ nhiệt (HAMR), nhưng thời gian tìm và độ trễ quay gần như không đổi vì bị giới hạn bởi cơ học.</p>
+        </div></details>
+
+        <h4 id="nvm">11.1.2 · Nonvolatile Memory Devices <span class="vi">Thiết bị nhớ không khả biến</span></h4>
+        <p>Toàn bộ 13 ms ở trên đến từ chuyển động cơ học. Thiết bị NVM bỏ hẳn phần đó: chúng hoàn toàn điện tử, thường gồm một bộ điều khiển và nhiều chip <dfn>NAND flash</dfn>. Đặt trong vỏ hình ổ đĩa thì gọi là <dfn>ổ thể rắn</dfn> (<span class="en">solid-state disk, SSD</span>); cùng công nghệ đó còn có dạng USB flash hoặc được hàn thẳng lên bo mạch điện thoại. Không có bộ phận chuyển động nên NVM bền hơn, tốn ít điện hơn và không có thời gian tìm hay độ trễ quay; đổi lại giá mỗi MB cao hơn. Vì nhanh tới mức bus cũ thành nút cổ chai, nhiều thiết bị được nối thẳng vào bus PCIe. Nhưng NAND có những ràng buộc riêng, tóm tắt trong bảng dưới.</p>
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="Ba thao tác trên NAND flash">
+          <table class="tbl">
+            <thead><tr><th scope="col">Thao tác</th><th scope="col">Đơn vị</th><th scope="col">Tốc độ và ràng buộc</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Đọc</th><td>Trang (<span lang="en">page</span>), giống một sector</td><td>Nhanh nhất</td></tr>
+              <tr><th scope="row">Ghi</th><td>Trang</td><td>Chậm hơn đọc. Chỉ ghi được vào trang <em>đã xóa</em>, không ghi đè được</td></tr>
+              <tr><th scope="row">Xóa</th><td>Khối (<span lang="en">block</span>) gồm nhiều trang</td><td>Chậm nhất. Mỗi lần xóa làm ô nhớ hao mòn thêm</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Hàng cuối là điểm mấu chốt. Theo giáo trình, mỗi ô NAND chịu được khoảng 100.000 chu kỳ ghi–xóa (<span class="en">program-erase cycle</span>), sau đó không giữ được dữ liệu. Vì hao mòn theo lượng ghi chứ không theo năm tháng, tuổi thọ NVM được đo bằng <dfn>số lần ghi đầy ổ mỗi ngày</dfn> (<span class="en">drive writes per day, DWPD</span>): một ổ 1 TB đạt 5 DWPD được kỳ vọng chịu 5 TB ghi mỗi ngày trong suốt thời hạn bảo hành.</p>
+        <div class="box idea"><div class="box-h">Bối cảnh 2026 · số chu kỳ ghi–xóa đã giảm</div><p>Con số 100.000 đúng với NAND loại SLC, 1 bit mỗi ô. SSD phổ thông ngày nay dùng TLC (3 bit) hoặc QLC (4 bit) để rẻ hơn, chỉ chịu cỡ vài nghìn chu kỳ hoặc ít hơn, nên các thuật toán ở mục tiếp theo càng quan trọng. Công nghệ 3D XPoint (Intel Optane) mà giáo trình nhắc tới đã bị khai tử năm 2022.</p></div>
+
+        <h4 id="nand-ftl">11.1.2.2 · NAND Flash Controller Algorithms <span class="vi">Thuật toán của bộ điều khiển NAND flash</span></h4>
+        <p>An sửa một bức ảnh rồi lưu lại, tức hệ thống tệp ghi lại cùng một khối logic. Trên HDD, việc này chỉ là ghi đè sector cũ. Trên NAND thì không thể, vì muốn ghi lại phải xóa, mà xóa thì phải xóa cả khối nhiều trang. Bộ điều khiển vì thế không ghi đè: nó ghi bản mới vào một trang trống ở chỗ khác và đánh dấu trang cũ là <em>không hợp lệ</em>. Để biết khối logic nào đang nằm ở trang vật lý nào, nó giữ một bảng gọi là <dfn>lớp dịch flash</dfn> (<span class="en">flash translation layer, FTL</span>), kèm trạng thái từng khối. Ý tưởng này rất giống bảng trang ở Buổi 4: hệ điều hành nói bằng địa chỉ logic, thiết bị tự chọn vị trí vật lý.</p>
+        <p>Khi ổ đầy mà vẫn có yêu cầu ghi, bộ điều khiển phải <dfn>thu gom rác</dfn> (<span class="en">garbage collection</span>): chép các trang còn hợp lệ của một khối sang chỗ khác rồi xóa cả khối. Nhưng ổ đầy thì chép sang đâu? Để luôn có chỗ, ổ giữ riêng một phần dung lượng mà hệ điều hành không thấy, thường khoảng 20%, gọi là <dfn>dự phòng dung lượng</dfn> (<span class="en">over-provisioning</span>). Vùng này còn giúp <dfn>cân bằng hao mòn</dfn> (<span class="en">wear leveling</span>): bộ điều khiển đặt dữ liệu mới vào những khối ít bị xóa, để không khối nào mòn sớm kéo cả ổ chết theo. Giống HDD, NVM cũng lưu mã sửa lỗi cho từng trang (mục 11.4) và loại bỏ trang hay lỗi; còn khi cả thiết bị hỏng thì chỉ RAID mới cứu được dữ liệu.</p>
+        <p>Mọi thuật toán này chạy trong bộ điều khiển, hệ điều hành chỉ đọc ghi khối logic. Nhưng chúng làm hiệu năng thay đổi theo mức đầy của ổ, nên cần hiểu. Mô phỏng dưới đây thu nhỏ một SSD còn 4 khối, mỗi khối 4 trang; máy tính chỉ thấy 8 khối logic ứng với 8 bức ảnh, nên vùng dự phòng lớn hơn thực tế để dễ quan sát.</p>
+        <div class="box predict"><div class="box-h">Đoán trước</div><p>Sau khi máy tính ghi đủ 8 ảnh rồi ghi lại 4 ảnh trong số đó, ổ hết khối trống. Lần ghi tiếp theo buộc bộ điều khiển thu gom rác. Nó sẽ phải chép bao nhiêu trang? Nếu trước đó An xóa một bức ảnh và hệ thống tệp báo cho ổ biết, con số đó thay đổi thế nào?</p></div>
+        <div id="mo-phong-ftl" data-io-lab="ftl">
+          <noscript><p>Bật JavaScript để theo dõi từng khối. Tóm tắt: ghi lại ảnh 1, 2, 5, 6 làm các trang cũ trong B0 và B1 không còn hợp lệ. Lần ghi tiếp theo buộc bộ điều khiển chép 2 trang còn hợp lệ của B0 sang khối dự phòng rồi xóa B0. Nếu ảnh 3 đã được TRIM, chỉ cần chép 1 trang.</p></noscript>
+        </div>
+        <p>Mô phỏng cho thấy có những lần ghi NAND mà máy tính chưa hề yêu cầu. Mục 11.3 sẽ đặt tên cho hiện tượng này và xem nó ảnh hưởng tới lập lịch trên NVM ra sao.</p>
+
+        <h4 id="ram-drive">11.1.3 · Volatile Memory <span class="vi">Bộ nhớ khả biến dùng làm ổ</span></h4>
+        <p>DRAM cũng có thể đóng vai lưu trữ thứ cấp. Một <dfn>ổ RAM</dfn> (<span class="en">RAM drive</span>, hay <span class="en">RAM disk</span>) là một phần DRAM được driver trình ra như một thiết bị lưu trữ, thường kèm hệ thống tệp: nhanh nhất cho tệp tạm, nhưng mất sạch khi tắt máy. Thư mục <code>/tmp</code> kiểu <code>tmpfs</code> và hệ thống tệp gốc tạm <code>initrd</code> lúc khởi động Linux là hai ví dụ.</p>
+        <details class="deep"><summary><span class="q">Đọc thêm · băng từ</span></summary><div class="deep-body">
+          <p>Băng từ (<span class="en">magnetic tape</span>) chứa rất nhiều và không khả biến, nhưng truy cập ngẫu nhiên chậm hơn HDD khoảng một nghìn lần và chậm hơn SSD khoảng một trăm nghìn lần, vì phải cuộn tới đúng chỗ. Khi đã định vị, nó đọc ghi nhanh ngang HDD, nên chủ yếu dùng để sao lưu và lưu trữ ít dùng. Giáo trình lấy ví dụ LTO-6; thế hệ LTO-9 (2021) chứa 18 TB không nén trên một cuộn.</p>
+        </div></details>
+
+        <h4 id="ket-noi">11.1.4 · Secondary Storage Connection Methods <span class="vi">Cách nối thiết bị lưu trữ vào máy</span></h4>
+        <p>Thiết bị lưu trữ nối vào máy qua bus hệ thống hoặc bus vào/ra như SATA (phổ biến nhất), SAS, USB hay <span lang="en">fibre channel</span>; riêng NVM có giao tiếp <dfn>NVMe</dfn> (<span class="en">NVM express</span>) nối thẳng vào bus PCI. Dữ liệu trên bus do các <dfn>bộ điều khiển</dfn> (<span class="en">controller</span>, hay <span class="en">host-bus adapter, HBA</span>) chuyển: máy đặt lệnh vào bộ điều khiển phía máy, lệnh được gửi tới bộ điều khiển trong ổ, và dữ liệu đi từ cache của ổ vào RAM bằng DMA. Ngày nay SATA dừng ở khoảng 600 MB/s, trong khi SSD NVMe trên PCIe 4.0 và 5.0 đọc tuần tự khoảng 7 và 14 GB/s.</p>
+
+        <h4 id="anh-xa-dia-chi">11.1.5 · Address Mapping <span class="vi">Ánh xạ địa chỉ</span></h4>
+        <p>HDD có rãnh, cung, trụ; NVM có chip, khối, trang. Để hệ điều hành không phải nói chuyện bằng những tọa độ đó, mọi thiết bị được trình ra như một mảng một chiều gồm các <dfn>khối logic</dfn> (<span class="en">logical block</span>), đánh số bằng <dfn>địa chỉ khối logic</dfn> (<span class="en">logical block address, LBA</span>), và thiết bị tự ánh xạ mỗi khối tới một sector hay trang vật lý. Trên HDD, ánh xạ đi theo thứ tự tự nhiên: hết một rãnh, hết các rãnh của một trụ, rồi sang trụ kế tiếp từ ngoài vào trong. Nếu mọi rãnh có <var>S</var> sector và ổ có <var>H</var> đầu đọc, thì trụ = ⌊LBA / (<var>H</var> × <var>S</var>)⌋, đầu đọc = ⌊LBA / <var>S</var>⌋ mod <var>H</var>, sector = LBA mod <var>S</var>. Chẳng hạn với 4 đầu đọc và 100 sector mỗi rãnh, LBA 1.789 nằm ở trụ 4, phần dư 189, tức đầu đọc 1, sector 89.</p>
+        <p>Thực tế phép đổi khó làm, vì ba lý do: sector hỏng được thay ngầm bằng sector dự phòng ở chỗ khác; số sector mỗi rãnh không cố định; và nhà sản xuất tự quản lý ánh xạ bên trong. Chuyện số sector mỗi rãnh đến từ việc rãnh ngoài dài hơn rãnh trong. Cách <dfn>vận tốc dài không đổi</dfn> (<span class="en">constant linear velocity, CLV</span>) giữ mật độ bit đều nên rãnh ngoài chứa nhiều sector hơn, và ổ quay nhanh dần khi đầu đọc vào trong; CD và DVD dùng cách này. Cách <dfn>vận tốc góc không đổi</dfn> (<span class="en">constant angular velocity, CAV</span>) giữ tốc độ quay cố định, và theo giáo trình thì HDD dùng cách này. Dù vậy, các thuật toán vẫn dựa trên một giả định đơn giản: <em>LBA gần nhau thì nằm gần nhau, LBA tăng thì vị trí vật lý nói chung cũng tăng</em>. Mục 11.2 dựa hoàn toàn vào giả định đó.</p>
+        <details class="deep"><summary><span class="q">Đọc thêm · ghi theo vùng, SMR và ổ lai</span></summary><div class="deep-body">
+          <p>Mô tả CAV là mô hình đơn giản hóa: HDD hiện đại quay đều nhưng chia mặt đĩa thành nhiều vùng (<span lang="en">zoned bit recording</span>), vùng ngoài có nhiều sector mỗi rãnh hơn nên đọc tuần tự ở các LBA nhỏ nhanh hơn hẳn. Giáo trình cũng nhắc tới ổ ghi từ chồng lớp (SMR) mật độ cao nhưng ghi chậm, và các thiết bị lai NVM với HDD; chúng cần thuật toán cache và lập lịch riêng.</p>
+        </div></details>
+
+        <h3 id="lap-lich-hdd">11.2 · HDD Scheduling <span class="vi">Lập lịch ổ đĩa cứng</span></h3>
+        <p>Mục 11.1 cho thấy thời gian tìm chiếm phần lớn mỗi lần truy cập HDD. Hệ điều hành muốn giảm thời gian truy cập và tăng <dfn>băng thông</dfn> (<span class="en">bandwidth</span>), tức tổng số byte được truyền chia cho tổng thời gian từ yêu cầu đầu tiên tới lúc lần truyền cuối xong. Cả hai cải thiện được chỉ bằng cách chọn <em>thứ tự</em> phục vụ. Mỗi yêu cầu vào/ra mang theo chiều đọc hay ghi, tệp nào, địa chỉ bộ nhớ và lượng dữ liệu; nếu ổ đang bận, nó vào hàng đợi của ổ. Hàng đợi càng dài, driver càng có nhiều lựa chọn sắp xếp. Tình huống rất giống lập lịch CPU ở Buổi 2, chỉ khác chi phí chuyển giữa hai việc giờ là quãng đường cánh tay phải đi.</p>
+        <p>Ổ hiện đại không còn để lộ hình học và tự ánh xạ LBA, nên mục tiêu lập lịch ngày nay là công bằng, kịp thời, và gom các lần truy cập tuần tự. Các thuật toán dưới đây dựa trên giả định ở mục 11.1.5 và đo chi phí bằng số trụ đầu đọc đi qua; độ trễ quay bị bỏ qua vì hệ điều hành không biết đĩa đang quay tới đâu. Ví dụ dùng đúng hàng đợi của giáo trình: ứng dụng xem ảnh cần đọc tám ảnh thu nhỏ ở các trụ <b>98, 183, 37, 122, 14, 124, 65, 67</b> theo thứ tự đến, đĩa có các trụ 0 tới 199, và đầu đọc đang ở trụ <b>53</b>.</p>
+
+        <h4 id="fcfs">11.2.1 · FCFS Scheduling <span class="vi">Đến trước phục vụ trước</span></h4>
+        <p>Cách đơn giản nhất là <dfn>đến trước phục vụ trước</dfn> (<span class="en">first-come, first-served, FCFS</span>): phục vụ đúng thứ tự đến. Nó công bằng tự nhiên. Đầu đọc đi 53 → 98 → 183 → 37 → 122 → 14 → 124 → 65 → 67, các chặng dài 45, 85, 146, 85, 108, 110, 59 và 2 trụ, tổng <b>640 trụ</b>. Vấn đề lộ ra ở chặng 122 → 14 → 124: cánh tay vắt ngang gần hết mặt đĩa hai lần chỉ vì thứ tự đến tình cờ xen kẽ. Phục vụ 37 và 14 liền nhau sẽ tiết kiệm rất nhiều, câu hỏi là theo quy tắc nào.</p>
+
+        <h4 id="scan">11.2.2 · SCAN Scheduling <span class="vi">Quét qua lại</span></h4>
+        <p><dfn>SCAN</dfn> cho cánh tay đi từ một đầu đĩa sang đầu kia, phục vụ mọi yêu cầu gặp trên đường, tới đầu kia thì đổi chiều. Nó giống thang máy đón hết người cần lên rồi mới đi xuống, nên còn gọi là <dfn>thuật toán thang máy</dfn> (<span class="en">elevator algorithm</span>), và ta cần biết cả chiều đang đi. Nếu đầu đọc ở 53 và đi về phía 0, nó phục vụ 37, 14, đi tới trụ 0, đổi chiều rồi phục vụ 65, 67, 98, 122, 124, 183. Quãng đường là 53 + 183 = <b>236 trụ</b>, chưa bằng 40% của FCFS.</p>
+        <p>SCAN có một điểm bất công. Lúc đầu đọc tới mép và đổi chiều, phía trước nó có rất ít yêu cầu vì vùng đó vừa được quét, còn yêu cầu dày nhất và chờ lâu nhất lại nằm ở đầu bên kia. Vậy sao không đi thẳng tới đó?</p>
+
+        <h4 id="c-scan">11.2.3 · C-SCAN Scheduling <span class="vi">Quét vòng một chiều</span></h4>
+        <p><dfn>C-SCAN</dfn> (<span class="en">circular SCAN</span>) làm đúng điều đó để thời gian chờ đều hơn: cánh tay quét một chiều và phục vụ trên đường đi, tới mép thì <em>quay ngay về</em> đầu kia mà không phục vụ gì, rồi lại quét theo chiều cũ, như thể các trụ là một danh sách vòng. Giáo trình chạy C-SCAN theo chiều tăng: từ 53 phục vụ 65, 67, 98, 122, 124, 183, tới mép 199, quay về 0, rồi phục vụ 14 và 37. Quãng đường phục vụ là 146 + 37 = 183 trụ, cộng chặng quay về 199 trụ, tổng <b>382 trụ</b>. Có tài liệu không tính chặng quay về, nên khi làm bài hãy nói rõ quy ước; bài giảng này tính cả. Tổng quãng đường lớn hơn SCAN, nhưng mục tiêu của C-SCAN là đồng đều: mọi trụ được ghé đúng một lần mỗi vòng.</p>
+        <div class="box idea"><div class="box-h">Ngoài ấn bản 10 · SSTF, LOOK và C-LOOK</div>
+          <p>Ấn bản 9 còn giảng ba thuật toán vẫn hay xuất hiện trong bài tập và đề thi. <dfn>SSTF</dfn> (<span class="en">shortest-seek-time-first</span>) luôn chọn yêu cầu gần đầu đọc nhất, giống SJF ở Buổi 2 nên cũng có thể làm đói yêu cầu ở xa, và ưu ái các trụ ở giữa. <dfn>LOOK</dfn> và <dfn>C-LOOK</dfn> là SCAN và C-SCAN chỉ đi tới yêu cầu xa nhất rồi đổi chiều hay quay về, không đi thừa tới mép; trên thực tế SCAN và C-SCAN thường được cài đặt theo kiểu này.</p>
+        </div>
+        <p>Bảng dưới đặt sáu thuật toán cạnh nhau trên cùng hàng đợi; ba hàng cuối là các thuật toán ngoài ấn bản 10.</p>
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="So sánh sáu thuật toán lập lịch đĩa trên hàng đợi của giáo trình">
+          <table class="tbl">
+            <thead><tr><th scope="col">Thuật toán</th><th scope="col">Thứ tự phục vụ từ trụ 53</th><th scope="col" class="n">Tổng trụ</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">FCFS</th><td>98, 183, 37, 122, 14, 124, 65, 67</td><td class="n">640</td></tr>
+              <tr><th scope="row">SCAN, về phía 0</th><td>37, 14, (0), 65, 67, 98, 122, 124, 183</td><td class="n">236</td></tr>
+              <tr><th scope="row">C-SCAN, chiều tăng</th><td>65, 67, 98, 122, 124, 183, (199), ↺ (0), 14, 37</td><td class="n">382 <small>(183 + 199 quay về)</small></td></tr>
+              <tr><th scope="row">SSTF</th><td>65, 67, 37, 14, 98, 122, 124, 183</td><td class="n">236</td></tr>
+              <tr><th scope="row">LOOK, về phía 0</th><td>37, 14, 65, 67, 98, 122, 124, 183</td><td class="n">208</td></tr>
+              <tr><th scope="row">C-LOOK, chiều tăng</th><td>65, 67, 98, 122, 124, 183, ↺ 14, 37</td><td class="n">322 <small>(153 + 169 nhảy)</small></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Mọi thuật toán biết sắp xếp đều tốt hơn FCFS rất xa, còn thứ hạng giữa chúng phụ thuộc vào hướng ban đầu và vị trí yêu cầu. Cách nắm chắc nhất là tự chạy từng bước. Trong mô phỏng, đường đi của đầu đọc được vẽ từ trên xuống theo thời gian; nét đứt là chặng quay về hay nhảy, không phục vụ yêu cầu nào.</p>
+        <div class="box predict"><div class="box-h">Đoán trước</div><p>Với hàng đợi của giáo trình, nếu cho SCAN đi theo chiều tăng thay vì về phía 0, tổng quãng đường tăng hay giảm so với 236? Còn C-SCAN đi về phía 0 thì sao? Hãy ước lượng bằng cách xem đầu đọc phải đi tới mép nào, rồi kiểm tra trong mô phỏng.</p></div>
+        <div id="mo-phong-lap-lich-dia" data-io-lab="disk">
+          <noscript><p>Bật JavaScript để chạy mô phỏng. Bảng ở trên cho kết quả của sáu thuật toán trên hàng đợi của giáo trình.</p></noscript>
+        </div>
+        <p>Nếu thử SCAN đi lên trước, bạn sẽ thấy nó phải tới tận mép 199 rồi mới quay xuống 14, tốn 146 + 185 = 331 trụ. Không thuật toán nào thắng trong mọi trường hợp, vậy người thiết kế chọn bằng cách nào?</p>
+
+        <h4 id="chon-thuat-toan">11.2.4 · Selection of a Disk-Scheduling Algorithm <span class="vi">Chọn thuật toán lập lịch đĩa</span></h4>
+        <p>Thứ tự tối ưu luôn tính được, nhưng phép tính thường tốn hơn phần tiết kiệm so với SCAN. Hiệu năng còn phụ thuộc mạnh vào tải: nếu hàng đợi thường chỉ có một yêu cầu thì mọi thuật toán đều như FCFS. Khi tải nặng, SCAN và C-SCAN tốt hơn vì ít gây đói, nhưng ít đói chưa phải hết đói. Vì vậy Linux tạo bộ lập lịch <dfn>deadline</dfn>: hàng đợi đọc và ghi tách riêng, đọc được ưu tiên vì tiến trình thường bị chặn khi đọc; mỗi loại có một hàng sắp theo LBA, thực chất là C-SCAN, và một hàng FCFS. Yêu cầu được gửi theo lô từ hàng LBA, và nếu hàng FCFS có yêu cầu đã chờ quá ngưỡng, mặc định 500 ms, thì lô tiếp theo phải chứa nó. Nhờ vậy không yêu cầu nào chờ mãi.</p>
+        <details class="deep"><summary><span class="q">Đọc thêm · NOOP, CFQ trong RHEL 7 và bộ lập lịch Linux ngày nay</span></summary><div class="deep-body">
+          <p>Trong Red Hat Enterprise Linux 7 mà giáo trình mô tả, deadline là mặc định; NOOP được khuyên dùng cho thiết bị nhanh như NVM; CFQ (<span lang="en">Completely Fair Queueing</span>) là mặc định cho ổ SATA, với ba hàng đợi ưu tiên tuyệt đối là thời gian thực, nỗ lực tốt nhất và rảnh, và có thể chủ động chờ một tiến trình sắp gửi thêm yêu cầu gần đó. Từ Linux 5.0 (2019), ba bộ lập lịch kiểu cũ này bị gỡ; lớp khối nhiều hàng đợi hiện có <code>mq-deadline</code>, <code>bfq</code>, <code>kyber</code> và <code>none</code>, và SSD NVMe thường dùng <code>none</code>.</p>
+        </div></details>
+
+        <h3 id="lap-lich-nvm">11.3 · NVM Scheduling <span class="vi">Lập lịch thiết bị NVM</span></h3>
+        <p>Mọi thuật toán ở mục 11.2 nhằm giảm quãng đường đầu đọc. NVM không có đầu đọc, nên thường dùng FCFS; bộ lập lịch NOOP của Linux là FCFS kèm gộp các yêu cầu kề nhau. Thời gian đọc trên NVM khá đều, nhưng thời gian ghi thì không, nên vài bộ lập lịch cho SSD chỉ gộp các lần ghi kề nhau còn đọc thì theo FCFS. Khác biệt giữa hai loại thiết bị rõ nhất ở truy cập ngẫu nhiên, đo bằng <dfn>số thao tác vào/ra mỗi giây</dfn> (<span class="en">input/output operations per second, IOPS</span>), như bảng dưới.</p>
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="So sánh hiệu năng HDD và NVM">
+          <table class="tbl">
+            <thead><tr><th scope="col">Tiêu chí</th><th scope="col">HDD</th><th scope="col">NVM</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Truy cập ngẫu nhiên</th><td>Hàng trăm IOPS</td><td>Hàng trăm nghìn IOPS</td></tr>
+              <tr><th scope="row">Đọc tuần tự</th><td colspan="2">NVM ngang HDD tới nhanh hơn khoảng 10 lần; lợi thế nhỏ hơn hẳn</td></tr>
+              <tr><th scope="row">Ghi</th><td>Ổn định suốt đời ổ</td><td>Chậm hơn đọc, và chậm dần khi ổ đầy hoặc đã mòn</td></tr>
+              <tr><th scope="row">Lập lịch hợp lý</th><td>SCAN, C-SCAN, deadline</td><td>FCFS, có gộp yêu cầu kề nhau</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Vì sao ghi trên NVM chậm dần? Lời giải nằm trong mô phỏng ở mục 11.1.2.2. Khi ổ đã đầy, một lần ghi có thể kéo theo đọc các trang còn hợp lệ, ghi chúng sang vùng dự phòng, xóa khối cũ, rồi mới ghi dữ liệu mới. Những thao tác do chính thiết bị sinh ra khi thu gom rác như vậy gọi là <dfn>khuếch đại ghi</dfn> (<span class="en">write amplification</span>). Trong mô phỏng, 14 lần ghi của máy tính thành 16 lần ghi NAND, hệ số ≈ 1,14; trường hợp xấu, mỗi lần ghi kéo theo vài lần I/O phụ. Một cách giảm là để hệ thống tệp báo cho thiết bị biết tệp nào đã bị xóa, lệnh TRIM mà mục 14.5.6 sẽ bàn: ở tình huống thứ hai của mô phỏng, hệ số giảm còn 15 / 14 ≈ 1,07.</p>
+
+        <h3 id="phat-hien-loi">11.4 · Error Detection and Correction <span class="vi">Phát hiện và sửa lỗi</span></h3>
+        <p>Từ đầu chương ta ngầm giả định đọc lại một khối thì được đúng thứ đã ghi. Thực tế một bit DRAM có thể tự lật, một gói tin có thể bị biến đổi trên đường truyền, một khối trên ổ có thể hỏng giữa lúc ghi và lúc đọc. Phát hiện lỗi giúp hệ thống dừng trước khi lỗi lan ra, báo cho người dùng, hoặc cảnh báo thiết bị sắp hỏng.</p>
+        <p>Kỹ thuật lâu đời nhất là <dfn>bit chẵn lẻ</dfn> (<span class="en">parity bit</span>): mỗi byte có thêm một bit cho biết số bit 1 trong byte là chẵn (0) hay lẻ (1). Byte <code>1011 0010</code> có bốn bit 1 nên bit chẵn lẻ là 0. Lật một bit bất kỳ thì số bit 1 thành lẻ và không khớp, nên mọi lỗi một bit bị phát hiện; nhưng lật hai bit thì số bit 1 lại chẵn và lỗi lọt qua. Bit chẵn lẻ tính bằng phép XOR các bit, và ta sẽ gặp lại phép XOR này ở RAID. Bit chẵn lẻ là một dạng <dfn>tổng kiểm tra</dfn> (<span class="en">checksum</span>); trong mạng, <dfn>mã dư vòng</dfn> (<span class="en">cyclic redundancy check, CRC</span>) phát hiện được cả lỗi nhiều bit. Cả hai chỉ biết <em>có</em> lỗi.</p>
+        <p>Muốn biết bit nào sai để sửa, cần <dfn>mã sửa lỗi</dfn> (<span class="en">error-correction code, ECC</span>). HDD lưu ECC cho mỗi sector, flash cho mỗi trang. Khi ghi, bộ điều khiển tính ECC từ dữ liệu và ghi kèm; khi đọc, nó tính lại và so sánh. Nếu chỉ vài bit sai, ECC đủ thông tin để sửa, và bộ điều khiển báo một <dfn>lỗi mềm</dfn> (<span class="en">soft error</span>) đã được khắc phục; nếu quá nhiều bit sai, nó báo <dfn>lỗi cứng</dfn> (<span class="en">hard error</span>). Bảng dưới xếp các kỹ thuật theo khả năng.</p>
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="So sánh các kỹ thuật phát hiện và sửa lỗi">
+          <table class="tbl">
+            <thead><tr><th scope="col">Kỹ thuật</th><th scope="col">Phát hiện</th><th scope="col">Sửa</th><th scope="col">Hay gặp ở</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Bit chẵn lẻ</th><td>Mọi lỗi 1 bit; bỏ sót lỗi 2 bit</td><td>Không</td><td>Bộ nhớ đời cũ, RAID</td></tr>
+              <tr><th scope="row">Checksum, CRC</th><td>Cả lỗi nhiều bit</td><td>Không</td><td>Gói tin mạng, hệ thống tệp</td></tr>
+              <tr><th scope="row">ECC</th><td>Lỗi nhiều bit</td><td>Có, nếu ít bit sai</td><td>Sector HDD, trang flash, RAM máy chủ</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Khi ECC báo một sector đã hỏng hẳn, hệ điều hành và bộ điều khiển phải làm gì với nó? Câu hỏi đó thuộc về việc quản lý thiết bị, chủ đề của mục tiếp theo.</p>
+
+        <h3 id="quan-ly-thiet-bi">11.5 · Storage Device Management <span class="vi">Quản lý thiết bị lưu trữ</span></h3>
+        <p>An vừa mua một ổ mới làm kho ảnh. Từ lúc bóc hộp tới lúc chứa được tệp đầu tiên, ổ phải qua nhiều bước chuẩn bị; hệ điều hành còn phải khởi động máy từ ổ và xử lý những khối hỏng dần theo thời gian. Mục này đi qua ba việc đó.</p>
+
+        <h4 id="dinh-dang">11.5.1 · Drive Formatting, Partitions, and Volumes <span class="vi">Định dạng, phân vùng và tập đĩa</span></h4>
+        <p>Thiết bị mới phải được chia thành các sector hay trang mà bộ điều khiển đọc ghi được, mỗi vị trí gồm phần đầu, vùng dữ liệu và phần đuôi chứa số sector và mã sửa lỗi. Việc này gọi là <dfn>định dạng cấp thấp</dfn> (<span class="en">low-level formatting</span>, hay <span class="en">physical formatting</span>), thường làm ngay tại nhà máy, kèm việc khởi tạo ánh xạ LBA tránh các chỗ lỗi. Sau đó hệ điều hành ghi cấu trúc của mình lên ổ qua ba bước, tóm tắt trong bảng dưới.</p>
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="Các bước chuẩn bị một ổ mới">
+          <table class="tbl">
+            <thead><tr><th scope="col">Bước</th><th scope="col">Ai làm</th><th scope="col">Kết quả</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Định dạng cấp thấp</th><td>Nhà máy</td><td>Sector hoặc trang có header, dữ liệu, trailer kèm ECC</td></tr>
+              <tr><th scope="row">1. <dfn>Phân vùng</dfn> (<span class="en">partition</span>)</th><td>Hệ điều hành, như lệnh <code>fdisk</code></td><td>Chia ổ thành các nhóm khối, mỗi nhóm được đối xử như một thiết bị riêng</td></tr>
+              <tr><th scope="row">2. Tạo <dfn>tập đĩa</dfn> (<span class="en">volume</span>)</th><td>Ngầm định, hoặc trình quản lý như <code>lvm2</code>, ZFS</td><td>Một hay nhiều phân vùng, có thể trên nhiều ổ, ghép thành đơn vị chứa hệ thống tệp</td></tr>
+              <tr><th scope="row">3. <dfn>Định dạng logic</dfn> (<span class="en">logical formatting</span>)</th><td>Hệ điều hành</td><td>Tạo hệ thống tệp: bản đồ vùng trống, thư mục gốc rỗng</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Bảng cho thấy phân vùng và tập đĩa khác nhau: phân vùng là một lát cắt của một ổ, còn tập đĩa là thứ mang hệ thống tệp và có thể trải trên nhiều ổ, như một bộ RAID ở mục 11.8. Khi nhận ra thiết bị, hệ điều hành đọc bảng phân vùng, tạo mục thiết bị cho từng phân vùng (trên Linux là trong <code>/dev</code>), rồi <dfn>gắn</dfn> (<span class="en">mount</span>) mỗi hệ thống tệp vào một vị trí để dùng được. Hình dưới là bố cục ổ SSD trên laptop của An.</p>
+        <figure class="fig">
+          <div class="b5-disk-strip" role="img" aria-label="Bố cục ổ SSD của An: bảng phân vùng, phân vùng khởi động, phân vùng hệ điều hành, phân vùng hoán đổi, phân vùng dữ liệu ảnh">
+            <span class="meta-part" style="flex-grow:4"><b>Bảng phân vùng</b><small>vị trí cố định</small></span>
+            <span class="boot-part" style="flex-grow:8"><b>Khởi động</b><small>có cờ boot</small></span>
+            <span class="os-part" style="flex-grow:30"><b>Hệ điều hành</b><small>gắn tại /</small></span>
+            <span class="swap-part" style="flex-grow:10"><b>Hoán đổi</b><small>không có hệ thống tệp</small></span>
+            <span class="data-part" style="flex-grow:48"><b>Ảnh</b><small>gắn tại /home</small></span>
+          </div>
+          <figcaption><b>Một ổ, nhiều phân vùng.</b> Mỗi phân vùng được coi như một thiết bị riêng, và phân vùng hoán đổi không có hệ thống tệp nào. Trên Windows, mỗi tập đĩa có một chữ cái như C:, D:; trên Linux, mọi tập đĩa được gắn vào cùng một cây thư mục.</figcaption>
+        </figure>
+        <p>Hai chi tiết nữa đáng nhớ. Hệ thống tệp thường gom khối thành <dfn>cụm</dfn> (<span class="en">cluster</span>) để I/O mang tính tuần tự hơn. Ngược lại, cơ sở dữ liệu có thể dùng cả phân vùng như một dãy khối thô không có hệ thống tệp, gọi là <dfn>đĩa thô</dfn> (<span class="en">raw disk</span>), với <dfn>I/O thô</dfn> (<span class="en">raw I/O</span>) bỏ qua bộ đệm, khóa tệp và mọi dịch vụ khác của hệ thống tệp; Linux đạt hiệu quả tương tự bằng cờ <code>O_DIRECT</code> khi <code>open()</code>.</p>
+
+        <h4 id="khoi-khoi-dong">11.5.2 · Boot Block <span class="vi">Khối khởi động</span></h4>
+        <p>Buổi 1 đã kể về khởi động; giờ ta nhìn từ phía ổ. Khi bật máy, một <em>trình nạp khởi động</em> (<span class="en">bootstrap loader</span>) nhỏ nằm trong flash firmware trên bo mạch chủ khởi tạo phần cứng rồi đọc các <dfn>khối khởi động</dfn> (<span class="en">boot blocks</span>) ở vị trí cố định trên ổ. Các khối này chứa chương trình khởi động đầy đủ, như <code>grub2</code> của Linux, đủ thông minh để tìm và nạp cả hệ điều hành. Ổ có phân vùng khởi động gọi là <dfn>đĩa khởi động</dfn> (<span class="en">boot disk</span>). Ví dụ của giáo trình là Windows, với mã khởi động đặt ở khối đầu tiên của ổ, gọi là <dfn>bản ghi khởi động chính</dfn> (<span class="en">master boot record, MBR</span>), như hình dưới.</p>
+        <figure class="fig">
+          <ol class="b5-boot">
+            <li class="mbr"><b>MBR</b><small>mã khởi động + bảng phân vùng</small></li>
+            <li class="boot"><b>Phân vùng 1</b><small>phân vùng khởi động: sector đầu là boot sector</small></li>
+            <li><b>Phân vùng 2</b></li>
+            <li><b>Phân vùng 3</b></li>
+            <li><b>Phân vùng 4</b></li>
+          </ol>
+          <ol class="visual-flow b5-boot-flow">
+            <li><strong>Firmware</strong><small>đọc MBR vào bộ nhớ và chạy mã trong đó</small></li>
+            <li><strong>Mã trong MBR</strong><small>tra bảng phân vùng, tìm phân vùng có cờ khởi động</small></li>
+            <li><strong>Boot sector</strong><small>chỉ đường tới kernel, rồi nạp các hệ thống con</small></li>
+          </ol>
+          <figcaption><b>Khởi động qua ba chặng.</b> Mỗi chặng chỉ cần biết đủ để nạp chặng sau: firmware chỉ biết đọc một sector, mã trong MBR hiểu bảng phân vùng, boot sector mới biết kernel nằm ở đâu.</figcaption>
+        </figure>
+        <div class="box idea"><div class="box-h">Bối cảnh 2026 · UEFI và GPT</div><p>MBR chỉ chứa bốn phân vùng chính và, với sector 512 byte, không quản lý được ổ lớn hơn 2 TiB. Máy tính hiện nay dùng firmware UEFI cùng bảng phân vùng GPT: UEFI đọc trình nạp từ một phân vùng hệ thống EFI thay vì chạy mã trong MBR, và Secure Boot kiểm tra chữ ký trình nạp để chặn kiểu virus ghi đè mã khởi động mà giáo trình cảnh báo. Windows 11 bắt buộc UEFI.</p></div>
+
+        <h4 id="khoi-hong">11.5.3 · Bad Blocks <span class="vi">Khối hỏng</span></h4>
+        <p>Ổ có dung sai rất nhỏ nên dễ hỏng, và thường gặp nhất là vài sector hỏng chứ không phải cả ổ. Ổ đời cũ để hệ điều hành tự xử lý: quét khi định dạng và đánh dấu khối hỏng, hoặc chạy lệnh như <code>badblocks</code>. Ổ hiện đại để bộ điều khiển lo: nó giữ danh sách khối hỏng và một số sector dự phòng mà hệ điều hành không thấy. Khi hệ điều hành đọc khối 87 và ECC báo sector hỏng, bộ điều khiển báo lỗi I/O, thay sector đó bằng một sector dự phòng, và từ đó mọi lần đọc khối 87 được chuyển tới sector thay thế. Cách này gọi là <dfn>thay sector</dfn> (<span class="en">sector sparing</span>, hay <span class="en">forwarding</span>).</p>
+        <p>Bạn có thấy vấn đề không? Khối 87 bỗng nằm ở một trụ xa, phá hỏng tối ưu của lập lịch đĩa ở mục 11.2. Vì vậy ổ thường chừa vài sector dự phòng trên mỗi trụ, và bộ điều khiển ưu tiên dùng sector cùng trụ. Một cách khác là <dfn>trượt sector</dfn> (<span class="en">sector slipping</span>): nếu khối 17 hỏng và sector dự phòng đầu tiên nằm sau sector 202, bộ điều khiển dời các sector 18 tới 202 xuống một vị trí, giải phóng chỗ của 18 cho khối 17. Bảng dưới so sánh hai cách.</p>
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="So sánh thay sector và trượt sector">
+          <table class="tbl">
+            <thead><tr><th scope="col">Cách</th><th scope="col">Ưu điểm</th><th scope="col">Nhược điểm</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Thay sector</th><td>Nhanh, chỉ đụng tới một sector</td><td>Khối bị thay nằm xa các khối kề nó</td></tr>
+              <tr><th scope="row">Trượt sector</th><td>Giữ thứ tự vật lý, đọc tuần tự vẫn nhanh</td><td>Phải chép nhiều sector, ví dụ trên là 185</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Lỗi mềm cho phép chép dữ liệu ra trước khi thay hay trượt sector; lỗi cứng thì làm mất dữ liệu và phải phục hồi từ sao lưu. Với NVM, mọi việc đơn giản hơn vì không có thời gian tìm cần bảo vệ: bộ điều khiển chỉ cần lấy trang thay thế từ vùng dự phòng và không bao giờ ghi vào trang hỏng nữa.</p>
+
+        <h3 id="vung-hoan-doi">11.6 · Swap-Space Management <span class="vi">Quản lý vùng hoán đổi</span></h3>
+        <p>Ở Buổi 4, trang của ứng dụng xem ảnh bị đẩy ra “vùng hoán đổi” khi RAM đầy. Hệ điều hành hiện đại hầu như không còn hoán đổi cả tiến trình mà chuyển từng trang, tới mức nhiều hệ dùng lẫn hai chữ <span lang="en">swapping</span> và <span lang="en">paging</span>. Vì ổ chậm hơn RAM rất nhiều, mục tiêu khi thiết kế vùng hoán đổi là thông lượng tốt nhất cho bộ nhớ ảo, qua ba câu hỏi: dùng vào việc gì, đặt ở đâu, quản lý ra sao.</p>
+
+        <h4 id="dung-swap">11.6.1 · Swap-Space Use <span class="vi">Vùng hoán đổi dùng vào việc gì</span></h4>
+        <p>Hệ thống hoán đổi cả tiến trình chứa cả ảnh tiến trình, còn hệ thống phân trang chỉ chứa trang bị đẩy ra, nên lượng cần dao động từ vài MB tới nhiều GB. Ước lượng thừa an toàn hơn ước lượng thiếu, vì hết vùng hoán đổi thì hệ thống có thể phải hủy tiến trình hoặc sập; Linux trước kia khuyên gấp đôi RAM, nay dùng ít hơn nhiều. Linux cũng cho phép nhiều vùng hoán đổi trên nhiều thiết bị để chia tải I/O.</p>
+
+        <h4 id="vi-tri-swap">11.6.2 · Swap-Space Location <span class="vi">Đặt vùng hoán đổi ở đâu</span></h4>
+        <p>Vùng hoán đổi có thể là một tệp lớn trong hệ thống tệp, hoặc một phân vùng thô riêng. Bảng dưới so sánh hai lựa chọn; Linux hỗ trợ cả hai và để người quản trị chọn.</p>
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="So sánh tệp hoán đổi và phân vùng hoán đổi">
+          <table class="tbl">
+            <thead><tr><th scope="col"></th><th scope="col">Tệp hoán đổi</th><th scope="col">Phân vùng hoán đổi thô</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Quản lý</th><td>Dùng thủ tục bình thường của hệ thống tệp</td><td>Trình quản lý riêng, tối ưu cho tốc độ chứ không cho hiệu quả lưu trữ</td></tr>
+              <tr><th scope="row">Hiệu năng</th><td>Chậm hơn vì đi qua cấu trúc hệ thống tệp</td><td>Nhanh hơn; phân mảnh trong chấp nhận được vì dữ liệu sống ngắn và được xóa mỗi lần khởi động</td></tr>
+              <tr><th scope="row">Đổi kích thước</th><td>Dễ</td><td>Cố định; muốn thêm phải phân vùng lại hoặc thêm vùng khác</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4 id="vi-du-swap">11.6.3 · Swap-Space Management: An Example <span class="vi">Ví dụ quản lý vùng hoán đổi</span></h4>
+        <p>UNIX truyền thống chép cả tiến trình ra vùng đĩa liền nhau, rồi chuyển dần sang kết hợp với phân trang. Solaris thêm cải tiến ta đã gặp ở Buổi 4: trang mã được đọc lại từ tệp chương trình nên khi bị đẩy ra chỉ việc bỏ đi, và vùng hoán đổi chỉ dành cho <em>bộ nhớ ẩn danh</em> như stack, heap; bản Solaris sau còn chỉ cấp chỗ hoán đổi khi trang thật sự bị đẩy ra. Linux cũng vậy. Mỗi vùng hoán đổi của Linux gồm các <em>ô trang</em> 4 KiB, đi kèm một <dfn>bản đồ hoán đổi</dfn> (<span class="en">swap map</span>) là mảng bộ đếm, mỗi phần tử ứng với một ô, như hình dưới.</p>
+        <figure class="fig">
+          <ol class="b5-swapmap" aria-label="Bản đồ hoán đổi gồm năm ô">
+            <li class="used"><b>1</b><small>ô 0</small></li>
+            <li><b>0</b><small>ô 1</small></li>
+            <li class="used shared"><b>3</b><small>ô 2</small></li>
+            <li><b>0</b><small>ô 3</small></li>
+            <li class="used"><b>1</b><small>ô 4</small></li>
+          </ol>
+          <figcaption><b>Đọc bản đồ hoán đổi.</b> Bộ đếm bằng 0 nghĩa là ô trống; lớn hơn 0 nghĩa là ô đang chứa một trang, và giá trị là số ánh xạ trỏ tới trang đó. Ô 2 chứa một trang thuộc vùng nhớ dùng chung của ba tiến trình, nên chỉ được giải phóng khi cả ba đều không cần nữa.</figcaption>
+        </figure>
+        <details class="deep"><summary><span class="q">Đọc thêm · hoán đổi có nén trên Linux, Windows và macOS</span></summary><div class="deep-body">
+          <p>Kết hợp với nén bộ nhớ ở mục 10.7, các hệ điều hành ngày nay thường nén trang trước khi ghi ra ổ. Linux có <code>zswap</code>, một cache nén đặt trước vùng hoán đổi, và <code>zram</code>, một thiết bị khối nằm trong RAM dùng làm vùng hoán đổi nén. Windows dùng tệp <code>pagefile.sys</code> kèm nén bộ nhớ, macOS dùng các tệp hoán đổi tạo động kèm bộ nén.</p>
+        </div></details>
+
+        <h3 id="gan-ket-luu-tru">11.7 · Storage Attachment <span class="vi">Cách gắn kết lưu trữ</span></h3>
+        <p>Thư viện ảnh của An trải ra nhiều nơi: SSD trong laptop, ổ cứng cắm USB, hộp NAS ở nhà và một dịch vụ đám mây. Mỗi nơi được truy cập một cách khác nhau. Bảng dưới đặt bốn cách gắn kết của giáo trình cạnh nhau, rồi các mục con nói ngắn gọn về từng cách.</p>
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="So sánh bốn cách gắn kết lưu trữ">
+          <table class="tbl">
+            <thead><tr><th scope="col">Cách gắn</th><th scope="col">Đi qua</th><th scope="col">Máy khách thấy gì</th><th scope="col">Trong nhà An</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Gắn với máy</th><td>Cổng I/O cục bộ: SATA, USB, Thunderbolt, FC</td><td>Các khối logic</td><td>SSD trong laptop, ổ gắn ngoài</td></tr>
+              <tr><th scope="row">NAS</th><td>Mạng LAN dùng chung, RPC trên TCP/IP</td><td>Một hệ thống tệp (NFS, CIFS) hoặc khối (iSCSI)</td><td>Hộp NAS bốn ổ</td></tr>
+              <tr><th scope="row">Đám mây</th><td>Internet hoặc WAN</td><td>Một API</td><td>Bản sao ảnh trên mây</td></tr>
+              <tr><th scope="row">SAN</th><td>Mạng riêng cho lưu trữ</td><td>Các khối logic, như ổ gắn trực tiếp</td><td>Không có; dùng ở trung tâm dữ liệu</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4 id="host-attached">11.7.1 · Host-Attached Storage <span class="vi">Lưu trữ gắn với máy</span></h4>
+        <p><dfn>Lưu trữ gắn với máy</dfn> (<span class="en">host-attached storage</span>) đi qua cổng I/O cục bộ, phổ biến nhất là SATA, hoặc USB và Thunderbolt khi cần thêm ổ. Máy chủ cao cấp dùng <dfn>fibre channel</dfn> (FC), kiến trúc nối tiếp tốc độ cao qua cáp quang hay cáp đồng có chuyển mạch, cho nhiều máy và nhiều thiết bị cùng gắn vào. Lệnh I/O ở đây luôn là đọc ghi khối logic.</p>
+
+        <h4 id="nas">11.7.2 · Network-Attached Storage <span class="vi">Lưu trữ gắn qua mạng</span></h4>
+        <p><dfn>Lưu trữ gắn qua mạng</dfn> (<span class="en">network-attached storage, NAS</span>) cung cấp lưu trữ qua mạng LAN bằng giao thức gọi thủ tục từ xa như NFS trên UNIX, Linux và CIFS trên Windows, có cơ chế khóa để nhiều máy dùng chung tệp. Tiện lợi nhưng thường chậm hơn ổ gắn trực tiếp. Giao thức <dfn>iSCSI</dfn> chở lệnh SCSI qua mạng IP và gửi <em>khối</em> thay vì tệp, để máy khách tự tạo hệ thống tệp như với một ổ ở xa. Giao thức CIFS ngày nay là các phiên bản mới của SMB.</p>
+
+        <h4 id="cloud">11.7.3 · Cloud Storage <span class="vi">Lưu trữ đám mây</span></h4>
+        <p><dfn>Lưu trữ đám mây</dfn> (<span class="en">cloud storage</span>) đi qua Internet tới trung tâm dữ liệu của nhà cung cấp, và được truy cập qua API như Amazon S3 hay ứng dụng của Dropbox, OneDrive, iCloud, thay vì như một hệ thống tệp. Lý do là WAN có độ trễ cao và hay mất kết nối: giao thức NAS có thể làm hệ thống treo khi mạng đứt, còn ứng dụng dùng API chỉ tạm dừng rồi tiếp tục.</p>
+
+        <h4 id="san">11.7.4 · Storage-Area Networks and Storage Arrays <span class="vi">Mạng lưu trữ và mảng lưu trữ</span></h4>
+        <p>NAS có nhược điểm: lưu lượng lưu trữ ăn vào băng thông của mạng dữ liệu chung. <dfn>Mạng lưu trữ</dfn> (<span class="en">storage-area network, SAN</span>) tách hai luồng ra bằng một mạng riêng nối máy chủ với thiết bị lưu trữ, dùng giao thức lưu trữ như FC hoặc iSCSI, như hình dưới.</p>
+        <figure class="fig">
+          <svg class="teaching-svg b5-san b5-narrow" viewBox="0 0 340 270" role="img" aria-labelledby="san-title san-desc">
+            <title id="san-title">NAS dùng chung mạng LAN, SAN là mạng riêng phía sau máy chủ</title>
+            <desc id="san-desc">Phía trên là mạng dữ liệu nối hai máy khách, một hộp NAS và hai máy chủ. Phía dưới, hai máy chủ nối vào một mạng SAN riêng, cùng với hai mảng lưu trữ và một thư viện băng.</desc>
+            <rect class="z-acc" x="4" y="6" width="332" height="104" rx="10"/>
+            <text class="annotation" x="14" y="24">Mạng dữ liệu (LAN)</text>
+            <path class="bus-line" d="M18 64H322"/>
+            <rect class="nd" x="14" y="76" width="62" height="26" rx="5"/><text class="annotation" x="45" y="94" text-anchor="middle">khách</text>
+            <rect class="nd" x="84" y="76" width="62" height="26" rx="5"/><text class="annotation" x="115" y="94" text-anchor="middle">khách</text>
+            <rect class="nd-ch" x="236" y="30" width="92" height="24" rx="5"/><text class="annotation" x="282" y="47" text-anchor="middle">NAS</text>
+            <path class="route" d="M45 76V64M115 76V64M282 54V64"/>
+            <rect class="nd-acc" x="150" y="124" width="76" height="28" rx="6"/><text class="annotation" x="188" y="143" text-anchor="middle">máy chủ</text>
+            <rect class="nd-acc" x="246" y="124" width="76" height="28" rx="6"/><text class="annotation" x="284" y="143" text-anchor="middle">máy chủ</text>
+            <path class="route" d="M188 124V64M284 124V64"/>
+            <rect class="z-violet" x="4" y="166" width="332" height="98" rx="10"/>
+            <text class="annotation" x="14" y="184">SAN: mạng riêng</text>
+            <path class="bus-line" d="M18 204H322"/>
+            <path class="route" d="M188 152V204M284 152V204"/>
+            <rect class="nd-violet" x="12" y="220" width="100" height="30" rx="5"/><text class="annotation" x="62" y="240" text-anchor="middle">mảng lưu trữ</text>
+            <rect class="nd-violet" x="120" y="220" width="100" height="30" rx="5"/><text class="annotation" x="170" y="240" text-anchor="middle">mảng lưu trữ</text>
+            <rect class="nd-soft" x="228" y="220" width="100" height="30" rx="5"/><text class="annotation" x="278" y="240" text-anchor="middle">thư viện băng</text>
+            <path class="route" d="M62 220V204M170 220V204M278 220V204"/>
+          </svg>
+          <figcaption><b>Hai mạng, hai loại lưu lượng.</b> Hộp NAS ngồi trên chính mạng mà máy khách dùng, nên mỗi lần đọc ghi tệp chiếm băng thông của mọi người. SAN nằm phía sau máy chủ: lưu lượng lưu trữ chạy trên mạng riêng, và một máy chủ cần thêm chỗ có thể được cấp thêm dung lượng mà không đụng tới LAN.</figcaption>
+        </figure>
+        <p>Sức mạnh của SAN là sự linh hoạt: nhiều máy chủ và nhiều mảng lưu trữ gắn chung, dung lượng được cấp động, và bộ chuyển mạch SAN quyết định máy nào được truy cập thiết bị nào. Thiết bị ở đầu kia thường là một <dfn>mảng lưu trữ</dfn> (<span class="en">storage array</span>): một hộp chuyên dụng chứa nhiều ổ cùng bộ điều khiển có CPU, bộ nhớ và phần mềm riêng, cung cấp RAID, ảnh chụp nhanh, sao chép, nén, mã hóa, và có thể dùng SSD làm cache cho HDD.</p>
+
+        <h3 id="raid">11.8 · RAID Structure <span class="vi">Cấu trúc RAID</span></h3>
+        <p>Hộp NAS của An có bốn ổ. Nên ghép chúng thành một khối lớn cho nhanh, hay chép dữ liệu lên nhiều ổ cho an toàn? Nhiều ổ mở ra hai cơ hội: chạy song song để đọc ghi nhanh hơn, và lưu thông tin thừa để một ổ hỏng không làm mất dữ liệu. Các kỹ thuật nhắm tới hai mục tiêu đó gọi chung là <dfn>RAID</dfn> (<span class="en">redundant arrays of independent disks</span>). Chữ I từng là <em>inexpensive</em>, vì RAID ra đời để thay ổ lớn đắt bằng nhiều ổ nhỏ rẻ; ngày nay RAID được dùng vì độ tin cậy và tốc độ nên I đọc là <em>independent</em>.</p>
+
+        <h4 id="do-tin-cay">11.8.1 · Improvement of Reliability via Redundancy <span class="vi">Tăng độ tin cậy nhờ dư thừa</span></h4>
+        <p>Càng nhiều ổ, khả năng <em>một ổ nào đó</em> hỏng càng cao. Độ tin cậy của ổ đo bằng <dfn>thời gian trung bình giữa hai lần hỏng</dfn> (<span class="en">mean time between failures, MTBF</span>). Nếu mỗi ổ có MTBF 100.000 giờ, thì trong mảng 100 ổ, trung bình cứ 100.000 / 100 = 1.000 giờ, khoảng 41,66 ngày, lại có một ổ hỏng. Nếu dữ liệu chỉ có một bản, tần suất mất dữ liệu đó là không chấp nhận được.</p>
+        <p>Lời giải là <em>dư thừa</em> (<span class="en">redundancy</span>): lưu thêm thông tin dùng để dựng lại dữ liệu khi một ổ hỏng. Cách đơn giản và đắt nhất là <dfn>phản chiếu</dfn> (<span class="en">mirroring</span>): một ổ logic gồm hai ổ vật lý, mọi lần ghi làm trên cả hai, tạo thành một <dfn>tập đĩa phản chiếu</dfn> (<span class="en">mirrored volume</span>). Dữ liệu chỉ mất khi ổ thứ hai hỏng trước khi ổ thứ nhất được thay xong. Nếu hai ổ hỏng độc lập và <dfn>thời gian sửa trung bình</dfn> (<span class="en">mean time to repair</span>) là 10 giờ, thời gian trung bình tới khi mất dữ liệu là MTBF² / (2 × thời gian sửa) = 100.000² / 20 = 500 × 10⁶ giờ, khoảng <b>57.000 năm</b>.</p>
+        <p>Thực tế con số nhỏ hơn nhiều, vì hỏng hóc không độc lập: mất điện, thiên tai, lỗi cùng một lô sản xuất, hay ổ già đi đều làm hai ổ dễ hỏng cùng lúc. Mất điện còn gây một rủi ro riêng: nếu đang ghi cùng một khối lên hai ổ thì hai bản có thể lệch nhau. Có thể ghi xong bản này mới ghi bản kia, hoặc thêm cho mảng một cache không khả biến được bảo vệ khi mất điện.</p>
+
+        <h4 id="song-song">11.8.2 · Improvement in Performance via Parallelism <span class="vi">Tăng hiệu năng nhờ song song</span></h4>
+        <p>Phản chiếu cũng đọc nhanh hơn: mỗi yêu cầu đọc gửi được tới ổ nào cũng được, nên số lần đọc mỗi giây tăng gấp đôi. Muốn tăng tốc độ của từng lần truyền, ta <dfn>chia dải dữ liệu</dfn> (<span class="en">data striping</span>) qua nhiều ổ. Chia dải mức bit ghi bit thứ <var>i</var> của mỗi byte lên ổ thứ <var>i</var>, nhưng kiểu duy nhất còn phổ biến là <dfn>chia dải mức khối</dfn> (<span class="en">block-level striping</span>): với <var>n</var> ổ, khối <var>i</var> của tệp nằm trên ổ (<var>i</var> mod <var>n</var>) + 1. Chia dải vừa cân bằng tải khi có nhiều truy cập nhỏ, vừa giảm thời gian đáp ứng của truy cập lớn, vì một tệp ảnh lớn được đọc từ nhiều ổ cùng lúc.</p>
+
+        <h4 id="muc-raid">11.8.3 · RAID Levels <span class="vi">Các mức RAID</span></h4>
+        <p>Phản chiếu tin cậy nhưng tốn gấp đôi ổ; chia dải nhanh nhưng không tăng độ tin cậy. Kết hợp chia dải với bit chẵn lẻ ở mục 11.4 cho những điểm cân bằng rẻ hơn, được phân loại thành các <dfn>mức RAID</dfn> (<span class="en">RAID levels</span>). Hình dưới vẽ năm mức phổ biến, mỗi mức chứa cùng lượng dữ liệu bằng bốn ổ.</p>
+        <figure class="fig">
+          <div class="b5-levels">
+            <div class="b5-level"><b>RAID 0</b><small>chia dải, không dư thừa</small>
+              <div class="b5-disks" style="--n:4"><span>A1<br>A5</span><span>A2<br>A6</span><span>A3<br>A7</span><span>A4<br>A8</span></div></div>
+            <div class="b5-level"><b>RAID 1</b><small>phản chiếu từng ổ</small>
+              <div class="b5-disks" style="--n:8"><span>A1</span><span>A2</span><span>A3</span><span>A4</span><span class="c">A1</span><span class="c">A2</span><span class="c">A3</span><span class="c">A4</span></div></div>
+            <div class="b5-level"><b>RAID 4</b><small>chia dải khối, một ổ chẵn lẻ</small>
+              <div class="b5-disks" style="--n:5"><span>A1<br>A5</span><span>A2<br>A6</span><span>A3<br>A7</span><span>A4<br>A8</span><span class="p">P1<br>P2</span></div></div>
+            <div class="b5-level"><b>RAID 5</b><small>chẵn lẻ xoay vòng qua mọi ổ</small>
+              <div class="b5-disks" style="--n:5"><span>A1<br><i class="p">P2</i></span><span>A2<br>A5</span><span>A3<br>A6</span><span>A4<br>A7</span><span><i class="p">P1</i><br>A8</span></div></div>
+            <div class="b5-level"><b>RAID 6</b><small>hai khối dư thừa P và Q mỗi stripe</small>
+              <div class="b5-disks" style="--n:6"><span>A1</span><span>A2</span><span>A3</span><span>A4</span><span class="p">P1</span><span class="q">Q1</span></div></div>
+          </div>
+          <figcaption><b>Đọc hình theo cột.</b> Mỗi cột là một ổ, mỗi hàng là một stripe. Ô viền đậm là bản sao, P là khối chẵn lẻ, Q là khối mã sửa lỗi thứ hai. Đếm số cột không chứa dữ liệu gốc để thấy chi phí: RAID 1 thêm bốn ổ, RAID 4 và 5 thêm một, RAID 6 thêm hai.</figcaption>
+        </figure>
+        <p><dfn>RAID 0</dfn> là chia dải mức khối không dư thừa, <dfn>RAID 1</dfn> là phản chiếu. Các mức còn lại tìm điểm cân bằng giữa hai thái cực đó bằng khối chẵn lẻ.</p>
+        <p><dfn>RAID 4</dfn> chia dải khối qua <var>N</var> ổ dữ liệu và lưu khối chẵn lẻ của mỗi hàng trên ổ thứ <var>N</var> + 1. Ở mục 11.4, một bit chẵn lẻ chỉ đủ phát hiện lỗi; ở đây nó đủ để sửa, vì bộ điều khiển ổ tự biết sector nào đọc hỏng nhờ ECC của sector. Đã biết <em>vị trí</em> lỗi thì chỉ cần tìm <em>giá trị</em>: khối mất bằng XOR của mọi khối còn lại trong hàng, kể cả khối chẵn lẻ. Đọc một khối chỉ đụng tới một ổ, và đọc ghi khối lớn rất nhanh vì mọi ổ cùng chạy. Nhưng một lần <em>ghi nhỏ</em> phải đọc dữ liệu cũ và chẵn lẻ cũ, tính P mới = P cũ ⊕ dữ liệu cũ ⊕ dữ liệu mới, rồi ghi cả hai. Chu trình <dfn>đọc–sửa–ghi</dfn> (<span class="en">read-modify-write cycle</span>) này tốn bốn lần truy cập ổ. So với RAID 1, RAID 4 tốn ít ổ hơn nhiều và đọc ghi một loạt khối nhanh gấp <var>N</var> lần; chi phí tính chẵn lẻ thì nhỏ với CPU hiện đại, và bộ điều khiển phần cứng có cache NVRAM còn gom đủ cả stripe để tránh đọc–sửa–ghi.</p>
+        <p><dfn>RAID 5</dfn> (<span class="en">block-interleaved distributed parity</span>) khác RAID 4 ở một điểm: khối chẵn lẻ được trải qua cả <var>N</var> + 1 ổ. Với năm ổ, chẵn lẻ của hàng <var>n</var> nằm trên ổ (<var>n</var> mod 5) + 1, không bao giờ cùng ổ với dữ liệu nó bảo vệ. Nhờ vậy không có một ổ chẵn lẻ duy nhất bị quá tải như RAID 4, và RAID 5 là mức dùng chẵn lẻ phổ biến nhất. <dfn>RAID 6</dfn>, hay sơ đồ <span class="en">P + Q</span>, lưu thêm một khối Q tính bằng mã sửa lỗi trên trường Galois (không dùng XOR được vì sẽ trùng P), nên chịu được <em>hai</em> ổ hỏng. Mảng hàng trăm ổ còn dùng RAID 6 nhiều chiều, áp dụng RAID 6 theo cả hàng lẫn cột.</p>
+        <div class="box idea"><div class="box-h">Lưu ý về tên gọi</div><p>Giáo trình ấn bản 10 gọi RAID 4 là <span lang="en">memory-style error-correcting-code organization</span>. Trong bài báo gốc về RAID và ấn bản 9, tên đó thuộc về RAID 2, mức dùng mã Hamming, còn RAID 4 là <span lang="en">block-interleaved parity</span>. Khi làm bài, hãy mô tả RAID 4 theo cơ chế: chia dải mức khối với một ổ chẵn lẻ riêng.</p></div>
+        <p>Hai cách kết hợp RAID 0 với RAID 1 dùng khi cần cả hiệu năng lẫn độ tin cậy, đổi lại tốn gấp đôi ổ. <dfn>RAID 0 + 1</dfn> chia dải một bộ ổ rồi phản chiếu cả dải; <dfn>RAID 1 + 0</dfn> phản chiếu từng cặp rồi chia dải qua các cặp. Khác biệt lộ ra khi một ổ hỏng, như hình dưới.</p>
+        <figure class="fig">
+          <div class="b5-mirror-compare">
+            <div><b>RAID 0 + 1</b><small>chia dải rồi phản chiếu</small>
+              <div class="b5-row lost"><span class="x">✕</span><span>ổ</span><span>ổ</span><span>ổ</span><em>dải 1: hỏng cả dải</em></div>
+              <div class="b5-row"><span>ổ</span><span>ổ</span><span>ổ</span><span>ổ</span><em>dải 2: còn chạy</em></div></div>
+            <div><b>RAID 1 + 0</b><small>phản chiếu từng cặp rồi chia dải</small>
+              <div class="b5-row"><span class="x">✕</span><span>ổ</span><span>ổ</span><span>ổ</span><em>chỉ mất một ổ</em></div>
+              <div class="b5-row"><span>ổ</span><span>ổ</span><span>ổ</span><span>ổ</span><em>bản phản chiếu của nó</em></div></div>
+          </div>
+          <figcaption><b>Cùng một ổ hỏng, hậu quả khác nhau.</b> Ở RAID 0 + 1, cả dải chứa ổ hỏng không dùng được, và thêm một ổ bất kỳ của dải kia hỏng là mất dữ liệu. Ở RAID 1 + 0, chỉ một ổ không dùng được; hệ thống chỉ mất dữ liệu nếu đúng ổ cặp với nó cũng hỏng.</figcaption>
+        </figure>
+        <p>Bảng dưới gom các mức theo những câu hỏi hay gặp khi làm bài: với <var>n</var> ổ dung lượng <var>C</var>, dùng được bao nhiêu, chịu được mấy ổ hỏng, và một lần ghi nhỏ tốn bao nhiêu lần truy cập.</p>
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="Tóm tắt các mức RAID">
+          <table class="tbl">
+            <thead><tr><th scope="col">Mức</th><th scope="col">Dung lượng dùng được</th><th scope="col">Chịu được</th><th scope="col">Ghi nhỏ một khối</th><th scope="col">Hợp với</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">RAID 0</th><td><var>n</var>·<var>C</var></td><td>0 ổ hỏng</td><td>1 lần ghi</td><td>Dữ liệu nạp lại được</td></tr>
+              <tr><th scope="row">RAID 1</th><td><var>n</var>·<var>C</var> / 2</td><td>1 ổ mỗi cặp</td><td>2 lần ghi</td><td>Tin cậy, phục hồi nhanh</td></tr>
+              <tr><th scope="row">RAID 4</th><td>(<var>n</var> − 1)·<var>C</var></td><td>1 ổ</td><td>4 lần, luôn đụng ổ chẵn lẻ</td><td>Thêm ổ dễ dàng</td></tr>
+              <tr><th scope="row">RAID 5</th><td>(<var>n</var> − 1)·<var>C</var></td><td>1 ổ</td><td>4 lần, chẵn lẻ trải đều</td><td>Lượng dữ liệu vừa phải</td></tr>
+              <tr><th scope="row">RAID 6</th><td>(<var>n</var> − 2)·<var>C</var></td><td>2 ổ</td><td>6 lần (đọc và ghi D, P, Q)</td><td>Mảng lưu trữ lớn</td></tr>
+              <tr><th scope="row">RAID 1 + 0</th><td><var>n</var>·<var>C</var> / 2</td><td>Ít nhất 1, tối đa 1 mỗi cặp</td><td>2 lần ghi</td><td>Cơ sở dữ liệu nhỏ, cần nhanh và bền</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Đọc theo cột thứ hai và thứ ba, mỗi ổ dư thừa mua được khả năng chịu thêm một ổ hỏng; cột thứ tư cho biết cái giá khi ghi. Để thấy phép XOR làm việc, hãy chạy mô phỏng dưới đây. Mỗi khối chỉ có 4 bit cho dễ tính tay; khối 4 KiB thật cũng tính hệt vậy cho từng bit.</p>
+        <div class="box predict"><div class="box-h">Đoán trước</div><p>Hàng 0 có A = 0110, C = 0011 và P = 1110. Ổ chứa B hỏng: B bằng bao nhiêu? Ở tình huống thứ hai, An sửa hai khối ở hai hàng khác nhau. Với RAID 4 và RAID 5, ổ nào phải làm nhiều nhất, và hai lần ghi có chạy song song được không?</p></div>
+        <div id="mo-phong-raid" data-io-lab="raid">
+          <noscript><p>Bật JavaScript để chạy mô phỏng. Đáp án nhanh: B = 0110 ⊕ 0011 ⊕ 1110 = 1011. Ở RAID 4, ổ chẵn lẻ tham gia cả hai lần ghi nhỏ nên chúng phải chờ nhau; ở RAID 5, hai khối chẵn lẻ nằm trên hai ổ khác nhau.</p></noscript>
+        </div>
+        <p>RAID có thể được cài ở nhiều tầng: phần mềm quản lý tập đĩa trong kernel, phần cứng của HBA, phần cứng của mảng lưu trữ, hoặc thiết bị ảo hóa trên đường kết nối SAN. Ở mỗi tầng còn có thể có <dfn>ảnh chụp nhanh</dfn> (<span class="en">snapshot</span>), tức góc nhìn của hệ thống tệp trước lần cập nhật cuối, và <dfn>sao chép sang nơi khác</dfn> (<span class="en">replication</span>), đồng bộ hoặc không đồng bộ, để phòng thảm họa. Hầu hết cài đặt RAID còn có <dfn>ổ dự phòng nóng</dfn> (<span class="en">hot spare</span>), sẵn sàng tự thay vào khi có ổ hỏng để dựng lại ngay.</p>
+
+        <h4 id="chon-raid">11.8.4 · Selecting a RAID Level <span class="vi">Chọn mức RAID</span></h4>
+        <p>Một tiêu chí quan trọng là <em>hiệu năng dựng lại</em>: RAID 1 chỉ cần chép từ ổ kia, còn các mức khác phải đọc mọi ổ còn lại, và dựng lại RAID 5 nhiều ổ lớn có thể mất hàng giờ. Từ đó có các khuyến nghị: RAID 0 cho dữ liệu nạp lại được như tính toán khoa học; RAID 1 cho dữ liệu cần tin cậy và phục hồi nhanh; RAID 0 + 1 và 1 + 0 cho cơ sở dữ liệu nhỏ cần cả nhanh lẫn bền; RAID 5 cho lượng dữ liệu vừa phải; RAID 6 và RAID 6 nhiều chiều là định dạng phổ biến nhất trong mảng lưu trữ. Với hộp NAS bốn ổ 8 TB của An, RAID 5 cho 24 TB và chịu một ổ hỏng, còn RAID 6 hay RAID 1 + 0 cho 16 TB; RAID 6 chịu được bất kỳ hai ổ hỏng, RAID 1 + 0 chỉ khi hai ổ thuộc hai cặp khác nhau.</p>
+        <div class="box idea"><div class="box-h">Bối cảnh 2026 · dựng lại RAID 5 với ổ lớn</div><p>Với HDD 20–30 TB, dựng lại RAID 5 mất nhiều ngày chứ không phải vài giờ, và trong thời gian đó chỉ cần thêm một ổ hỏng hay một sector không đọc được là mất dữ liệu. Vì vậy với ổ dung lượng lớn, người ta thường khuyên RAID 6 thay cho RAID 5.</p></div>
+        <details class="deep"><summary><span class="q">Đọc thêm · mảng InServ: RAID theo mẩu nhỏ và cấp phát dần</span></summary><div class="deep-body">
+          <p>Mảng InServ của HP 3Par chia mỗi ổ thành các mẩu 256 MB và áp dụng RAID ở mức mẩu, nên một ổ có thể cùng lúc thuộc nhiều mức RAID. Nó còn cho phép cấp cho máy chủ một dung lượng logic lớn nhưng chỉ chiếm ổ thật khi dữ liệu thật sự được ghi, kỹ thuật ngày nay gọi là cấp phát mỏng (<span lang="en">thin provisioning</span>), giúp hoãn việc mua ổ tới khi cần.</p>
+        </div></details>
+
+        <h4 id="mo-rong-raid">11.8.5 · Extensions <span class="vi">Mở rộng</span></h4>
+        <p>Ý tưởng RAID còn được áp dụng cho mảng băng từ, để khôi phục khi một cuộn băng hỏng, và cho phát dữ liệu không dây: một khối được chia nhỏ và phát kèm một đơn vị chẵn lẻ, nên bên nhận dựng lại được đơn vị bị mất.</p>
+
+        <h4 id="van-de-raid">11.8.6 · Problems with RAID <span class="vi">Những giới hạn của RAID</span></h4>
+        <p>RAID chỉ bảo vệ trước lỗi <em>vật lý của phương tiện lưu trữ</em>. Con trỏ sai trong cấu trúc tệp, lần ghi dở dang (<span class="en">torn writes</span>), một tiến trình ghi đè nhầm, hay lỗi của chính bộ điều khiển RAID đều có thể làm mất dữ liệu. Nếu An lỡ xóa một thư mục ảnh, RAID trung thành xóa nó trên mọi ổ. Vì vậy RAID không thay được sao lưu.</p>
+        <p>Hệ thống tệp ZFS giải quyết nhóm vấn đề này bằng checksum cho mọi khối, đặt ở <em>con trỏ</em> trỏ tới khối chứ không ở chính khối: inode giữ checksum của từng khối dữ liệu, mục thư mục giữ checksum của inode. Dữ liệu hỏng thì checksum lệch ngay, và nếu có bản phản chiếu đúng, ZFS tự sửa bản hỏng; Btrfs trên Linux có tính năng tương tự. ZFS còn gỡ một hạn chế khác của RAID truyền thống là sự cứng nhắc, như hình dưới.</p>
+        <figure class="fig">
+          <div class="b5-pool-compare">
+            <div><b>Truyền thống</b>
+              <div class="b5-pool-row"><span class="fs">FS</span><span class="fs">FS</span><span class="fs">FS</span></div>
+              <div class="b5-pool-row"><span>tập đĩa</span><span>tập đĩa</span><span>tập đĩa</span></div>
+              <small>Mỗi hệ thống tệp bị giới hạn trong tập đĩa của nó</small></div>
+            <div><b>ZFS</b>
+              <div class="b5-pool-row"><span class="fs">ZFS</span><span class="fs">ZFS</span><span class="fs">ZFS</span></div>
+              <div class="b5-pool-row"><span class="pool">vùng lưu trữ chung (pool)</span></div>
+              <small>Mọi hệ thống tệp lấy chỗ từ cùng một pool</small></div>
+          </div>
+          <figcaption><b>Từ ô cố định sang kho chung.</b> Theo cách truyền thống, nếu một hệ thống tệp lớn hơn tập đĩa của nó còn hệ thống tệp khác gần như bỏ trống, phải dời dữ liệu hay đổi kích thước tập đĩa. ZFS gom ổ thành một pool; mỗi hệ thống tệp xin và trả khối từ pool như <code>malloc()</code> và <code>free()</code>, kèm hạn mức (<span lang="en">quota</span>) và mức đặt trước (<span lang="en">reservation</span>) đổi được bất cứ lúc nào.</figcaption>
+        </figure>
+
+        <h4 id="luu-tru-doi-tuong">11.8.7 · Object Storage <span class="vi">Lưu trữ đối tượng</span></h4>
+        <p>Bản sao ảnh của An trên đám mây không nằm trong một hệ thống tệp như ta quen. <dfn>Lưu trữ đối tượng</dfn> (<span class="en">object storage</span>) bắt đầu từ một vùng chứa chung và đặt các <em>đối tượng</em> vào đó, không có cây thư mục để duyệt. Nó hướng về chương trình chứ không hướng về người, với chuỗi thao tác chỉ ba bước: tạo đối tượng và nhận mã đối tượng, truy cập qua mã, xóa qua mã. Phần mềm như HDFS hay Ceph quyết định đặt đối tượng ở đâu, thường bằng cách lưu <var>N</var> bản trên <var>N</var> máy phổ thông thay vì dùng RAID, và chạy phép tính ngay trên máy có bản sao. Bảng dưới so sánh với hệ thống tệp.</p>
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="So sánh hệ thống tệp và lưu trữ đối tượng">
+          <table class="tbl">
+            <thead><tr><th scope="col"></th><th scope="col">Hệ thống tệp</th><th scope="col">Lưu trữ đối tượng</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Định danh</th><td>Tên trong cây thư mục</td><td>Mã đối tượng; không duyệt được</td></tr>
+              <tr><th scope="row">Bảo vệ dữ liệu</th><td>Thường nhờ RAID</td><td>Thường nhân bản trên nhiều máy</td></tr>
+              <tr><th scope="row">Mở rộng</th><td>Bị giới hạn bởi mảng lưu trữ</td><td>Mở rộng ngang: thêm máy vào pool, tới hàng petabyte</td></tr>
+              <tr><th scope="row">Hợp với</th><td>Truy cập ngẫu nhiên nhanh</td><td>Kho dữ liệu khối lượng lớn</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Mỗi đối tượng tự mô tả nội dung của nó, nên lưu trữ đối tượng còn gọi là <dfn>lưu trữ định địa chỉ theo nội dung</dfn> (<span class="en">content-addressable storage</span>), chứa dữ liệu phi cấu trúc. Dù hiếm trên máy đa dụng, nó đang chứa nội dung tìm kiếm của Google, tệp của Dropbox, nhạc của Spotify, ảnh của Facebook, và Amazon S3 của điện toán đám mây.</p>
+        <div class="box key"><div class="box-h">Điều cần nhớ · Chapter 11</div><ul>
+          <li><em>HDD</em>: đĩa, rãnh, cung, trụ. Thời gian truy cập = thời gian tìm + độ trễ quay + thời gian truyền; độ trễ quay trung bình = 30.000 / RPM ms. Phần cơ học chiếm gần hết, nên thứ tự và tính liền nhau quyết định hiệu năng.</li>
+          <li><em>NVM</em>: đọc ghi theo trang, xóa theo khối, không ghi đè được, hao mòn theo chu kỳ ghi–xóa. Bộ điều khiển dùng <em>FTL</em>, thu gom rác, dự phòng dung lượng và cân bằng hao mòn; thu gom rác gây <em>khuếch đại ghi</em>, TRIM làm giảm nó.</li>
+          <li>Thiết bị được trình ra như dãy khối logic đánh số bằng <em>LBA</em>; thuật toán giả định LBA gần nhau thì nằm gần nhau.</li>
+          <li>Lập lịch HDD: FCFS công bằng nhưng đi xa; SCAN quét qua lại; C-SCAN quét một chiều rồi quay về, chờ đều hơn; SSTF, LOOK, C-LOOK là biến thể hay ra thi. Nói rõ có tính chặng quay về hay không. NVM thường dùng FCFS có gộp yêu cầu.</li>
+          <li>Bit chẵn lẻ phát hiện lỗi 1 bit; CRC phát hiện lỗi nhiều bit; ECC phát hiện và sửa, phân biệt lỗi mềm và lỗi cứng.</li>
+          <li>Chuẩn bị ổ: định dạng cấp thấp → phân vùng → tập đĩa → định dạng logic. Khởi động qua firmware → MBR (nay là UEFI/GPT) → boot sector. Khối hỏng xử lý bằng thay sector hoặc trượt sector.</li>
+          <li>Vùng hoán đổi là tệp hoặc phân vùng thô; Linux dùng bản đồ hoán đổi với bộ đếm số ánh xạ. Gắn lưu trữ: với máy, NAS, đám mây, SAN.</li>
+          <li><em>RAID</em>: 0 chia dải, 1 phản chiếu, 4 một ổ chẵn lẻ, 5 chẵn lẻ xoay vòng, 6 chịu hai ổ hỏng. Khối mất = XOR các khối còn lại. Ghi nhỏ RAID 5 tốn 4 lần truy cập. MTBF của <var>n</var> ổ chia <var>n</var>; phản chiếu: MTBF² / (2 × thời gian sửa). RAID không thay được sao lưu.</li>
+        </ul></div>
+      </section>
+
+      <section aria-labelledby="chuong-12">
+        <h2 id="chuong-12"><span class="sec">12</span><span>I/O Systems <span class="vi">Hệ thống vào/ra</span></span></h2>
+        <p>Ổ lưu trữ chỉ là một trong vô số thiết bị vào/ra, bên cạnh bàn phím, chuột, card mạng, màn hình, máy in. Chương này hỏi: làm sao kernel điều khiển những thiết bị khác nhau tới vậy mà vẫn trình cho ứng dụng một giao diện thống nhất, và làm điều đó nhanh? Ta đi từ phần cứng lên giao diện ứng dụng, vào các dịch vụ của kernel nằm giữa, ráp tất cả thành đường đi của một yêu cầu, rồi kết thúc bằng hiệu năng.</p>
+
+        <h3 id="tong-quan-io">12.1 · Overview <span class="vi">Tổng quan</span></h3>
+        <p>Máy tính làm hai việc chính là vào/ra và tính toán, và nhiều khi vào/ra mới là việc chính: lướt thư viện ảnh hay sửa chú thích ảnh chủ yếu là đọc và nhập thông tin. Cái khó nằm ở sự đa dạng, vì chuột, ổ cứng, USB flash và robot băng từ khác nhau cả về chức năng lẫn tốc độ. Các cách điều khiển chúng hợp thành <dfn>hệ con vào/ra</dfn> (<span class="en">I/O subsystem</span>) của kernel, tách phần còn lại của kernel khỏi sự phức tạp đó. Lời giải kết hợp hai phía: về phần cứng, cổng, bus và bộ điều khiển tiếp nhận được nhiều loại thiết bị; về phần mềm, các mô-đun <dfn>driver thiết bị</dfn> (<span class="en">device driver</span>) che chi tiết riêng của từng thiết bị sau một giao diện thống nhất, giống như system call trình cho ứng dụng một giao diện chuẩn.</p>
+
+        <h3 id="phan-cung-io">12.2 · I/O Hardware <span class="vi">Phần cứng vào/ra</span></h3>
+        <p>Thiết bị thường thuộc ba nhóm: lưu trữ, truyền dẫn như card mạng, và giao tiếp người–máy như bàn phím, màn hình. Dù đa dạng, chỉ vài khái niệm là đủ để hiểu chúng được nối và điều khiển ra sao. Thiết bị giao tiếp với máy qua một <dfn>cổng</dfn> (<span class="en">port</span>). Nếu nhiều thiết bị dùng chung một bộ dây theo một giao thức quy định chặt chẽ các thông điệp, đó là một <dfn>bus</dfn>; nếu thiết bị cắm nối tiếp vào nhau rồi mới vào máy, đó là một <dfn>chuỗi nối tiếp</dfn> (<span class="en">daisy chain</span>). Hình dưới là cấu trúc bus điển hình của máy tính cá nhân.</p>
+        <figure class="fig">
+          <svg class="teaching-svg b5-bus b5-narrow" viewBox="0 0 340 250" role="img" aria-labelledby="bus-title bus-desc">
+            <title id="bus-title">Cấu trúc bus điển hình của máy tính cá nhân</title>
+            <desc id="bus-desc">CPU và cache nối với bộ nhớ qua cầu và bộ điều khiển bộ nhớ. Bus PCIe nối cầu với bộ điều khiển đồ họa, bộ điều khiển SAS và giao diện bus mở rộng. Bộ điều khiển SAS nối với bốn ổ đĩa. Bus mở rộng nối với bàn phím và cổng USB.</desc>
+            <rect class="nd-acc" x="4" y="8" width="84" height="40" rx="6"/><text class="annotation" x="46" y="25" text-anchor="middle">CPU</text><text class="annotation" x="46" y="41" text-anchor="middle">+ cache</text>
+            <rect class="nd-violet" x="120" y="8" width="100" height="40" rx="6"/><text class="annotation" x="170" y="25" text-anchor="middle">cầu nối, điều</text><text class="annotation" x="170" y="41" text-anchor="middle">khiển bộ nhớ</text>
+            <rect class="nd-soft" x="252" y="8" width="84" height="40" rx="6"/><text class="annotation" x="294" y="33" text-anchor="middle">RAM</text>
+            <path class="route" d="M88 28H120M220 28H252"/>
+            <path class="bus-line" d="M8 82H332"/>
+            <text class="annotation halo" x="332" y="72" text-anchor="end">bus PCIe</text>
+            <path class="route" d="M170 48V82"/>
+            <rect class="nd" x="4" y="104" width="100" height="38" rx="6"/><text class="annotation" x="54" y="120" text-anchor="middle">điều khiển</text><text class="annotation" x="54" y="135" text-anchor="middle">đồ họa</text>
+            <rect class="nd" x="120" y="104" width="100" height="38" rx="6"/><text class="annotation" x="170" y="120" text-anchor="middle">điều khiển</text><text class="annotation" x="170" y="135" text-anchor="middle">SAS</text>
+            <rect class="nd" x="236" y="104" width="100" height="38" rx="6"/><text class="annotation" x="286" y="120" text-anchor="middle">giao diện</text><text class="annotation" x="286" y="135" text-anchor="middle">bus mở rộng</text>
+            <path class="route" d="M54 82V104M170 82V104M286 82V104"/>
+            <rect class="nd-soft" x="4" y="166" width="100" height="28" rx="6"/><text class="annotation" x="54" y="185" text-anchor="middle">màn hình</text>
+            <path class="route" d="M54 142V166M170 142V160"/>
+            <g class="device-glyph"><rect x="122" y="160" width="44" height="24" rx="4"/><rect x="174" y="160" width="44" height="24" rx="4"/><rect x="122" y="192" width="44" height="24" rx="4"/><rect x="174" y="192" width="44" height="24" rx="4"/></g>
+            <text class="annotation" x="144" y="177" text-anchor="middle">đĩa</text><text class="annotation" x="196" y="177" text-anchor="middle">đĩa</text><text class="annotation" x="144" y="209" text-anchor="middle">đĩa</text><text class="annotation" x="196" y="209" text-anchor="middle">đĩa</text>
+            <path class="bus-line thin" d="M240 172H336"/>
+            <path class="route" d="M286 142V172M262 172V192M312 172V192"/>
+            <rect class="nd-soft" x="240" y="192" width="44" height="24" rx="5"/><text class="annotation" x="262" y="209" text-anchor="middle">phím</text>
+            <rect class="nd-soft" x="290" y="192" width="44" height="24" rx="5"/><text class="annotation" x="312" y="209" text-anchor="middle">USB</text>
+            <text class="annotation" x="288" y="236" text-anchor="middle">bus mở rộng</text>
+          </svg>
+          <figcaption><b>Bus theo tầng tốc độ.</b> Bus PCIe nối CPU và bộ nhớ với các thiết bị nhanh, còn bus mở rộng gom thiết bị chậm như bàn phím và cổng USB. Bốn ổ đĩa nối chung vào một bộ điều khiển SAS, cho thấy một bộ điều khiển có thể quản lý cả một nhóm thiết bị.</figcaption>
+        </figure>
+        <p>PCIe gửi dữ liệu qua một hay nhiều <em>làn</em> (<span class="en">lane</span>), ký hiệu x1 tới x32, và qua nhiều thế hệ: một card “PCIe gen3 x8” có thông lượng tối đa khoảng 8 GB/s, và mỗi thế hệ sau gấp đôi tốc độ mỗi làn. Phía sau mỗi cổng hay bus là một <dfn>bộ điều khiển</dfn> (<span class="en">controller</span>), mạch điện tử vận hành cổng, bus hay thiết bị. Nó có thể đơn giản như một con chip điều khiển cổng nối tiếp, hoặc phức tạp như một bo mạch HBA có bộ xử lý và bộ nhớ riêng; ổ cứng có sẵn bộ điều khiển trên bo mạch của nó.</p>
+
+        <h4 id="mmio">12.2.1 · Memory-Mapped I/O <span class="vi">Vào/ra ánh xạ bộ nhớ</span></h4>
+        <p>CPU ra lệnh cho bộ điều khiển bằng cách đọc ghi các mẫu bit vào <em>thanh ghi</em> của nó. Có hai cách. Cách thứ nhất dùng <em>lệnh vào/ra</em> riêng để chuyển một byte hay một từ tới một địa chỉ cổng. Cách thứ hai là <dfn>vào/ra ánh xạ bộ nhớ</dfn> (<span class="en">memory-mapped I/O</span>): thanh ghi của thiết bị được ánh xạ vào không gian địa chỉ của bộ xử lý, nên CPU dùng ngay lệnh đọc ghi bộ nhớ thông thường. Bộ điều khiển đồ họa là ví dụ điển hình: vẽ lên màn hình chỉ là ghi vào một vùng nhớ, nhanh hơn nhiều so với phát hàng triệu lệnh vào/ra. Vì vậy ngày nay phần lớn vào/ra dùng cách này. Một thiết bị thường có bốn thanh ghi như bảng dưới.</p>
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="Bốn thanh ghi điều khiển thiết bị">
+          <table class="tbl">
+            <thead><tr><th scope="col">Thanh ghi</th><th scope="col">Ai ghi, ai đọc</th><th scope="col">Dùng để</th></tr></thead>
+            <tbody>
+              <tr><th scope="row"><span lang="en">data-in</span></th><td>Thiết bị ghi, CPU đọc</td><td>Lấy dữ liệu vào</td></tr>
+              <tr><th scope="row"><span lang="en">data-out</span></th><td>CPU ghi, thiết bị đọc</td><td>Gửi dữ liệu ra</td></tr>
+              <tr><th scope="row"><dfn>Trạng thái</dfn> (<span class="en">status</span>)</th><td>Thiết bị ghi, CPU đọc</td><td>Lệnh xong chưa, có byte để đọc chưa, có lỗi không</td></tr>
+              <tr><th scope="row"><dfn>Điều khiển</dfn> (<span class="en">control</span>)</th><td>CPU ghi</td><td>Bắt đầu một lệnh hoặc đổi chế độ, như bật kiểm tra chẵn lẻ, chọn tốc độ</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Thanh ghi dữ liệu thường dài 1 tới 4 byte; một số bộ điều khiển có chip FIFO giữ được vài byte để chứa một đợt dữ liệu ngắn. Đã có thanh ghi, câu hỏi tiếp theo là CPU và bộ điều khiển phối hợp qua chúng thế nào.</p>
+
+        <h4 id="tham-do">12.2.2 · Polling <span class="vi">Thăm dò</span></h4>
+        <p>Giao thức <dfn>bắt tay</dfn> (<span class="en">handshaking</span>) cơ bản trong giáo trình dùng hai bit. Bộ điều khiển báo trạng thái qua bit <em>busy</em>: bằng 1 khi đang bận, 0 khi sẵn sàng nhận lệnh. Máy báo có lệnh mới qua bit <em>command-ready</em>. Để ghi một byte ra cổng, hai bên phối hợp qua sáu bước.</p>
+        <ol class="b5-steps">
+          <li><b>Máy</b> đọc bit busy liên tục cho tới khi nó bằng 0.</li>
+          <li><b>Máy</b> đặt bit write trong thanh ghi lệnh và ghi một byte vào data-out.</li>
+          <li><b>Máy</b> đặt bit command-ready.</li>
+          <li><b>Bộ điều khiển</b> thấy command-ready bằng 1 thì đặt busy.</li>
+          <li><b>Bộ điều khiển</b> đọc thanh ghi lệnh, thấy lệnh ghi, lấy byte trong data-out và đưa ra thiết bị.</li>
+          <li><b>Bộ điều khiển</b> xóa command-ready, xóa bit error để báo thành công, rồi xóa busy.</li>
+        </ol>
+        <p>Vòng này lặp lại cho mỗi byte, và đây chính là bài toán sản xuất–tiêu thụ ở Buổi 3: máy sản xuất, bộ điều khiển tiêu thụ, data-out là bộ đệm một ô, còn hai bit làm nhiệm vụ đồng bộ. Ở bước 1, máy <dfn>chờ bận</dfn> (<span class="en">busy-waiting</span>), hay <dfn>thăm dò</dfn> (<span class="en">polling</span>): quay vòng đọc thanh ghi trạng thái cho tới khi busy bằng 0.</p>
+        <div class="box predict"><div class="box-h">Đoán trước</div><p>CPU cần gửi hai byte “A” và “n”. Nếu lúc bắt đầu bộ điều khiển còn bận việc trước, CPU phải đọc thanh ghi trạng thái bao nhiêu lần? Bit nào do CPU đặt, bit nào do bộ điều khiển đặt? Dự đoán rồi chạy cả hai tình huống.</p></div>
+        <div id="mo-phong-bat-tay" data-io-lab="handshake">
+          <noscript><p>Bật JavaScript để chạy mô phỏng. Sáu bước ở danh sách phía trên lặp lại cho mỗi byte; CPU chỉ đặt command-ready, write và data-out, còn bộ điều khiển đặt và xóa busy, xóa command-ready và error.</p></noscript>
+        </div>
+        <p>Mỗi vòng thăm dò rất rẻ, chỉ ba lệnh máy: đọc thanh ghi, AND để tách bit, rẽ nhánh. Nếu thiết bị nhanh, thăm dò là hợp lý. Nhưng nếu phải lặp rất nhiều lần mới thấy thiết bị sẵn sàng, CPU phí thời gian lẽ ra dùng cho việc khác; còn nếu CPU bận việc khác quá lâu mới quay lại, bộ đệm nhỏ của bàn phím hay cổng nối tiếp có thể tràn và mất dữ liệu. Tốt hơn là để bộ điều khiển chủ động báo khi sẵn sàng.</p>
+
+        <h4 id="ngat">12.2.3 · Interrupts <span class="vi">Ngắt</span></h4>
+        <p>Cơ chế để thiết bị báo cho CPU chính là <dfn>ngắt</dfn> (<span class="en">interrupt</span>) đã gặp ở Buổi 1. CPU kiểm tra một dây gọi là <dfn>đường yêu cầu ngắt</dfn> (<span class="en">interrupt-request line</span>) sau mỗi lệnh. Khi một bộ điều khiển phát tín hiệu trên dây này, CPU lưu trạng thái rồi nhảy tới <dfn>trình xử lý ngắt</dfn> (<span class="en">interrupt handler</span>); trình xử lý tìm nguyên nhân, phục vụ thiết bị, khôi phục trạng thái và trở về. Giáo trình nói bộ điều khiển <em>phát</em> (<span class="en">raise</span>) ngắt, CPU <em>bắt</em> (<span class="en">catch</span>) và <em>chuyển</em> (<span class="en">dispatch</span>) nó tới trình xử lý, và trình xử lý <em>xóa</em> (<span class="en">clear</span>) ngắt. Hình dưới tóm tắt chu trình.</p>
+        <figure class="fig">
+          <ol class="b5-cycle">
+            <li class="cpu"><b>1</b>Driver khởi động vào/ra</li>
+            <li class="dev"><b>2</b>Bộ điều khiển bắt đầu làm việc với thiết bị</li>
+            <li class="cpu"><b>3</b>CPU chạy việc khác, kiểm tra ngắt sau mỗi lệnh</li>
+            <li class="dev"><b>4</b>Có dữ liệu, ghi xong hoặc lỗi: bộ điều khiển phát ngắt</li>
+            <li class="cpu"><b>5</b>CPU nhận ngắt, chuyển quyền cho trình xử lý</li>
+            <li class="cpu"><b>6</b>Trình xử lý xử lý dữ liệu, trở về từ ngắt</li>
+            <li class="cpu"><b>7</b>CPU tiếp tục việc bị ngắt</li>
+          </ol>
+          <figcaption><b>Chu trình vào/ra dùng ngắt.</b> Ô xanh là việc của CPU, ô vàng là việc của bộ điều khiển. Khác với thăm dò, giữa bước 2 và bước 4 CPU hoàn toàn tự do.</figcaption>
+        </figure>
+        <p>Một máy cá nhân ngồi yên đã xử lý gần 23.000 ngắt trong mười giây theo ví dụ của giáo trình, còn máy chủ xử lý hàng trăm nghìn ngắt mỗi giây. Ở mức đó, hệ điều hành cần thêm bốn khả năng, do CPU và bộ điều khiển ngắt cung cấp như bảng dưới.</p>
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="Bốn nhu cầu về ngắt và cơ chế đáp ứng">
+          <table class="tbl">
+            <thead><tr><th scope="col">Nhu cầu</th><th scope="col">Cơ chế</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Hoãn xử lý ngắt khi đang làm việc hệ trọng</th><td><dfn>Ngắt che được</dfn> (<span class="en">maskable interrupt</span>) dùng cho thiết bị, CPU tắt được tạm thời; <dfn>ngắt không che được</dfn> (<span class="en">nonmaskable interrupt</span>) dành cho sự cố như lỗi bộ nhớ không sửa được</td></tr>
+              <tr><th scope="row">Tìm đúng trình xử lý mà không phải hỏi mọi thiết bị</th><td><dfn>Vectơ ngắt</dfn> (<span class="en">interrupt vector</span>): ngắt mang một con số, là chỉ số vào bảng địa chỉ các trình xử lý</td></tr>
+              <tr><th scope="row">Phân biệt ngắt khẩn và ngắt thường</th><td><dfn>Mức ưu tiên ngắt</dfn> (<span class="en">interrupt priority levels</span>): hoãn ngắt ưu tiên thấp, cho ngắt ưu tiên cao chen ngang</td></tr>
+              <tr><th scope="row">Cho một lệnh gây chú ý của hệ điều hành</th><td><dfn>Trap</dfn>: lỗi trang, chia cho 0, system call đi qua cùng cơ chế</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Máy thường có nhiều trình xử lý hơn số phần tử của vectơ ngắt. Cách giải là <dfn>xâu chuỗi ngắt</dfn> (<span class="en">interrupt chaining</span>): mỗi phần tử trỏ tới một danh sách trình xử lý, được gọi lần lượt tới khi gặp trình xử lý phục vụ được, một điểm cân bằng giữa bảng khổng lồ và một trình xử lý phải dò tất cả. Trên Intel Pentium mà giáo trình dẫn, các số vectơ 0 tới 31 dành cho lỗi và ngoại lệ, chẳng hạn 0 là lỗi chia và <b>14 là lỗi trang</b> ở Buổi 4, còn 32 tới 255 là ngắt che được dành cho thiết bị. Lúc khởi động, hệ điều hành dò các bus và cài trình xử lý tương ứng vào vectơ.</p>
+        <p>Vì xử lý ngắt bị bó buộc về thời gian, nhiều hệ thống chia nó làm hai: <dfn>trình xử lý ngắt cấp một</dfn> (<span class="en">first-level interrupt handler, FLIH</span>) lo lưu trạng thái và xếp hàng việc cần làm, còn <dfn>trình xử lý ngắt cấp hai</dfn> (<span class="en">second-level interrupt handler, SLIH</span>) được lập lịch riêng để làm phần chính. Cũng cơ chế ngắt đó phục vụ lỗi trang, và phục vụ system call qua một lệnh <dfn>ngắt mềm</dfn> (<span class="en">software interrupt</span>), tức trap, có ưu tiên thấp hơn ngắt thiết bị vì phục vụ một bộ điều khiển trước khi FIFO của nó tràn thì khẩn hơn. Kernel còn dùng cặp ngắt để tự điều phối: khi một lần đọc đĩa xong, trình xử lý ưu tiên cao khởi động ngay lần đọc kế tiếp cho ổ, rồi để một trình xử lý ưu tiên thấp chép dữ liệu cho ứng dụng sau.</p>
+        <p>Tóm lại, vào/ra dùng ngắt nay phổ biến hơn thăm dò rất nhiều, còn thăm dò dành cho vào/ra thông lượng cao; một số driver dùng ngắt khi tải thấp và chuyển sang thăm dò khi tải cao.</p>
+        <details class="deep"><summary><span class="q">Đọc thêm · luồng ngắt của Solaris, MSI-X và NAPI</span></summary><div class="deep-body">
+          <p>Solaris chạy trình xử lý ngắt như các luồng kernel có ưu tiên cao, nên bộ lập lịch tự cho ngắt ưu tiên cao chen ngang ngắt ưu tiên thấp và nhiều trình xử lý chạy song song trên máy nhiều lõi. Trên phần cứng ngày nay, thiết bị PCIe dùng ngắt báo bằng thông điệp (MSI, MSI-X) thay cho dây ngắt vật lý, mỗi thiết bị có thể có nhiều vectơ, chẳng hạn mỗi hàng đợi NVMe một vectơ gắn với một lõi. Ý tưởng chuyển giữa ngắt và thăm dò được Linux cài đặt cho card mạng dưới tên NAPI.</p>
+        </div></details>
+
+        <h4 id="dma">12.2.4 · Direct Memory Access <span class="vi">Truy cập bộ nhớ trực tiếp</span></h4>
+        <p>Ngắt giải phóng CPU khỏi việc <em>chờ</em>, nhưng với thiết bị truyền nhiều dữ liệu như ổ đĩa, CPU vẫn phải <em>chép</em> từng byte qua thanh ghi, cách làm gọi là <dfn>vào/ra do CPU tự chuyển</dfn> (<span class="en">programmed I/O, PIO</span>). Máy tính tránh lãng phí đó bằng một bộ xử lý chuyên dụng, <dfn>bộ điều khiển truy cập bộ nhớ trực tiếp</dfn> (<span class="en">direct-memory-access controller, DMA controller</span>). Để bắt đầu, máy ghi vào bộ nhớ một <em>khối lệnh DMA</em> gồm con trỏ nguồn, con trỏ đích và số byte; khối lệnh cũng có thể là cả một danh sách nguồn và đích không liền nhau, gọi là <dfn>gom–rải</dfn> (<span class="en">scatter–gather</span>). CPU đưa địa chỉ khối lệnh cho bộ điều khiển DMA rồi đi làm việc khác. Hình dưới là sáu bước khi driver đọc một khối từ ổ vào vùng đệm ở địa chỉ X.</p>
+        <figure class="fig">
+          <ol class="b5-dma">
+            <li><b>1</b><span>Driver được yêu cầu chuyển dữ liệu từ ổ vào vùng đệm ở địa chỉ X</span></li>
+            <li><b>2</b><span>Driver bảo bộ điều khiển ổ chuyển C byte vào vùng đệm ở X</span></li>
+            <li><b>3</b><span>Bộ điều khiển ổ bắt đầu lần truyền DMA</span></li>
+            <li><b>4</b><span>Bộ điều khiển ổ gửi từng byte cho bộ điều khiển DMA</span></li>
+            <li class="hot"><b>5</b><span>Bộ điều khiển DMA ghi byte vào vùng đệm X, tăng địa chỉ và giảm C cho tới khi C = 0</span></li>
+            <li class="irq"><b>6</b><span>Khi C = 0, bộ điều khiển DMA phát ngắt báo CPU việc truyền đã xong</span></li>
+          </ol>
+          <figcaption><b>CPU chỉ xuất hiện ở hai đầu.</b> Bước 1 và 2 là driver chạy trên CPU; bước 3 tới 5 do phần cứng tự làm; bước 6 là ngắt duy nhất cho cả khối. Nếu CPU tự chép như ở Buổi 1, đọc 4 KiB tốn 4.096 ngắt; với DMA chỉ còn một.</figcaption>
+        </figure>
+        <p>Bước 4 và 5 có bắt tay riêng qua cặp dây <em>DMA-request</em> và <em>DMA-acknowledge</em>. Trong lúc bộ điều khiển DMA chiếm bus bộ nhớ để ghi, CPU tạm thời không truy cập được bộ nhớ chính, dù vẫn dùng được cache. Hiện tượng này gọi là <dfn>đánh cắp chu kỳ</dfn> (<span class="en">cycle stealing</span>); nó làm CPU chậm đi chút ít, nhưng giao việc chép cho DMA vẫn làm cả hệ thống nhanh hơn.</p>
+        <p>Đích của lần truyền thường nằm trong không gian kernel, vì nếu nằm trong không gian người dùng, ứng dụng có thể sửa vùng đệm ngay giữa lần truyền. Nhưng khi đó dữ liệu lại phải chép thêm một lần sang ứng dụng, nên các hệ điều hành dần chuyển sang ánh xạ bộ nhớ để truyền thẳng vào không gian người dùng. Một số kiến trúc còn dùng <dfn>truy cập bộ nhớ ảo trực tiếp</dfn> (<span class="en">direct virtual memory access, DVMA</span>), với địa chỉ ảo được dịch sang địa chỉ vật lý. Ngày nay ý tưởng đó nằm trong IOMMU: một “MMU cho thiết bị” vừa dịch địa chỉ DMA vừa chặn thiết bị ghi bậy vào bộ nhớ. Kernel có bảo vệ cũng không cho tiến trình tự ra lệnh cho thiết bị, mà chỉ cung cấp hàm cho tiến trình đủ đặc quyền.</p>
+
+        <h4 id="tom-tat-phan-cung">12.2.5 · I/O Hardware Summary <span class="vi">Tóm tắt phần cứng vào/ra</span></h4>
+        <p>Bảng dưới gom các khái niệm phần cứng theo đúng thứ tự một lần vào/ra cần tới.</p>
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="Tóm tắt các khái niệm phần cứng vào/ra">
+          <table class="tbl">
+            <thead><tr><th scope="col">Khái niệm</th><th scope="col">Trả lời câu hỏi</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Bus</th><td>Thiết bị nối với CPU và bộ nhớ qua đường nào?</td></tr>
+              <tr><th scope="row">Bộ điều khiển</th><td>Ai vận hành cổng, bus hay thiết bị?</td></tr>
+              <tr><th scope="row">Cổng vào/ra và thanh ghi</th><td>CPU nói chuyện với bộ điều khiển qua đâu?</td></tr>
+              <tr><th scope="row">Bắt tay</th><td>Hai bên phối hợp từng bước ra sao?</td></tr>
+              <tr><th scope="row">Thăm dò hoặc ngắt</th><td>Máy biết bộ điều khiển xong việc bằng cách nào?</td></tr>
+              <tr><th scope="row">DMA</th><td>Ai chép dữ liệu khi lần truyền lớn?</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Thực tế, mỗi loại thiết bị có bộ khả năng, bit điều khiển và giao thức riêng. Làm sao gắn thiết bị mới mà không phải viết lại hệ điều hành, và làm sao cho ứng dụng một giao diện thống nhất? Đó là chủ đề của mục tiếp theo.</p>
+
+        <h3 id="giao-dien-ung-dung">12.3 · Application I/O Interface <span class="vi">Giao diện vào/ra cho ứng dụng</span></h3>
+        <p>Ứng dụng xem ảnh mở được tệp ảnh mà không cần biết nó nằm trên SSD NVMe, ổ USB hay hộp NAS. Làm được vậy là nhờ trừu tượng hóa, đóng gói và phân tầng: thiết bị được gom thành vài <em>loại</em> chung, mỗi loại có một giao diện chuẩn, và khác biệt riêng của từng thiết bị được đóng gói trong driver. Hình dưới cho thấy các tầng đó.</p>
+        <figure class="fig">
+          <div class="b5-stack" role="img" aria-label="Các tầng vào/ra trong kernel: hệ con vào/ra ở trên, các driver ở giữa, các bộ điều khiển và thiết bị ở dưới">
+            <div class="b5-stack-row sw-k"><span class="b5-stack-label">kernel</span><span class="wide">hệ con vào/ra của kernel</span></div>
+            <div class="b5-stack-row sw-d"><span class="b5-stack-label">driver</span><span>SAS</span><span>bàn phím</span><span>chuột</span><span>PCIe</span><span>802.11</span><span>USB</span></div>
+            <div class="b5-stack-row hw"><span class="b5-stack-label">bộ điều khiển</span><span>SAS</span><span>bàn phím</span><span>chuột</span><span>PCIe</span><span>802.11</span><span>USB</span></div>
+            <div class="b5-stack-row hw"><span class="b5-stack-label">thiết bị</span><span>đĩa, băng</span><span>bàn phím</span><span>chuột</span><span>bus PCIe</span><span>Wi-Fi</span><span>thiết bị USB</span></div>
+          </div>
+          <figcaption><b>Đường kẻ giữa phần mềm và phần cứng.</b> Hai hàng trên là phần mềm trong kernel, hai hàng dưới là phần cứng. Hệ con vào/ra chỉ nói chuyện với driver qua giao diện chuẩn, nên thêm một thiết bị mới chỉ là thêm một cột: một driver mới.</figcaption>
+        </figure>
+        <p>Nhờ vậy nhà sản xuất phần cứng chỉ cần làm thiết bị tương thích một giao diện có sẵn như SATA, hoặc tự viết driver; điểm bất lợi là mỗi hệ điều hành có chuẩn driver riêng. Bảng dưới liệt kê các chiều mà thiết bị khác nhau.</p>
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="Các đặc điểm của thiết bị vào/ra">
+          <table class="tbl">
+            <thead><tr><th scope="col">Khía cạnh</th><th scope="col">Các khả năng</th><th scope="col">Ví dụ</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Kiểu truyền</th><td>Dòng ký tự (từng byte) hoặc khối</td><td>Bàn phím; ổ đĩa</td></tr>
+              <tr><th scope="row">Cách truy cập</th><td>Tuần tự hoặc ngẫu nhiên</td><td>Modem; CD-ROM</td></tr>
+              <tr><th scope="row">Lịch truyền</th><td>Đồng bộ (đoán trước được) hoặc bất đồng bộ (thất thường)</td><td>Băng; bàn phím</td></tr>
+              <tr><th scope="row">Chia sẻ</th><td>Dùng chung được hoặc dành riêng</td><td>Bàn phím; băng</td></tr>
+              <tr><th scope="row">Tốc độ</th><td>Độ trễ, thời gian tìm, tốc độ truyền</td><td>Từ vài byte tới hàng GB mỗi giây</td></tr>
+              <tr><th scope="row">Chiều vào/ra</th><td>Chỉ đọc, chỉ ghi, đọc–ghi</td><td>CD-ROM; bộ điều khiển đồ họa; đĩa</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Phần lớn khác biệt này được giấu đi, và ứng dụng thấy vài kiểu truy cập chuẩn: <em>vào/ra khối</em>, <em>vào/ra dòng ký tự</em>, <em>tệp ánh xạ bộ nhớ</em> và <em>socket mạng</em>, cộng với đồng hồ và bộ định thời. Cho những gì không vừa khuôn, UNIX có “cửa sau” <code>ioctl()</code> chuyển nguyên một lệnh tới driver, với ba đối số: định danh thiết bị, mã lệnh và con trỏ tới dữ liệu tùy ý. Định danh thiết bị là cặp <dfn>số chính và số phụ</dfn> (<span class="en">major and minor device numbers</span>): số chính chọn driver, số phụ chọn thực thể. Trên máy của An, <code>ls -l /dev/sda*</code> cho kết quả sau.</p>
+        <pre class="b5-ls"><code>brw-rw---- 1 root disk 8, 0 Mar 16 09:18 /dev/sda
+brw-rw---- 1 root disk 8, 1 Mar 16 09:18 /dev/sda1
+brw-rw---- 1 root disk 8, 2 Mar 16 09:18 /dev/sda2</code></pre>
+        <p>Chữ <code>b</code> cho biết đây là thiết bị khối, số chính 8 chỉ driver đĩa, còn số phụ 0, 1, 2 chọn cả ổ hay từng phân vùng. Mục 12.5 sẽ dùng lại cặp số này.</p>
+
+        <h4 id="khoi-ky-tu">12.3.1 · Block and Character Devices <span class="vi">Thiết bị khối và thiết bị ký tự</span></h4>
+        <p><dfn>Giao diện thiết bị khối</dfn> (<span class="en">block-device interface</span>) gồm <code>read()</code>, <code>write()</code> và, với thiết bị truy cập ngẫu nhiên, <code>seek()</code>. Ứng dụng thường đi qua hệ thống tệp, còn cơ sở dữ liệu có thể muốn vào/ra thô để tự đệm và tự khóa; lối dung hòa là mở tệp ở chế độ <dfn>vào/ra trực tiếp</dfn> (<span class="en">direct I/O</span>), tắt đệm và khóa của hệ điều hành. Truy cập <em>tệp ánh xạ bộ nhớ</em> cũng xây trên thiết bị khối: tệp hiện ra như một mảng byte trong bộ nhớ ảo, và dữ liệu chỉ được đọc khi có truy cập, nhờ chính cơ chế phân trang theo yêu cầu ở Buổi 4. Ứng dụng xem ảnh ánh xạ tệp ảnh lớn theo cách này, và hệ điều hành cũng ánh xạ tệp thực thi khi chạy chương trình.</p>
+        <p>Bàn phím, chuột, máy in, card âm thanh dùng <dfn>giao diện dòng ký tự</dfn> (<span class="en">character-stream interface</span>) với <code>get()</code> và <code>put()</code> từng ký tự; thư viện có thể xây trên đó việc đọc theo dòng có chỉnh sửa, như phím xóa lùi.</p>
+
+        <h4 id="thiet-bi-mang">12.3.2 · Network Devices <span class="vi">Thiết bị mạng</span></h4>
+        <p>Vào/ra mạng khác vào/ra đĩa cả về hiệu năng lẫn cách đánh địa chỉ, nên có giao diện riêng là <dfn>socket</dfn>: tạo socket, nối tới địa chỉ ở xa, lắng nghe kết nối, gửi và nhận gói tin. Hàm <code>select()</code> cho biết trong một tập socket, socket nào có gói chờ nhận hay còn chỗ để gửi, nên máy chủ khỏi phải thăm dò từng socket.</p>
+
+        <h4 id="dong-ho">12.3.3 · Clocks and Timers <span class="vi">Đồng hồ và bộ định thời</span></h4>
+        <p>Đồng hồ và bộ định thời cho biết giờ hiện tại, thời gian đã trôi, và hẹn giờ làm việc X lúc T. Phần cứng chính là <dfn>bộ định thời lập trình được</dfn> (<span class="en">programmable interval timer</span>), phát ngắt sau một khoảng định trước, một lần hoặc định kỳ; bộ lập lịch ở Buổi 2 dùng nó để thu hồi CPU khi hết lượng thời gian. Kernel phục vụ nhiều yêu cầu hơn số kênh phần cứng bằng <em>đồng hồ ảo</em>: giữ danh sách yêu cầu sắp theo thời điểm và chỉ đặt bộ định thời cho thời điểm sớm nhất. Chẳng hạn cần ngắt sau 30, 50 và 120 ms thì bộ định thời được đặt 30 ms, rồi 20 ms, rồi 70 ms. Máy tính cá nhân có <dfn>bộ định thời sự kiện độ chính xác cao</dfn> (<span class="en">high-performance event timer, HPET</span>) chạy cỡ 10 MHz, và đồng hồ hệ thống bị trôi được chỉnh lại bằng giao thức NTP.</p>
+
+        <h4 id="khong-chan">12.3.4 · Nonblocking and Asynchronous I/O <span class="vi">Vào/ra không chặn và bất đồng bộ</span></h4>
+        <p>Khi gọi một system call <dfn>chặn</dfn> (<span class="en">blocking</span>), luồng bị chuyển từ hàng đợi chạy sang hàng đợi chờ cho tới khi lời gọi xong. Thiết bị vốn hoạt động bất đồng bộ, nhưng hệ điều hành vẫn cho ứng dụng giao diện chặn vì mã chặn dễ viết hơn nhiều. Có những lúc không được chặn: trong khi tải ảnh thu nhỏ, ứng dụng xem ảnh vẫn phải nhận phím và chuột để An cuộn tiếp. Có ba cách. Cách thứ nhất là đa luồng, để vài luồng chịu chặn còn luồng khác chạy tiếp. Cách thứ hai là lời gọi <dfn>không chặn</dfn> (<span class="en">nonblocking</span>), trả về ngay với số byte đã truyền được. Cách thứ ba là lời gọi <dfn>bất đồng bộ</dfn> (<span class="en">asynchronous</span>), trả về ngay rồi báo cho luồng khi vào/ra xong, qua một biến, một tín hiệu hay một hàm gọi lại. Hình dưới đặt ba kiểu cạnh nhau.</p>
+        <figure class="fig">
+          <svg class="teaching-svg b5-modes b5-narrow" viewBox="0 0 340 226" role="img" aria-labelledby="modes-title modes-desc">
+            <title id="modes-title">So sánh lời gọi chặn, không chặn và bất đồng bộ</title>
+            <desc id="modes-desc">Ba làn thời gian. Làn chặn: luồng chờ suốt thời gian thiết bị làm việc rồi mới chạy tiếp. Làn không chặn: lời gọi trả về ngay với phần dữ liệu đang có, luồng phải gọi lại để lấy phần còn lại. Làn bất đồng bộ: lời gọi trả về ngay, luồng chạy tiếp, và nhận thông báo khi toàn bộ dữ liệu đã được truyền.</desc>
+            <defs><marker id="modes-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path class="arrowhead" d="M0 0L10 5L0 10z"/></marker></defs>
+            <text class="annotation" x="4" y="18">Chặn</text>
+            <rect class="nd-acc" x="4" y="26" width="60" height="20" rx="3"/><rect class="b5-wait-bar" x="64" y="26" width="190" height="20" rx="3"/><rect class="nd-acc" x="254" y="26" width="82" height="20" rx="3"/>
+            <text class="annotation" x="159" y="41" text-anchor="middle">luồng bị treo</text>
+            <text class="annotation" x="34" y="62" text-anchor="middle">gọi read()</text><text class="annotation" x="295" y="62" text-anchor="middle">có đủ dữ liệu</text>
+            <text class="annotation" x="4" y="92">Không chặn</text>
+            <rect class="nd-acc" x="4" y="100" width="332" height="20" rx="3"/>
+            <path class="ln-ch" d="M64 96V124M158 96V124M254 96V124"/>
+            <text class="annotation" x="64" y="138" text-anchor="middle">1 KiB</text><text class="annotation" x="158" y="138" text-anchor="middle">0 B</text><text class="annotation" x="254" y="138" text-anchor="middle">3 KiB</text>
+            <text class="annotation" x="4" y="166">Bất đồng bộ</text>
+            <rect class="nd-acc" x="4" y="174" width="332" height="20" rx="3"/>
+            <path class="ln-ch" d="M64 170V198"/>
+            <path class="route" d="M262 212V198" marker-end="url(#modes-arrow)"/>
+            <text class="annotation" x="64" y="214" text-anchor="middle">gửi yêu cầu</text>
+            <text class="annotation" x="256" y="218" text-anchor="end">báo xong: đủ 4 KiB</text>
+          </svg>
+          <figcaption><b>Ba cách đợi một lần đọc 4 KiB.</b> Thanh xanh là lúc luồng chạy được, thanh vàng là lúc luồng bị treo. Lời gọi chặn treo luồng cho tới khi đủ dữ liệu. Lời gọi không chặn trả về ngay với những gì đang có, có khi 0 byte, nên luồng phải tự gọi lại. Lời gọi bất đồng bộ trả về ngay và hứa truyền <em>đủ</em> 4 KiB, rồi báo khi xong.</figcaption>
+        </figure>
+        <p>Hình làm rõ chỗ hay nhầm nhất: <code>read()</code> không chặn trả về ngay với bất cứ dữ liệu nào đang có, đủ, thiếu hay không có gì; còn <code>read()</code> bất đồng bộ yêu cầu một lần truyền sẽ được thực hiện trọn vẹn, chỉ là xong vào lúc sau. Bản thân hệ điều hành cũng làm việc bất đồng bộ: khi ứng dụng ghi ổ, kernel thường chỉ đệm dữ liệu rồi trả về ngay và ghi thật sau đó, có bản UNIX đẩy bộ đệm ra ổ mỗi 30 giây, nên nếu máy sập thì các lần ghi “đang bay” bị mất trừ khi ứng dụng yêu cầu đẩy ngay. Hàm <code>select()</code> với thời gian chờ bằng 0 là một ví dụ của hành vi không chặn: nó chỉ kiểm tra có thể vào/ra hay không, rồi vẫn phải gọi đọc hay ghi sau đó.</p>
+        <div class="box idea"><div class="box-h">Bối cảnh 2026 · <code>epoll</code> và <code>io_uring</code></div><p>Máy chủ mạng trên Linux dùng <code>epoll</code> thay cho <code>select()</code> vì không phải quét lại cả tập socket mỗi lần gọi. Từ năm 2019, Linux có <code>io_uring</code>: ứng dụng và kernel dùng chung một vòng đệm yêu cầu và một vòng đệm kết quả, nên vào/ra bất đồng bộ gần như không tốn system call cho mỗi thao tác. Windows có cổng hoàn tất I/O và gần đây là I/O rings.</p></div>
+
+        <h4 id="vectored">12.3.5 · Vectored I/O <span class="vi">Vào/ra theo vectơ</span></h4>
+        <p>Khi lưu một ảnh đã chỉnh, ứng dụng có ba vùng đệm riêng: phần đầu tệp, siêu dữ liệu và điểm ảnh. <dfn>Vào/ra theo vectơ</dfn> (<span class="en">vectored I/O</span>) cho một system call như <code>writev</code> hay <code>readv</code> làm việc với cả vectơ vùng đệm đó, thay vì ba lần gọi hay một lần chép gom vào vùng đệm lớn. Nó bớt chi phí system call và chuyển ngữ cảnh, và có phiên bản còn bảo đảm cả loạt vào/ra diễn ra nguyên tử.</p>
+
+        <h3 id="he-con-io">12.4 · Kernel I/O Subsystem <span class="vi">Hệ con vào/ra của kernel</span></h3>
+        <p>Giữa giao diện cho ứng dụng và driver là hệ con vào/ra của kernel, cung cấp các dịch vụ lập lịch, đệm, cache, spooling, giữ chỗ thiết bị, xử lý lỗi, và tự bảo vệ trước tiến trình lỗi hay có ý đồ xấu. Các mục con dưới đây xét lần lượt từng dịch vụ, kỹ nhất là đệm và cache.</p>
+
+        <h4 id="lap-lich-io">12.4.1 · I/O Scheduling <span class="vi">Lập lịch vào/ra</span></h4>
+        <p>Thứ tự mà ứng dụng gọi system call hiếm khi là thứ tự tốt nhất. Nếu cánh tay đĩa đang ở gần đầu đĩa và ba ứng dụng cần khối ở cuối, ở đầu và ở giữa, phục vụ theo thứ tự đầu, giữa, cuối sẽ giảm quãng đường, đúng tinh thần mục 11.2. Kernel giữ một hàng đợi chờ cho mỗi thiết bị và sắp lại nó, có thể ưu tiên yêu cầu nhạy độ trễ như của bộ nhớ ảo. Khi hỗ trợ vào/ra bất đồng bộ, kernel phải theo dõi nhiều yêu cầu cùng lúc qua một <dfn>bảng trạng thái thiết bị</dfn> (<span class="en">device-status table</span>), mỗi thiết bị một mục ghi loại, địa chỉ, trạng thái và các yêu cầu đang chờ, như bảng dưới.</p>
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="Bảng trạng thái thiết bị">
+          <table class="tbl">
+            <thead><tr><th scope="col">Thiết bị</th><th scope="col">Trạng thái</th><th scope="col">Các yêu cầu đang chờ</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Bàn phím</th><td>Rảnh</td><td>—</td></tr>
+              <tr><th scope="row">Máy in laser</th><td>Bận</td><td>In từ địa chỉ 38546, dài 1372</td></tr>
+              <tr class="hl"><th scope="row">Ổ đĩa 2</th><td>Bận</td><td>Đọc tệp xxx, địa chỉ 43046, dài 20000 → Ghi tệp yyy, địa chỉ 03458, dài 500</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4 id="dem">12.4.2 · Buffering <span class="vi">Đệm</span></h4>
+        <p><dfn>Bộ đệm</dfn> (<span class="en">buffer</span>) là vùng nhớ chứa dữ liệu đang được chuyển giữa hai thiết bị, hoặc giữa thiết bị và ứng dụng. Giáo trình nêu ba lý do để đệm. Lý do thứ nhất là chênh lệch tốc độ. An tải một album từ đám mây về SSD, mạng chậm hơn ổ hàng nghìn lần: kernel gom byte từ mạng vào một vùng đệm, đầy thì ghi xuống ổ một lần. Nhưng trong lúc ổ ghi, mạng vẫn cần chỗ chứa dữ liệu đang đến, nên dùng hai vùng đệm luân phiên, gọi là <dfn>đệm kép</dfn> (<span class="en">double buffering</span>), như hình dưới.</p>
+        <figure class="fig">
+          <div class="b5-double" role="img" aria-label="Đệm kép: mạng và ổ luân phiên dùng hai vùng đệm">
+            <div class="b5-double-h"><span></span><span>Vùng đệm 1</span><span>Vùng đệm 2</span></div>
+            <div class="b5-double-r"><b>Lượt 1</b><span class="fill">mạng đang đổ vào</span><span class="idle">trống</span></div>
+            <div class="b5-double-r"><b>Lượt 2</b><span class="drain">đang ghi xuống SSD</span><span class="fill">mạng đang đổ vào</span></div>
+            <div class="b5-double-r"><b>Lượt 3</b><span class="fill">mạng đang đổ vào</span><span class="drain">đang ghi xuống SSD</span></div>
+          </div>
+          <figcaption><b>Hai vùng đệm đổi vai luân phiên.</b> Trong lúc ổ ghi một vùng, mạng đổ vào vùng kia. Chỉ cần ổ ghi xong trước khi mạng đổ đầy vùng còn lại, hai bên không bao giờ phải chờ nhau. Đây là bộ đệm vòng hai ô của bài toán sản xuất–tiêu thụ ở Buổi 3.</figcaption>
+        </figure>
+        <p>Lý do thứ hai là chênh lệch kích thước truyền, rất thường gặp trong mạng: bên gửi cắt thông điệp lớn thành nhiều gói, bên nhận ráp lại trong một vùng đệm. Lý do thứ ba là bảo đảm <dfn>ngữ nghĩa sao chép</dfn> (<span class="en">copy semantics</span>). Giả sử ứng dụng gọi <code>write()</code> rồi sửa ngay vùng đệm của mình; dữ liệu ghi ra ổ phải đúng là bản lúc gọi. Cách đơn giản là <code>write()</code> chép dữ liệu vào vùng đệm kernel trước khi trả về; cách rẻ hơn là dùng ánh xạ bộ nhớ và copy-on-write ở Buổi 4.</p>
+
+        <h4 id="cache">12.4.3 · Caching <span class="vi">Cache</span></h4>
+        <p><dfn>Cache</dfn> là vùng nhớ nhanh chứa <em>bản sao</em> dữ liệu. Khác biệt với bộ đệm nằm ở đó: bộ đệm có thể giữ <em>bản duy nhất</em> của dữ liệu đang chuyển, còn cache luôn giữ bản sao của dữ liệu nằm ở nơi khác. Hai chức năng có thể dùng chung một vùng nhớ: kernel giữ dữ liệu đĩa trong các vùng đệm ở RAM, và chính các vùng đó làm <dfn>bộ đệm cache</dfn> (<span class="en">buffer cache</span>). Mỗi yêu cầu đọc tệp được tra trong bộ đệm cache trước; nếu có, khỏi đọc đĩa. Các lần ghi cũng được gom lại vài giây để ghi thành khối lớn. Lần thứ hai An mở cùng một album, ảnh hiện ra gần như tức thì chính vì vậy.</p>
+
+        <h4 id="spooling">12.4.4 · Spooling and Device Reservation <span class="vi">Spooling và giữ chỗ thiết bị</span></h4>
+        <p>Máy in chỉ in được một việc một lúc, và không ai muốn trang ảnh của An xen lẫn trang tài liệu của người khác. <dfn>Spool</dfn> là vùng đệm chứa dữ liệu xuất cho những thiết bị như vậy: hệ điều hành ghi phần in của mỗi ứng dụng vào một tệp riêng trên ổ, rồi lần lượt đưa từng tệp ra máy in, kèm giao diện để xem hay hủy hàng đợi. Cách khác là cho tiến trình giữ độc quyền một thiết bị rồi trả lại sau; khi đó tránh bế tắc là việc của ứng dụng, như ở Buổi 3.</p>
+
+        <h4 id="xu-ly-loi">12.4.5 · Error Handling <span class="vi">Xử lý lỗi</span></h4>
+        <p>Lỗi tạm thời như mạng quá tải thường được bù bằng cách thử lại; lỗi vĩnh viễn như bộ điều khiển hỏng thì khó phục hồi. System call thường chỉ trả về thành công hay thất bại, và UNIX thêm biến <code>errno</code> chứa một trong khoảng một trăm mã lỗi, dù phần cứng như SCSI có thể báo chi tiết hơn nhiều.</p>
+
+        <h4 id="bao-ve-io">12.4.6 · I/O Protection <span class="vi">Bảo vệ vào/ra</span></h4>
+        <p>Mọi lệnh vào/ra là <em>lệnh đặc quyền</em> (Buổi 1), nên tiến trình phải nhờ hệ điều hành qua system call, và vùng nhớ ánh xạ thiết bị được cơ chế bảo vệ bộ nhớ che khỏi người dùng. Ngoại lệ là bộ nhớ đồ họa: trò chơi cần truy cập thẳng, nên kernel cấp từng phần cho một tiến trình tại mỗi thời điểm.</p>
+
+        <h4 id="cau-truc-kernel">12.4.7 · Kernel Data Structures <span class="vi">Cấu trúc dữ liệu của kernel</span></h4>
+        <p>Kernel lưu trạng thái vào/ra trong các cấu trúc như bảng tệp đang mở. Trên UNIX, <code>read()</code> từ tệp, từ đĩa thô hay từ ảnh tiến trình có ngữ nghĩa khác nhau, nên mỗi bản ghi tệp mở chứa một bảng con trỏ tới các hàm phù hợp, như hình dưới. Windows còn đi xa hơn, biến mỗi yêu cầu vào/ra thành một thông điệp gửi qua kernel tới driver.</p>
+        <figure class="fig">
+          <div class="b5-dispatch">
+            <div class="b5-fd"><b>Mô tả tệp</b><small>trong bảng tệp mở của tiến trình</small></div>
+            <div class="b5-records">
+              <div><b>Bản ghi tệp hệ thống tệp</b><span>con trỏ tới inode</span><span>con trỏ tới hàm read, write</span><span>con trỏ tới hàm select, ioctl, close</span></div>
+              <div><b>Bản ghi socket mạng</b><span>con trỏ tới thông tin mạng</span><span>con trỏ tới hàm read, write</span><span>con trỏ tới hàm select, ioctl, close</span></div>
+            </div>
+          </div>
+          <figcaption><b>Bảng phân phát trong bản ghi tệp mở.</b> Kernel chỉ việc gọi “hàm read của bản ghi này” mà không cần biết đó là tệp trên đĩa hay socket mạng, giống gọi phương thức ảo trong lập trình hướng đối tượng.</figcaption>
+        </figure>
+
+        <h4 id="nang-luong">12.4.8 · Power Management <span class="vi">Quản lý điện năng</span></h4>
+        <p>Ở trung tâm dữ liệu, làm mát có thể tốn gấp đôi điện chạy máy, nên hệ điều hành góp phần bằng cách dồn tải rồi tắt máy rảnh, hay tắt bớt lõi CPU khi tải thấp. Trên điện thoại, thời lượng pin quyết định trải nghiệm, và giáo trình phân tích ba tính năng của Android. <dfn>Sập nguồn sâu</dfn> (<span class="en">power collapse</span>) tắt gần hết linh kiện và đưa CPU về trạng thái ngủ thấp nhất, chỉ vài mW thay vì hàng trăm mW, mà vẫn thức dậy ngay khi có ngắt. <dfn>Quản lý điện năng theo linh kiện</dfn> (<span class="en">component-level power management</span>) dựa trên một cây thiết bị: linh kiện không dùng thì tắt, mọi linh kiện trên một bus không dùng thì tắt bus. <dfn>Khóa thức</dfn> (<span class="en">wakelock</span>) cho ứng dụng tạm ngăn máy ngủ, như khi điện thoại của An đang tải ảnh lên đám mây. Trên máy tính đa dụng, việc phát hiện, quản lý và cấp điện cho thiết bị đi qua firmware chuẩn <dfn>ACPI</dfn> (<span class="en">advanced configuration and power interface</span>).</p>
+
+        <h4 id="tom-tat-he-con">12.4.9 · Kernel I/O Subsystem Summary <span class="vi">Tóm tắt hệ con vào/ra</span></h4>
+        <p>Tóm lại, hệ con vào/ra quản lý không gian tên của tệp và thiết bị, kiểm soát truy cập, kiểm soát thao tác (modem không thể <code>seek()</code>), cấp phát không gian và thiết bị, đệm, cache, spooling, lập lịch, theo dõi trạng thái và xử lý lỗi, cấu hình driver và quản lý điện năng. Các tầng trên của nó chỉ truy cập thiết bị qua giao diện thống nhất của driver. Đã có đủ các mảnh, giờ ta ráp chúng lại thành đường đi của một yêu cầu.</p>
+
+        <h3 id="vong-doi-io">12.5 · Transforming I/O Requests to Hardware Operations <span class="vi">Từ yêu cầu vào/ra tới thao tác phần cứng</span></h3>
+        <p>Ứng dụng gọi dữ liệu bằng tên tệp, còn bộ điều khiển chỉ hiểu thanh ghi. Hệ thống tệp lo nửa đầu, từ tên tệp tới các khối của tệp, qua bảng FAT hay inode mà Buổi 6 sẽ học. Nửa sau là từ tên tới đúng bộ điều khiển. MS-DOS dùng tiền tố như <code>C:</code> ứng với một địa chỉ cổng trong bảng thiết bị, tách không gian tên thiết bị khỏi không gian tên tệp. UNIX đặt tên thiết bị ngay trong không gian tên của hệ thống tệp, nên thiết bị cũng có chủ sở hữu và quyền truy cập như tệp, và dùng một <dfn>bảng gắn kết</dfn> (<span class="en">mount table</span>) nối các tiền tố đường dẫn với thiết bị. Bảng dưới theo dấu tệp ảnh <code>/media/an/KhoAnh/2019/hue.jpg</code> trên ổ gắn ngoài của An.</p>
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="Các bước tra từ đường dẫn tới thanh ghi bộ điều khiển trên UNIX">
+          <table class="tbl">
+            <thead><tr><th scope="col">Bước</th><th scope="col">Tra ở đâu</th><th scope="col">Kết quả</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">1</th><td>Bảng gắn kết, tìm tiền tố khớp dài nhất</td><td><code>/media/an/KhoAnh</code> → thiết bị <code>/dev/sdb1</code></td></tr>
+              <tr><th scope="row">2</th><td>Cấu trúc thư mục, tra tên <code>/dev/sdb1</code></td><td>Không phải số inode mà là cặp ⟨số chính, số phụ⟩ = ⟨8, 17⟩</td></tr>
+              <tr><th scope="row">3</th><td>Số chính 8</td><td>Driver đĩa sẽ xử lý mọi vào/ra cho thiết bị này</td></tr>
+              <tr><th scope="row">4</th><td>Số phụ 17, chỉ số vào bảng thiết bị của driver</td><td>Địa chỉ cổng hoặc địa chỉ ánh xạ bộ nhớ của bộ điều khiển</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Nhiều tầng bảng tra như vậy cho hệ điều hành sự linh hoạt: thêm thiết bị và driver mới mà không phải biên dịch lại kernel, thậm chí nạp driver theo nhu cầu khi dò bus lúc khởi động hay khi thiết bị được cắm vào lúc đang chạy. Giờ ta theo trọn vòng đời của một yêu cầu đọc chặn mà giáo trình chia làm mười bước. Trước khi chạy mô phỏng, hãy nhớ lại bộ đệm cache ở mục 12.4.3, DMA ở mục 12.2.4, và hàng đợi sẵn sàng ở Buổi 2.</p>
+        <div class="box predict"><div class="box-h">Đoán trước</div><p>Ở bước nào tiến trình xem ảnh rời CPU, và ở bước nào nó quay lại hàng đợi sẵn sàng? Dữ liệu ảnh đi qua những nơi nào trong bộ nhớ trước khi tới vùng đệm của ứng dụng? Nếu khối đã có trong bộ đệm của kernel, bao nhiêu bước bị bỏ qua?</p></div>
+        <div id="mo-phong-vong-doi" data-io-lab="lifecycle">
+          <noscript><p>Bật JavaScript để chạy mô phỏng. Mười bước: (1) tiến trình gọi read() chặn; (2) kernel kiểm tra tham số và tra bộ đệm, nếu có thì trả về ngay; (3) nếu không, tiến trình vào hàng đợi chờ của thiết bị và yêu cầu được xếp lịch; (4) driver cấp vùng đệm kernel và ghi lệnh vào thanh ghi bộ điều khiển; (5) bộ điều khiển vận hành thiết bị; (6) DMA chuyển dữ liệu vào vùng đệm kernel rồi phát ngắt; (7) trình xử lý ngắt nhận ngắt qua bảng vectơ, báo cho driver; (8) driver xác định yêu cầu nào xong và báo cho hệ con vào/ra; (9) kernel chép dữ liệu sang tiến trình và chuyển nó về hàng đợi sẵn sàng; (10) khi được cấp CPU, tiến trình chạy tiếp sau system call.</p></noscript>
+        </div>
+        <p>Mô phỏng cho thấy tiến trình rời CPU ở bước 3 và chỉ chạy lại sau bước 10, nên trong khoảng giữa CPU phục vụ được tiến trình khác, đúng ý tưởng đa chương trình ở Buổi 1. Dữ liệu đi qua hai chỗ: vùng đệm kernel nhờ DMA, rồi vùng đệm ứng dụng nhờ một lần chép ở bước 9. Với khối đã có trong bộ đệm, tám bước cuối bị bỏ qua.</p>
+
+        <h3 id="streams">12.6 · STREAMS <span class="vi">Cơ chế STREAMS</span></h3>
+        <p>Đường đi ở mục 12.5 gồm các tầng cố định. UNIX System V có một cơ chế cho phép ráp dây chuyền mã driver một cách động, gọi là <dfn>STREAMS</dfn>. Một <em>stream</em> là kết nối song công giữa tiến trình và driver, gồm một <em>đầu stream</em> (<span class="en">stream head</span>) phía tiến trình, một <em>đầu driver</em> (<span class="en">driver end</span>) phía thiết bị, và không hoặc nhiều <em>mô-đun</em> ở giữa, mỗi thành phần có một hàng đọc và một hàng ghi trao đổi thông điệp, như hình dưới.</p>
+        <figure class="fig">
+          <div class="b5-streams">
+            <div class="user">tiến trình người dùng</div>
+            <div class="part head"><b>đầu stream</b><span>hàng đọc ↑</span><span>hàng ghi ↓</span></div>
+            <div class="part mod"><b>mô-đun</b><span>hàng đọc ↑</span><span>hàng ghi ↓</span></div>
+            <div class="part mod"><b>mô-đun</b><span>hàng đọc ↑</span><span>hàng ghi ↓</span></div>
+            <div class="part drv"><b>đầu driver</b><span>hàng đọc ↑</span><span>hàng ghi ↓</span></div>
+            <div class="dev">thiết bị</div>
+          </div>
+          <figcaption><b>Một dây chuyền xếp chồng.</b> Thông điệp ghi đi xuống qua các hàng ghi, dữ liệu đọc đi lên qua các hàng đọc. Tiến trình chèn thêm mô-đun bằng <code>ioctl()</code>, chẳng hạn một mô-đun chỉnh sửa dòng nhập cho bàn phím USB.</figcaption>
+        </figure>
+        <p>Để hàng đợi này không làm tràn hàng đợi kế, mỗi hàng có thể hỗ trợ <dfn>điều khiển luồng</dfn> (<span class="en">flow control</span>), từ chối nhận thông điệp khi hết chỗ. Lợi ích của STREAMS là một khung mô-đun để viết driver và giao thức mạng: một mô-đun mạng dùng chung được cho card Ethernet lẫn card không dây.</p>
+        <details class="deep"><summary><span class="q">Đọc thêm · đọc ghi qua stream và STREAMS ngày nay</span></summary><div class="deep-body">
+          <p>Tiến trình ghi bằng <code>write()</code> hoặc <code>putmsg()</code>, đọc bằng <code>read()</code> hoặc <code>getmsg()</code>; đầu stream chép dữ liệu thành thông điệp và chuyền xuống từng mô-đun. Vào/ra qua STREAMS là bất đồng bộ, trừ chỗ tiến trình giao tiếp với đầu stream: ghi thì bị chặn khi hàng kế đầy, đọc thì bị chặn tới khi có dữ liệu. Đầu driver phải đáp ứng ngắt và xử lý mọi dữ liệu đến, nên khi bộ đệm thiết bị đầy, nó đành bỏ thông điệp, như card mạng bỏ gói tin.</p>
+          <p>Giáo trình viết rằng hầu hết các bản UNIX hỗ trợ STREAMS và đây là cách ưa dùng để viết driver và giao thức. Nhận định đó đã cũ: Linux chưa bao giờ đưa STREAMS vào kernel chính, và chuẩn POSIX đã đánh dấu STREAMS là lỗi thời từ năm 2008.</p>
+        </div></details>
+
+        <h3 id="hieu-nang">12.7 · Performance <span class="vi">Hiệu năng</span></h3>
+        <p>Mười bước ở mục 12.5 đã gợi ý rằng vào/ra rất đắt. Nó bắt CPU chạy mã driver, lập lịch lại tiến trình mỗi khi bị chặn và mở chặn, gây chuyển ngữ cảnh làm nguội cache, và chép dữ liệu hai lần qua bus bộ nhớ: từ bộ điều khiển vào kernel, rồi từ kernel sang ứng dụng. Mỗi ngắt lại tốn chi phí đổi trạng thái, nên vào/ra do CPU tự chuyển có khi còn rẻ hơn ngắt nếu thời gian chờ bận ngắn. Ví dụ đăng nhập từ xa của giáo trình cho thấy rõ cái giá đó, như hình dưới.</p>
+        <figure class="fig">
+          <ol class="b5-remote">
+            <li><b>Máy gửi</b><span>Gõ phím → ngắt bàn phím → trình xử lý ngắt → driver → kernel → tiến trình người dùng</span></li>
+            <li><b>Máy gửi</b><span>System call gửi mạng → các tầng mạng đóng gói → driver mạng → bộ điều khiển gửi gói và phát ngắt → ngắt đi ngược lên để kết thúc system call</span></li>
+            <li><b>Máy nhận</b><span>Phần cứng mạng nhận gói → ngắt → các tầng mạng mở gói → tiến trình nền mạng → tiến trình phục vụ đúng phiên</span></li>
+            <li class="echo"><b>Phản hồi</b><span>Máy nhận gửi trả ký tự để hiện lên màn hình, nên toàn bộ công việc nhân đôi</span></li>
+          </ol>
+          <figcaption><b>Một ký tự, hàng chục lần đổi trạng thái.</b> Mỗi mũi tên đi qua ranh giới giữa phần cứng, kernel và tiến trình là một lần đổi trạng thái hay chuyển ngữ cảnh, cho một ký tự chỉ dài một byte.</figcaption>
+        </figure>
+        <p>Có hệ thống dùng phần cứng riêng để gánh bớt, như bộ tập trung đầu cuối gom lưu lượng của hàng trăm đầu cuối vào một cổng, hay <dfn>kênh vào/ra</dfn> (<span class="en">I/O channel</span>), một CPU chuyên dụng của máy tính lớn chỉ lo vào/ra. Từ đó giáo trình rút ra sáu nguyên tắc, đặt trong bảng dưới cùng ví dụ đã gặp trong buổi học.</p>
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="Sáu nguyên tắc tăng hiệu năng vào/ra">
+          <table class="tbl">
+            <thead><tr><th scope="col">Nguyên tắc</th><th scope="col">Ví dụ trong buổi học</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Giảm số lần chuyển ngữ cảnh</th><td>Vào/ra theo vectơ (12.3.5)</td></tr>
+              <tr><th scope="row">Giảm số lần chép dữ liệu</th><td>Ánh xạ bộ nhớ thay cho chép kernel → người dùng (12.2.4)</td></tr>
+              <tr><th scope="row">Giảm tần suất ngắt</th><td>Truyền khối lớn, bộ điều khiển thông minh, thăm dò khi chờ bận ngắn (12.2.3)</td></tr>
+              <tr><th scope="row">Tăng tính đồng thời</th><td>Giao việc chép cho DMA hay kênh vào/ra (12.2.4)</td></tr>
+              <tr><th scope="row">Đưa xử lý xuống phần cứng</th><td>Bộ điều khiển RAID tự tính chẵn lẻ (11.8.3)</td></tr>
+              <tr><th scope="row">Cân bằng CPU, bộ nhớ, bus và vào/ra</th><td>Một phần quá tải làm các phần khác ngồi chờ</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Vậy chức năng vào/ra nên đặt ở đâu? Giáo trình mô tả một lộ trình thường gặp: thuật toán mới được thử ở mức ứng dụng, nơi linh hoạt và lỗi không làm sập hệ thống, như các hệ thống tệp viết bằng FUSE; khi đã chứng tỏ giá trị, nó được đưa vào kernel hay driver để nhanh hơn, đổi lại khó phát triển và gỡ lỗi hơn; hiệu năng cao nhất đến khi đưa xuống bộ điều khiển hay thiết bị, nhưng khi đó sửa lỗi đắt, phát triển lâu và kém linh hoạt. Càng đi xuống, hiệu quả càng tăng còn tính linh hoạt càng giảm. Trong khi đó thiết bị ngày càng nhanh, NVM thế hệ mới tiến gần tốc độ DRAM, và phần mềm vào/ra chịu áp lực ngày càng lớn để theo kịp.</p>
+        <div class="box idea"><div class="box-h">Bối cảnh 2026 · khi phần mềm thành nút cổ chai</div><p>Khi SSD NVMe đọc một khối trong khoảng 10 micro giây, chi phí của ngắt, chuyển ngữ cảnh và các tầng kernel đã chiếm phần lớn thời gian của một lần vào/ra. Các kỹ thuật mới đi đúng theo sáu nguyên tắc trên: <code>io_uring</code> gom thao tác để bớt system call, chế độ thăm dò của NVMe bỏ ngắt khi thiết bị đủ nhanh, và các thư viện như SPDK cho ứng dụng nói chuyện thẳng với thiết bị.</p></div>
+        <div class="box key"><div class="box-h">Điều cần nhớ · Chapter 12</div><ul>
+          <li>Phần cứng vào/ra gồm cổng, bus và <em>bộ điều khiển</em>. CPU làm việc với bộ điều khiển qua bốn thanh ghi (data-in, data-out, status, control), bằng lệnh vào/ra riêng hoặc <em>vào/ra ánh xạ bộ nhớ</em>.</li>
+          <li><em>Thăm dò</em>: CPU chờ bận bit busy; rẻ khi thiết bị nhanh, phí khi thiết bị chậm. <em>Ngắt</em>: thiết bị báo khi xong; có che được và không che được, vectơ ngắt, xâu chuỗi ngắt, mức ưu tiên, FLIH/SLIH; trap và lỗi trang dùng cùng cơ chế.</li>
+          <li><em>DMA</em>: CPU chỉ ghi khối lệnh (nguồn, đích, số byte), bộ điều khiển DMA tự chép và phát một ngắt khi xong; có đánh cắp chu kỳ; gom–rải cho phép nhiều vùng trong một lệnh.</li>
+          <li>Driver che khác biệt thiết bị sau vài giao diện chuẩn: khối, ký tự, tệp ánh xạ bộ nhớ, socket; <code>ioctl()</code> là cửa sau; số chính chọn driver, số phụ chọn thực thể.</li>
+          <li><em>Chặn</em> treo luồng tới khi xong; <em>không chặn</em> trả về ngay với những gì đang có; <em>bất đồng bộ</em> trả về ngay và báo khi truyền đủ.</li>
+          <li>Hệ con vào/ra: lập lịch, <em>đệm</em> (chênh tốc độ, chênh kích thước, ngữ nghĩa sao chép), <em>cache</em> (bản sao), <em>spooling</em>, xử lý lỗi, bảo vệ, quản lý điện năng.</li>
+          <li>Một <code>read()</code> chặn đi qua mười bước: tiến trình rời CPU khi phải đọc thiết bị, DMA đưa dữ liệu vào vùng đệm kernel, ngắt báo xong, kernel chép sang tiến trình và đưa nó về hàng đợi sẵn sàng. Bộ đệm cache có thể bỏ qua cả chuỗi.</li>
+          <li>Vào/ra đắt vì chuyển ngữ cảnh, ngắt và chép dữ liệu; tăng hiệu năng bằng cách giảm ba thứ đó, tăng đồng thời, đưa xử lý xuống phần cứng và giữ cân bằng.</li>
+        </ul></div>
+      </section>
+
+      <section aria-labelledby="ghi-nho">
+        <h2 id="ghi-nho"><span>Summary &amp; Review <span class="vi">Tổng kết và ôn tập</span></span></h2>
+        <p>Buổi học trả lời hai câu hỏi về vào/ra. Chapter 11 cho thấy dữ liệu được cất trên thiết bị ra sao và hệ điều hành làm gì để đọc ghi chúng nhanh và an toàn: từ hình học của HDD và đặc tính của NAND, tới sắp xếp hàng đợi, sửa lỗi, chuẩn bị ổ, vùng hoán đổi, các cách gắn lưu trữ và RAID. Chapter 12 cho thấy kernel điều khiển mọi loại thiết bị bằng cùng một bộ khung: thanh ghi, thăm dò, ngắt và DMA ở phần cứng; driver và vài giao diện chuẩn ở phía ứng dụng; các dịch vụ đệm, cache, spooling ở giữa. Bảng dưới xâu các kiến thức lại theo chuỗi vấn đề và lời giải, trong đó mỗi lời giải lại sinh ra cái giá riêng.</p>
+        <div class="tbl-wrap" tabindex="0" role="region" aria-label="Hệ thống hóa vấn đề, cơ chế và cái giá">
+          <table class="tbl">
+            <thead><tr><th scope="col">Vấn đề</th><th scope="col">Cơ chế giải quyết</th><th scope="col">Cái giá hoặc vấn đề mới</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Đầu đọc HDD tốn thời gian di chuyển</th><td>Lập lịch đĩa: SCAN, C-SCAN, deadline (11.2)</td><td>Có thể gây đói; vô ích khi hàng đợi ngắn</td></tr>
+              <tr><th scope="row">NAND không ghi đè được, mòn khi xóa</th><td>FTL, thu gom rác, dự phòng dung lượng, cân bằng hao mòn (11.1.2)</td><td>Khuếch đại ghi; hiệu năng ghi thay đổi theo mức đầy</td></tr>
+              <tr><th scope="row">Bit có thể bị hỏng</th><td>Bit chẵn lẻ, CRC, ECC (11.4)</td><td>Tốn thêm bit dư thừa; lỗi cứng vẫn mất dữ liệu</td></tr>
+              <tr><th scope="row">Sector hỏng dần</th><td>Thay sector, trượt sector (11.5.3)</td><td>Phá tính liền nhau, hoặc phải chép nhiều sector</td></tr>
+              <tr><th scope="row">Cả một ổ có thể hỏng</th><td>RAID: phản chiếu, chẵn lẻ (11.8)</td><td>Tốn thêm ổ, ghi nhỏ đắt, dựng lại lâu, không thay được sao lưu</td></tr>
+              <tr><th scope="row">CPU phí thời gian chờ thiết bị</th><td>Ngắt thay cho thăm dò (12.2.3)</td><td>Mỗi ngắt tốn lưu và khôi phục trạng thái</td></tr>
+              <tr><th scope="row">CPU phí thời gian chép dữ liệu</th><td>DMA (12.2.4)</td><td>Đánh cắp chu kỳ bus; cần bảo vệ địa chỉ DMA</td></tr>
+              <tr><th scope="row">Thiết bị muôn hình vạn trạng</th><td>Driver và các giao diện chuẩn (12.3)</td><td>Mỗi hệ điều hành một chuẩn driver</td></tr>
+              <tr><th scope="row">Ứng dụng không muốn bị treo khi vào/ra</th><td>Vào/ra không chặn, bất đồng bộ (12.3.4)</td><td>Mã khó viết hơn</td></tr>
+              <tr><th scope="row">Thiết bị chênh tốc độ, chênh kích thước</th><td>Đệm, cache, spooling (12.4)</td><td>Thêm lần chép; dữ liệu đang đệm mất khi sập máy</td></tr>
+              <tr><th scope="row">Vào/ra quá nhiều tầng, quá đắt</th><td>Sáu nguyên tắc hiệu năng (12.7)</td><td>Đưa xuống phần cứng thì kém linh hoạt</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="box recap"><div class="box-h">Kể lại câu chuyện của một lần mở ảnh</div><p>An bấm mở một bức ảnh cũ trên ổ gắn ngoài. Ứng dụng gọi <code>read()</code>, và trap đưa CPU vào kernel. Kernel tra bộ đệm cache; không thấy, nó dùng bảng gắn kết và cặp số chính, số phụ để tìm driver đĩa, đưa tiến trình vào hàng đợi chờ, và bộ lập lịch đĩa xếp yêu cầu vào cùng các yêu cầu tạo ảnh thu nhỏ để đầu đọc đi ít nhất. Driver ghi lệnh vào thanh ghi của bộ điều khiển qua vào/ra ánh xạ bộ nhớ. Cánh tay tìm tới đúng trụ, chờ sector quay tới, bộ điều khiển kiểm tra ECC, rồi DMA chép khối vào vùng đệm kernel và phát một ngắt. Trình xử lý ngắt báo cho driver, kernel chép dữ liệu sang ứng dụng và đưa nó về hàng đợi sẵn sàng. Song song đó, bản sao lưu của bức ảnh nằm yên trong hộp NAS, nơi RAID 5 giữ khối chẵn lẻ để sống sót qua một ổ hỏng, còn SSD trong laptop lặng lẽ thu gom rác và cân bằng hao mòn sau lớp FTL. Mọi cơ chế đó cùng phục vụ một mục tiêu: cho ứng dụng một giao diện đơn giản và đáng tin, trên một thế giới thiết bị chậm, đa dạng và có thể hỏng bất cứ lúc nào.</p></div>
+        <p>Buổi này nhìn ổ như một dãy khối logic, và đã nhiều lần nhắc tới “hệ thống tệp” mà chưa giải thích: inode, bảng FAT, thư mục, TRIM, bảng tệp đang mở. Buổi 6 sẽ xây hệ thống tệp trên chính dãy khối đó, từ giao diện tệp và thư mục mà người dùng thấy, tới cách cấp phát khối và quản lý vùng trống bên trong. Trước khi đi tiếp, hãy thử sức với các câu hỏi dưới đây.</p>
+
+        <h3 id="tu-kiem-tra">Practice Exercises <span class="vi">Câu hỏi và bài tập tự kiểm tra</span></h3>
+        <p>Hãy ghi phép tính ra giấy trước khi mở lời giải. Các bài lập lịch đĩa kiểm tra lại được bằng mô phỏng ở mục 11.2.</p>
+        <details class="quiz"><summary><span class="q">1. Một ổ quay 10.000 RPM. Độ trễ quay trung bình là bao nhiêu? Ổ 5.400 RPM thì sao?</span></summary><div class="ans"><p>Một vòng mất 60.000 / 10.000 = 6 ms, trung bình chờ nửa vòng nên độ trễ quay trung bình là 3 ms. Với 5.400 RPM, một vòng mất khoảng 11,1 ms, độ trễ trung bình khoảng 5,56 ms.</p></div></details>
+        <details class="quiz"><summary><span class="q">2. Ổ 7.200 RPM có thời gian tìm trung bình 8 ms và tốc độ truyền 200 MB/s. Tính thời gian đọc một khối 4 KiB ở vị trí ngẫu nhiên và số lần đọc ngẫu nhiên mỗi giây.</span></summary><div class="ans"><p>Thời gian tìm 8 ms, độ trễ quay 4,17 ms, thời gian truyền 4.096 / 200.000.000 s ≈ 0,02 ms. Tổng ≈ 12,19 ms, nên ổ làm được khoảng 1.000 / 12,19 ≈ 82 lần đọc ngẫu nhiên mỗi giây. Phần truyền dữ liệu chiếm chưa tới 0,2%.</p></div></details>
+        <details class="quiz"><summary><span class="q">3. Một ổ có độ trễ truy cập 15 ms và tốc độ truyền liên tục 5 MB/s. Tính tốc độ truyền hiệu dụng khi mỗi lần đọc 512 byte, và khi mỗi lần đọc 1 MB.</span></summary><div class="ans"><p>Đọc 512 B mất 15 ms + 512 / 5.000.000 s ≈ 15,1 ms, nên tốc độ hiệu dụng ≈ 512 / 0,0151 ≈ 33,9 KB/s, chưa tới 1% tốc độ liên tục. Đọc 1 MB mất 15 + 200 = 215 ms, nên tốc độ hiệu dụng ≈ 4,65 MB/s, tức 93%. Truyền càng lớn, chi phí định vị càng được chia nhỏ. Đây là bài tập 11.7 của giáo trình.</p></div></details>
+        <details class="quiz"><summary><span class="q">4. Một ổ lý tưởng có 8 đầu đọc và 63 sector mỗi rãnh, đánh số sector từ 0. LBA 10.000 nằm ở trụ, đầu đọc và sector nào?</span></summary><div class="ans"><p>Mỗi trụ có 8 × 63 = 504 sector. Trụ = ⌊10.000 / 504⌋ = 19, phần dư 10.000 − 9.576 = 424. Đầu đọc = ⌊424 / 63⌋ = 6, sector = 424 − 378 = 46. Kiểm tra theo công thức: ⌊10.000 / 63⌋ = 158, 158 mod 8 = 6 và 10.000 mod 63 = 46.</p></div></details>
+        <details class="quiz"><summary><span class="q">5. Đĩa có trụ 0 tới 4.999. Đầu đọc đang ở 2.150, yêu cầu trước ở 1.805. Hàng đợi: 2.069; 1.212; 2.296; 2.800; 544; 1.618; 356; 1.523; 4.965; 3.681. Tính tổng quãng đường với FCFS, SCAN và C-SCAN.</span></summary><div class="ans"><p>Yêu cầu trước ở 1.805 nên cánh tay đang đi theo chiều tăng. FCFS: 81 + 857 + 1.084 + 504 + 2.256 + 1.074 + 1.262 + 1.167 + 3.442 + 1.284 = <b>13.011</b> trụ. SCAN: đi lên phục vụ 2.296, 2.800, 3.681, 4.965, tới mép 4.999 (2.849 trụ), rồi đi xuống tới 356 (4.643 trụ), tổng <b>7.492</b>. C-SCAN: đi lên tới 4.999 (2.849), quay về 0 (4.999), rồi lên tới 2.069 (2.069), tổng <b>9.917</b>, hoặc 4.918 nếu không tính chặng quay về. Đây là bài tập 11.13 của giáo trình.</p></div></details>
+        <details class="quiz"><summary><span class="q">6. Với hàng đợi “Ảnh của An” trong mô phỏng (đầu đọc ở 120; 30, 145, 10, 170, 125, 60, 190, 95), tính FCFS, LOOK đi lên và C-SCAN đi lên.</span></summary><div class="ans"><p>FCFS: 90 + 115 + 135 + 160 + 45 + 65 + 130 + 95 = <b>835</b>. LOOK đi lên: 125, 145, 170, 190 (70 trụ), rồi xuống 95, 60, 30, 10 (180 trụ), tổng <b>250</b>. C-SCAN đi lên: tới 199 (79), quay về 0 (199), rồi lên tới 95 phục vụ 10, 30, 60, 95 (95), tổng <b>373</b>, hoặc 174 nếu không tính chặng quay về. Chạy mô phỏng với hàng đợi này để đối chiếu.</p></div></details>
+        <details class="quiz"><summary><span class="q">7. Trong môi trường một người dùng, lập lịch đĩa khác FCFS có ích không?</span></summary><div class="ans"><p>Nếu hàng đợi thường chỉ có một yêu cầu, mọi thuật toán đều chỉ có một lựa chọn và hành xử như FCFS, nên lập lịch không giúp gì. Nhưng ngay cả máy một người dùng cũng có lúc hàng đợi dài: một ứng dụng gửi nhiều yêu cầu bất đồng bộ như khi tạo ảnh thu nhỏ, kernel đọc trước, hoặc ghi dồn các bộ đệm bẩn. Khi đó sắp xếp lại vẫn có ích với HDD.</p></div></details>
+        <details class="quiz"><summary><span class="q">8. Một SSD 2 TB được bảo hành 5 năm với 0,3 DWPD. Tổng lượng dữ liệu được phép ghi trong thời hạn bảo hành là bao nhiêu?</span></summary><div class="ans"><p>Mỗi ngày được ghi 2 × 0,3 = 0,6 TB. Trong 5 năm: 0,6 × 365 × 5 = 1.095 TB, khoảng 1,1 PB. Các hãng thường ghi con số này dưới dạng TBW (terabytes written).</p></div></details>
+        <details class="quiz"><summary><span class="q">9. Một lần ghi 4 KiB từ máy tính buộc bộ điều khiển thu gom rác và chép 3 trang còn hợp lệ. Hệ số khuếch đại ghi của lần đó là bao nhiêu? Vì sao TRIM giúp giảm nó?</span></summary><div class="ans"><p>Thiết bị ghi 1 trang dữ liệu mới cộng 3 trang chép lại, tổng 4 trang cho 1 trang máy tính yêu cầu, hệ số khuếch đại bằng 4. TRIM báo cho thiết bị những trang thuộc tệp đã xóa, nên các trang đó được đánh dấu không hợp lệ và không bị chép khi thu gom rác; khối nạn nhân có ít trang hợp lệ hơn, số lần chép giảm.</p></div></details>
+        <details class="quiz"><summary><span class="q">10. Dùng chẵn lẻ chẵn cho byte <code>0110 1001</code>. Bit chẵn lẻ bằng mấy? Nếu đọc lại được <code>0110 1101</code>, hoặc <code>0111 1101</code>, hệ thống có phát hiện lỗi không?</span></summary><div class="ans"><p>Byte gốc có bốn bit 1, nên bit chẵn lẻ bằng 0. <code>0110 1101</code> có năm bit 1, không khớp, lỗi một bit bị phát hiện. <code>0111 1101</code> có sáu bit 1, khớp với bit chẵn lẻ 0, nên lỗi hai bit này lọt qua. Đó là giới hạn của bit chẵn lẻ; muốn sửa được phải dùng ECC.</p></div></details>
+        <details class="quiz"><summary><span class="q">11. Khối logic 17 hỏng và sector dự phòng đầu tiên nằm sau sector 202. Trượt sector phải chép bao nhiêu sector? Vì sao khi dùng thay sector, bộ điều khiển ưu tiên sector dự phòng cùng trụ?</span></summary><div class="ans"><p>Phải dời các sector 18 tới 202, tức 202 − 18 + 1 = 185 sector. Thay sector thì chỉ chuyển hướng một khối, nhưng nếu sector thay thế nằm ở trụ xa, mỗi lần đọc khối đó cánh tay phải đi xa, phá các tối ưu của thuật toán lập lịch; dùng sector dự phòng cùng trụ giữ khối đó gần các khối kề nó.</p></div></details>
+        <details class="quiz"><summary><span class="q">12. Một hệ thống có 1.000 ổ, mỗi ổ có MTBF 750.000 giờ. Trung bình bao lâu lại có một ổ hỏng?</span></summary><div class="ans"><p>750.000 / 1.000 = 750 giờ, khoảng 31 ngày, tức gần đúng một lần mỗi tháng. Đây là bài tập 11.24 của giáo trình, cho thấy MTBF rất lớn của một ổ không có nghĩa là mảng lớn ít hỏng.</p></div></details>
+        <details class="quiz"><summary><span class="q">13. Một cặp phản chiếu có MTBF mỗi ổ 200.000 giờ và thời gian sửa 24 giờ. Tính thời gian trung bình tới khi mất dữ liệu, giả sử hai ổ hỏng độc lập. Giả thiết đó có thực tế không?</span></summary><div class="ans"><p>200.000² / (2 × 24) = 4 × 10¹⁰ / 48 ≈ 8,33 × 10⁸ giờ, khoảng 95.000 năm. Giả thiết độc lập không thực tế: mất điện, thiên tai, lỗi cùng lô sản xuất và ổ già đều làm hai ổ hỏng có tương quan, nên con số thật nhỏ hơn nhiều.</p></div></details>
+        <details class="quiz"><summary><span class="q">14. Một stripe RAID 5 có ba khối dữ liệu và một khối chẵn lẻ. Còn đọc được D1 = 1100, D2 = 1010, P = 0101; ổ chứa D3 hỏng. D3 bằng bao nhiêu?</span></summary><div class="ans"><p>D3 = D1 ⊕ D2 ⊕ P = 1100 ⊕ 1010 ⊕ 0101 = 0110 ⊕ 0101 = <b>0011</b>. Kiểm tra: 1100 ⊕ 1010 ⊕ 0011 = 0101, đúng bằng P.</p></div></details>
+        <details class="quiz"><summary><span class="q">15. RAID 5 gồm năm ổ, mỗi stripe có bốn khối dữ liệu. Ghi một khối cần bao nhiêu lần truy cập? Ghi bảy khối liên tiếp bắt đầu từ đầu một stripe thì sao?</span></summary><div class="ans"><p>Ghi một khối: đọc khối cũ và chẵn lẻ cũ, ghi khối mới và chẵn lẻ mới, tổng 4 lần. Ghi bảy khối: bốn khối đầu lấp đầy một stripe, nên chỉ cần tính chẵn lẻ từ dữ liệu mới và ghi 5 khối, không phải đọc. Ba khối còn lại nằm ở stripe sau: đọc khối thứ tư chưa đổi của stripe đó, tính chẵn lẻ, rồi ghi 3 khối dữ liệu và 1 khối chẵn lẻ, tổng 5 lần. Cộng lại 10 lần truy cập. Đây là bài tập 11.20 của giáo trình.</p></div></details>
+        <details class="quiz"><summary><span class="q">16. Hộp NAS có sáu ổ 10 TB. Tính dung lượng dùng được và số ổ hỏng chịu được với RAID 0, RAID 1 + 0, RAID 5 và RAID 6.</span></summary><div class="ans"><p>RAID 0: 60 TB, không chịu được ổ nào hỏng. RAID 1 + 0: 30 TB, chắc chắn chịu được 1 ổ, tối đa 3 ổ nếu chúng thuộc ba cặp khác nhau. RAID 5: 50 TB, chịu được 1 ổ. RAID 6: 40 TB, chịu được bất kỳ 2 ổ.</p></div></details>
+        <details class="quiz"><summary><span class="q">17. Có thể bắt tay giữa máy và bộ điều khiển chỉ bằng một bit thay vì hai bit busy và command-ready không?</span></summary><div class="ans"><p>Có. Dùng một bit làm cờ “có việc”. Khi bit bằng 0, bộ điều khiển rảnh. Máy ghi dữ liệu vào data-out rồi đặt bit bằng 1; bộ điều khiển thấy bit bằng 1 thì thực hiện, xong thì xóa bit về 0; máy chờ bit về 0 rồi mới gửi lệnh tiếp. Đây là bài tập 12.2 của giáo trình.</p></div></details>
+        <details class="quiz"><summary><span class="q">18. Chọn thăm dò hay ngắt cho: chuột trong giao diện đồ họa; một cổng nối tiếp đơn lẻ; card mạng tốc độ rất cao đang chịu tải nặng. Giải thích.</span></summary><div class="ans"><p>Chuột và cổng nối tiếp sinh dữ liệu thưa thớt, vào những lúc không đoán trước được, nên dùng ngắt để CPU không phí thời gian hỏi. Card mạng tải nặng gần như lúc nào cũng có gói chờ, nên thăm dò rẻ hơn chi phí xử lý hàng trăm nghìn ngắt mỗi giây; thực tế driver dùng cách lai, chuyển sang thăm dò khi tải cao và quay về ngắt khi tải thấp.</p></div></details>
+        <details class="quiz"><summary><span class="q">19. Một luồng gọi <code>read()</code> 4 KiB trong khi mới có 1 KiB dữ liệu sẵn sàng. Lời gọi chặn, không chặn và bất đồng bộ lần lượt làm gì?</span></summary><div class="ans"><p>Lời gọi chặn treo luồng cho tới khi có đủ dữ liệu (hoặc hết tệp) rồi trả về. Lời gọi không chặn trả về ngay với 1 KiB đang có, luồng phải tự gọi lại để lấy phần còn lại. Lời gọi bất đồng bộ trả về ngay mà chưa có dữ liệu nào, rồi báo cho luồng khi cả 4 KiB đã được truyền xong.</p></div></details>
+        <details class="quiz"><summary><span class="q">20. Theo vòng đời mười bước của một <code>read()</code> chặn: tiến trình đổi trạng thái ở những bước nào? Nếu khối đã có trong bộ đệm cache, những bước nào bị bỏ qua?</span></summary><div class="ans"><p>Tiến trình chuyển từ đang chạy sang chờ ở bước 3, khi được đưa vào hàng đợi chờ của thiết bị; chuyển sang sẵn sàng ở bước 9, khi kernel đưa nó về hàng đợi sẵn sàng; và chạy lại ở bước 10, khi bộ lập lịch cấp CPU. Nếu khối đã có trong bộ đệm cache, kernel chép dữ liệu và trả về ngay ở bước 2, nên các bước 3 tới 10 bị bỏ qua và tiến trình không phải chờ.</p></div></details>
+        <details class="quiz"><summary><span class="q">21. Trong bản đồ hoán đổi của Linux, một ô trang có bộ đếm bằng 3. Điều đó nghĩa là gì, và khi một trong các tiến trình liên quan kết thúc thì sao?</span></summary><div class="ans"><p>Ô đang chứa một trang bị đẩy ra, và trang đó được ba ánh xạ trỏ tới, chẳng hạn một vùng nhớ dùng chung của ba tiến trình. Khi một tiến trình kết thúc, bộ đếm giảm còn 2; ô chỉ được coi là trống khi bộ đếm về 0.</p></div></details>
+
+        <h3 id="thuat-ngu">Glossary <span class="vi">Bảng thuật ngữ Anh–Việt</span></h3>
+        <p>Các thuật ngữ được định nghĩa trong buổi học, sắp theo tên tiếng Anh. Cột cuối dẫn về mục nơi thuật ngữ xuất hiện lần đầu.</p>
+        <details class="quiz glossary"><summary><span class="q">Mở bảng 129 thuật ngữ</span></summary><div class="ans">
+          <div class="tbl-wrap"><table class="tbl glossary-table">
+            <thead><tr><th scope="col">Thuật ngữ</th><th scope="col">Tiếng Việt</th><th scope="col">Mục</th></tr></thead>
+            <tbody>
+              <tr><th scope="row" lang="en">ACPI</th><td>giao diện cấu hình và quản lý điện năng</td><td><a href="#nang-luong">12.4.8</a></td></tr>
+              <tr><th scope="row" lang="en">asynchronous I/O</th><td>vào/ra bất đồng bộ</td><td><a href="#khong-chan">12.3.4</a></td></tr>
+              <tr><th scope="row" lang="en">bandwidth</th><td>băng thông</td><td><a href="#lap-lich-hdd">11.2</a></td></tr>
+              <tr><th scope="row" lang="en">block-device interface</th><td>giao diện thiết bị khối</td><td><a href="#khoi-ky-tu">12.3.1</a></td></tr>
+              <tr><th scope="row" lang="en">block-level striping</th><td>chia dải mức khối</td><td><a href="#song-song">11.8.2</a></td></tr>
+              <tr><th scope="row" lang="en">blocking I/O</th><td>vào/ra chặn</td><td><a href="#khong-chan">12.3.4</a></td></tr>
+              <tr><th scope="row" lang="en">boot blocks</th><td>khối khởi động</td><td><a href="#khoi-khoi-dong">11.5.2</a></td></tr>
+              <tr><th scope="row" lang="en">boot disk, system disk</th><td>đĩa khởi động</td><td><a href="#khoi-khoi-dong">11.5.2</a></td></tr>
+              <tr><th scope="row" lang="en">buffer</th><td>bộ đệm</td><td><a href="#dem">12.4.2</a></td></tr>
+              <tr><th scope="row" lang="en">buffer cache</th><td>bộ đệm cache</td><td><a href="#cache">12.4.3</a></td></tr>
+              <tr><th scope="row" lang="en">bus</th><td>bus</td><td><a href="#phan-cung-io">12.2</a></td></tr>
+              <tr><th scope="row" lang="en">busy-waiting</th><td>chờ bận</td><td><a href="#tham-do">12.2.2</a></td></tr>
+              <tr><th scope="row" lang="en">C-SCAN, circular SCAN</th><td>quét vòng một chiều</td><td><a href="#c-scan">11.2.3</a></td></tr>
+              <tr><th scope="row" lang="en">cache</th><td>cache, bộ nhớ đệm chứa bản sao</td><td><a href="#cache">12.4.3</a></td></tr>
+              <tr><th scope="row" lang="en">character-stream interface</th><td>giao diện dòng ký tự</td><td><a href="#khoi-ky-tu">12.3.1</a></td></tr>
+              <tr><th scope="row" lang="en">checksum</th><td>tổng kiểm tra</td><td><a href="#phat-hien-loi">11.4</a></td></tr>
+              <tr><th scope="row" lang="en">cloud storage</th><td>lưu trữ đám mây</td><td><a href="#cloud">11.7.3</a></td></tr>
+              <tr><th scope="row" lang="en">cluster</th><td>cụm khối</td><td><a href="#dinh-dang">11.5.1</a></td></tr>
+              <tr><th scope="row" lang="en">component-level power management</th><td>quản lý điện năng theo linh kiện</td><td><a href="#nang-luong">12.4.8</a></td></tr>
+              <tr><th scope="row" lang="en">constant angular velocity (CAV)</th><td>vận tốc góc không đổi</td><td><a href="#anh-xa-dia-chi">11.1.5</a></td></tr>
+              <tr><th scope="row" lang="en">constant linear velocity (CLV)</th><td>vận tốc dài không đổi</td><td><a href="#anh-xa-dia-chi">11.1.5</a></td></tr>
+              <tr><th scope="row" lang="en">content-addressable storage</th><td>lưu trữ định địa chỉ theo nội dung</td><td><a href="#luu-tru-doi-tuong">11.8.7</a></td></tr>
+              <tr><th scope="row" lang="en">control register</th><td>thanh ghi điều khiển</td><td><a href="#mmio">12.2.1</a></td></tr>
+              <tr><th scope="row" lang="en">controller, host-bus adapter (HBA)</th><td>bộ điều khiển</td><td><a href="#ket-noi">11.1.4</a></td></tr>
+              <tr><th scope="row" lang="en">copy semantics</th><td>ngữ nghĩa sao chép</td><td><a href="#dem">12.4.2</a></td></tr>
+              <tr><th scope="row" lang="en">cyclic redundancy check (CRC)</th><td>mã dư vòng</td><td><a href="#phat-hien-loi">11.4</a></td></tr>
+              <tr><th scope="row" lang="en">cycle stealing</th><td>đánh cắp chu kỳ</td><td><a href="#dma">12.2.4</a></td></tr>
+              <tr><th scope="row" lang="en">cylinder</th><td>trụ</td><td><a href="#hdd">11.1.1</a></td></tr>
+              <tr><th scope="row" lang="en">daisy chain</th><td>chuỗi nối tiếp</td><td><a href="#phan-cung-io">12.2</a></td></tr>
+              <tr><th scope="row" lang="en">data striping</th><td>chia dải dữ liệu</td><td><a href="#song-song">11.8.2</a></td></tr>
+              <tr><th scope="row" lang="en">deadline scheduler</th><td>bộ lập lịch deadline</td><td><a href="#chon-thuat-toan">11.2.4</a></td></tr>
+              <tr><th scope="row" lang="en">device driver</th><td>driver thiết bị</td><td><a href="#tong-quan-io">12.1</a></td></tr>
+              <tr><th scope="row" lang="en">device-status table</th><td>bảng trạng thái thiết bị</td><td><a href="#lap-lich-io">12.4.1</a></td></tr>
+              <tr><th scope="row" lang="en">direct I/O</th><td>vào/ra trực tiếp</td><td><a href="#khoi-ky-tu">12.3.1</a></td></tr>
+              <tr><th scope="row" lang="en">direct memory access (DMA) controller</th><td>bộ điều khiển truy cập bộ nhớ trực tiếp</td><td><a href="#dma">12.2.4</a></td></tr>
+              <tr><th scope="row" lang="en">direct virtual memory access (DVMA)</th><td>truy cập bộ nhớ ảo trực tiếp</td><td><a href="#dma">12.2.4</a></td></tr>
+              <tr><th scope="row" lang="en">disk arm</th><td>cánh tay đĩa</td><td><a href="#hdd">11.1.1</a></td></tr>
+              <tr><th scope="row" lang="en">double buffering</th><td>đệm kép</td><td><a href="#dem">12.4.2</a></td></tr>
+              <tr><th scope="row" lang="en">drive writes per day (DWPD)</th><td>số lần ghi đầy ổ mỗi ngày</td><td><a href="#nvm">11.1.2</a></td></tr>
+              <tr><th scope="row" lang="en">elevator algorithm</th><td>thuật toán thang máy</td><td><a href="#scan">11.2.2</a></td></tr>
+              <tr><th scope="row" lang="en">error-correction code (ECC)</th><td>mã sửa lỗi</td><td><a href="#phat-hien-loi">11.4</a></td></tr>
+              <tr><th scope="row" lang="en">fibre channel (FC)</th><td>kênh quang (fibre channel)</td><td><a href="#host-attached">11.7.1</a></td></tr>
+              <tr><th scope="row" lang="en">first-come, first-served (FCFS)</th><td>đến trước phục vụ trước</td><td><a href="#fcfs">11.2.1</a></td></tr>
+              <tr><th scope="row" lang="en">first-level / second-level interrupt handler (FLIH / SLIH)</th><td>trình xử lý ngắt cấp một / cấp hai</td><td><a href="#ngat">12.2.3</a></td></tr>
+              <tr><th scope="row" lang="en">flash translation layer (FTL)</th><td>lớp dịch flash</td><td><a href="#nand-ftl">11.1.2.2</a></td></tr>
+              <tr><th scope="row" lang="en">flow control</th><td>điều khiển luồng</td><td><a href="#streams">12.6</a></td></tr>
+              <tr><th scope="row" lang="en">garbage collection</th><td>thu gom rác</td><td><a href="#nand-ftl">11.1.2.2</a></td></tr>
+              <tr><th scope="row" lang="en">handshaking</th><td>bắt tay</td><td><a href="#tham-do">12.2.2</a></td></tr>
+              <tr><th scope="row" lang="en">hard disk drive (HDD)</th><td>ổ đĩa cứng</td><td><a href="#tong-quan-luu-tru">11.1</a></td></tr>
+              <tr><th scope="row" lang="en">hard error / soft error</th><td>lỗi cứng / lỗi mềm</td><td><a href="#phat-hien-loi">11.4</a></td></tr>
+              <tr><th scope="row" lang="en">head crash</th><td>va đầu từ</td><td><a href="#hdd">11.1.1</a></td></tr>
+              <tr><th scope="row" lang="en">high-performance event timer (HPET)</th><td>bộ định thời sự kiện độ chính xác cao</td><td><a href="#dong-ho">12.3.3</a></td></tr>
+              <tr><th scope="row" lang="en">host-attached storage</th><td>lưu trữ gắn với máy</td><td><a href="#host-attached">11.7.1</a></td></tr>
+              <tr><th scope="row" lang="en">hot spare</th><td>ổ dự phòng nóng</td><td><a href="#muc-raid">11.8.3</a></td></tr>
+              <tr><th scope="row" lang="en">I/O channel</th><td>kênh vào/ra</td><td><a href="#hieu-nang">12.7</a></td></tr>
+              <tr><th scope="row" lang="en">I/O subsystem</th><td>hệ con vào/ra</td><td><a href="#tong-quan-io">12.1</a></td></tr>
+              <tr><th scope="row" lang="en">input/output operations per second (IOPS)</th><td>số thao tác vào/ra mỗi giây</td><td><a href="#lap-lich-nvm">11.3</a></td></tr>
+              <tr><th scope="row" lang="en">interrupt</th><td>ngắt</td><td><a href="#ngat">12.2.3</a></td></tr>
+              <tr><th scope="row" lang="en">interrupt chaining</th><td>xâu chuỗi ngắt</td><td><a href="#ngat">12.2.3</a></td></tr>
+              <tr><th scope="row" lang="en">interrupt handler</th><td>trình xử lý ngắt</td><td><a href="#ngat">12.2.3</a></td></tr>
+              <tr><th scope="row" lang="en">interrupt priority levels</th><td>mức ưu tiên ngắt</td><td><a href="#ngat">12.2.3</a></td></tr>
+              <tr><th scope="row" lang="en">interrupt vector</th><td>vectơ ngắt</td><td><a href="#ngat">12.2.3</a></td></tr>
+              <tr><th scope="row" lang="en">interrupt-request line</th><td>đường yêu cầu ngắt</td><td><a href="#ngat">12.2.3</a></td></tr>
+              <tr><th scope="row" lang="en">iSCSI</th><td>SCSI qua mạng IP</td><td><a href="#nas">11.7.2</a></td></tr>
+              <tr><th scope="row" lang="en">logical block, logical block address (LBA)</th><td>khối logic, địa chỉ khối logic</td><td><a href="#anh-xa-dia-chi">11.1.5</a></td></tr>
+              <tr><th scope="row" lang="en">logical formatting</th><td>định dạng logic</td><td><a href="#dinh-dang">11.5.1</a></td></tr>
+              <tr><th scope="row" lang="en">LOOK / C-LOOK</th><td>quét tới yêu cầu xa nhất / bản vòng một chiều</td><td><a href="#c-scan">11.2.3</a></td></tr>
+              <tr><th scope="row" lang="en">low-level (physical) formatting</th><td>định dạng cấp thấp</td><td><a href="#dinh-dang">11.5.1</a></td></tr>
+              <tr><th scope="row" lang="en">major and minor device numbers</th><td>số chính và số phụ của thiết bị</td><td><a href="#giao-dien-ung-dung">12.3</a></td></tr>
+              <tr><th scope="row" lang="en">maskable / nonmaskable interrupt</th><td>ngắt che được / không che được</td><td><a href="#ngat">12.2.3</a></td></tr>
+              <tr><th scope="row" lang="en">master boot record (MBR)</th><td>bản ghi khởi động chính</td><td><a href="#khoi-khoi-dong">11.5.2</a></td></tr>
+              <tr><th scope="row" lang="en">mean time between failures (MTBF)</th><td>thời gian trung bình giữa hai lần hỏng</td><td><a href="#do-tin-cay">11.8.1</a></td></tr>
+              <tr><th scope="row" lang="en">mean time to repair</th><td>thời gian sửa trung bình</td><td><a href="#do-tin-cay">11.8.1</a></td></tr>
+              <tr><th scope="row" lang="en">memory-mapped I/O</th><td>vào/ra ánh xạ bộ nhớ</td><td><a href="#mmio">12.2.1</a></td></tr>
+              <tr><th scope="row" lang="en">mirroring, mirrored volume</th><td>phản chiếu, tập đĩa phản chiếu</td><td><a href="#do-tin-cay">11.8.1</a></td></tr>
+              <tr><th scope="row" lang="en">mount</th><td>gắn hệ thống tệp</td><td><a href="#dinh-dang">11.5.1</a></td></tr>
+              <tr><th scope="row" lang="en">mount table</th><td>bảng gắn kết</td><td><a href="#vong-doi-io">12.5</a></td></tr>
+              <tr><th scope="row" lang="en">NAND flash</th><td>bộ nhớ flash NAND</td><td><a href="#nvm">11.1.2</a></td></tr>
+              <tr><th scope="row" lang="en">network-attached storage (NAS)</th><td>lưu trữ gắn qua mạng</td><td><a href="#nas">11.7.2</a></td></tr>
+              <tr><th scope="row" lang="en">nonblocking I/O</th><td>vào/ra không chặn</td><td><a href="#khong-chan">12.3.4</a></td></tr>
+              <tr><th scope="row" lang="en">nonvolatile memory device (NVM)</th><td>thiết bị nhớ không khả biến</td><td><a href="#tong-quan-luu-tru">11.1</a></td></tr>
+              <tr><th scope="row" lang="en">nonvolatile storage (NVS)</th><td>lưu trữ không khả biến</td><td><a href="#tong-quan-luu-tru">11.1</a></td></tr>
+              <tr><th scope="row" lang="en">NVM express (NVMe)</th><td>giao tiếp NVMe</td><td><a href="#ket-noi">11.1.4</a></td></tr>
+              <tr><th scope="row" lang="en">object storage</th><td>lưu trữ đối tượng</td><td><a href="#luu-tru-doi-tuong">11.8.7</a></td></tr>
+              <tr><th scope="row" lang="en">over-provisioning</th><td>dự phòng dung lượng</td><td><a href="#nand-ftl">11.1.2.2</a></td></tr>
+              <tr><th scope="row" lang="en">parity bit</th><td>bit chẵn lẻ</td><td><a href="#phat-hien-loi">11.4</a></td></tr>
+              <tr><th scope="row" lang="en">partition</th><td>phân vùng</td><td><a href="#dinh-dang">11.5.1</a></td></tr>
+              <tr><th scope="row" lang="en">platter</th><td>đĩa từ</td><td><a href="#hdd">11.1.1</a></td></tr>
+              <tr><th scope="row" lang="en">polling</th><td>thăm dò</td><td><a href="#tham-do">12.2.2</a></td></tr>
+              <tr><th scope="row" lang="en">port</th><td>cổng</td><td><a href="#phan-cung-io">12.2</a></td></tr>
+              <tr><th scope="row" lang="en">positioning time, random-access time</th><td>thời gian định vị</td><td><a href="#hdd">11.1.1</a></td></tr>
+              <tr><th scope="row" lang="en">power collapse</th><td>sập nguồn sâu</td><td><a href="#nang-luong">12.4.8</a></td></tr>
+              <tr><th scope="row" lang="en">programmable interval timer</th><td>bộ định thời lập trình được</td><td><a href="#dong-ho">12.3.3</a></td></tr>
+              <tr><th scope="row" lang="en">programmed I/O (PIO)</th><td>vào/ra do CPU tự chuyển</td><td><a href="#dma">12.2.4</a></td></tr>
+              <tr><th scope="row" lang="en">RAID, redundant arrays of independent disks</th><td>mảng ổ độc lập có dư thừa</td><td><a href="#raid">11.8</a></td></tr>
+              <tr><th scope="row" lang="en">RAID levels 0, 1, 4, 5, 6</th><td>các mức RAID</td><td><a href="#muc-raid">11.8.3</a></td></tr>
+              <tr><th scope="row" lang="en">RAID 0 + 1, RAID 1 + 0</th><td>chia dải rồi phản chiếu / phản chiếu rồi chia dải</td><td><a href="#muc-raid">11.8.3</a></td></tr>
+              <tr><th scope="row" lang="en">RAM drive, RAM disk</th><td>ổ RAM</td><td><a href="#ram-drive">11.1.3</a></td></tr>
+              <tr><th scope="row" lang="en">raw disk, raw I/O</th><td>đĩa thô, vào/ra thô</td><td><a href="#dinh-dang">11.5.1</a></td></tr>
+              <tr><th scope="row" lang="en">read–write head</th><td>đầu đọc–ghi</td><td><a href="#hdd">11.1.1</a></td></tr>
+              <tr><th scope="row" lang="en">read-modify-write cycle</th><td>chu trình đọc–sửa–ghi</td><td><a href="#muc-raid">11.8.3</a></td></tr>
+              <tr><th scope="row" lang="en">replication</th><td>sao chép sang nơi khác</td><td><a href="#muc-raid">11.8.3</a></td></tr>
+              <tr><th scope="row" lang="en">rotational latency</th><td>độ trễ quay</td><td><a href="#hdd">11.1.1</a></td></tr>
+              <tr><th scope="row" lang="en">SCAN</th><td>quét qua lại</td><td><a href="#scan">11.2.2</a></td></tr>
+              <tr><th scope="row" lang="en">scatter–gather</th><td>gom–rải</td><td><a href="#dma">12.2.4</a></td></tr>
+              <tr><th scope="row" lang="en">secondary storage</th><td>lưu trữ thứ cấp</td><td><a href="#tong-quan-luu-tru">11.1</a></td></tr>
+              <tr><th scope="row" lang="en">sector</th><td>cung</td><td><a href="#hdd">11.1.1</a></td></tr>
+              <tr><th scope="row" lang="en">sector sparing (forwarding)</th><td>thay sector</td><td><a href="#khoi-hong">11.5.3</a></td></tr>
+              <tr><th scope="row" lang="en">sector slipping</th><td>trượt sector</td><td><a href="#khoi-hong">11.5.3</a></td></tr>
+              <tr><th scope="row" lang="en">seek time</th><td>thời gian tìm</td><td><a href="#hdd">11.1.1</a></td></tr>
+              <tr><th scope="row" lang="en">shortest-seek-time-first (SSTF)</th><td>thời gian tìm ngắn nhất trước</td><td><a href="#c-scan">11.2.3</a></td></tr>
+              <tr><th scope="row" lang="en">snapshot</th><td>ảnh chụp nhanh</td><td><a href="#muc-raid">11.8.3</a></td></tr>
+              <tr><th scope="row" lang="en">socket</th><td>socket mạng</td><td><a href="#thiet-bi-mang">12.3.2</a></td></tr>
+              <tr><th scope="row" lang="en">software interrupt, trap</th><td>ngắt mềm</td><td><a href="#ngat">12.2.3</a></td></tr>
+              <tr><th scope="row" lang="en">solid-state disk (SSD)</th><td>ổ thể rắn</td><td><a href="#nvm">11.1.2</a></td></tr>
+              <tr><th scope="row" lang="en">spool, spooling</th><td>vùng chờ in, spooling</td><td><a href="#spooling">12.4.4</a></td></tr>
+              <tr><th scope="row" lang="en">status register</th><td>thanh ghi trạng thái</td><td><a href="#mmio">12.2.1</a></td></tr>
+              <tr><th scope="row" lang="en">storage array</th><td>mảng lưu trữ</td><td><a href="#san">11.7.4</a></td></tr>
+              <tr><th scope="row" lang="en">storage-area network (SAN)</th><td>mạng lưu trữ</td><td><a href="#san">11.7.4</a></td></tr>
+              <tr><th scope="row" lang="en">STREAMS</th><td>cơ chế STREAMS</td><td><a href="#streams">12.6</a></td></tr>
+              <tr><th scope="row" lang="en">swap map</th><td>bản đồ hoán đổi</td><td><a href="#vi-du-swap">11.6.3</a></td></tr>
+              <tr><th scope="row" lang="en">tertiary storage</th><td>lưu trữ cấp ba</td><td><a href="#tong-quan-luu-tru">11.1</a></td></tr>
+              <tr><th scope="row" lang="en">track</th><td>rãnh</td><td><a href="#hdd">11.1.1</a></td></tr>
+              <tr><th scope="row" lang="en">transfer rate</th><td>tốc độ truyền</td><td><a href="#hdd">11.1.1</a></td></tr>
+              <tr><th scope="row" lang="en">vectored I/O</th><td>vào/ra theo vectơ</td><td><a href="#vectored">12.3.5</a></td></tr>
+              <tr><th scope="row" lang="en">volume</th><td>tập đĩa</td><td><a href="#dinh-dang">11.5.1</a></td></tr>
+              <tr><th scope="row" lang="en">wakelock</th><td>khóa thức</td><td><a href="#nang-luong">12.4.8</a></td></tr>
+              <tr><th scope="row" lang="en">wear leveling</th><td>cân bằng hao mòn</td><td><a href="#nand-ftl">11.1.2.2</a></td></tr>
+              <tr><th scope="row" lang="en">write amplification</th><td>khuếch đại ghi</td><td><a href="#lap-lich-nvm">11.3</a></td></tr>
+            </tbody>
+          </table></div>
+        </div></details>
+        <h3 id="giao-trinh">Textbook Reference <span class="vi">Giáo trình tham chiếu</span></h3>
+        <p class="src">Biên soạn theo Abraham Silberschatz, Peter Baer Galvin và Greg Gagne, <cite>Operating System Concepts</cite>, ấn bản 10, Wiley, 2018: Chapter 11 <span lang="en">Mass-Storage Structure</span> (từ tr. 449); Chapter 12 <span lang="en">I/O Systems</span> (từ tr. 489). Tên chương và tên mục trong bài giữ đúng như giáo trình để bạn tra cứu song song. Các thuật toán SSTF, LOOK, C-LOOK lấy từ ấn bản 9. Các hộp “Bối cảnh 2026” cập nhật những chỗ đã thay đổi sau năm 2018. Tình huống, số liệu minh họa, sơ đồ, mô phỏng và bài tập được soạn riêng cho khóa học này, trừ những bài có ghi rõ số bài tập của giáo trình.</p>
+        <nav class="pager" aria-label="Điều hướng khóa học">
+          <a href="buoi-4.html"><small>← Buổi trước</small>Main Memory &amp; Virtual Memory</a>
+          <a class="next" href="index.html"><small>Khóa học →</small>Trang chủ OS</a>
+        </nav>
+      </section>
+    </article></main>
+  </div>
+</body>
+</html>
